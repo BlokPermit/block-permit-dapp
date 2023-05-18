@@ -1,5 +1,5 @@
-import React, {FC, ReactNode, useEffect} from 'react';
-import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
+import React, {FC, ReactNode} from 'react';
+import {AiOutlineFundProjectionScreen, GiFox, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
 import {useRouter} from "next/router";
 import Link from "next/link";
 
@@ -26,13 +26,12 @@ const Navigation: FC = () => {
             href: '/documents',
             icon: <HiOutlineDocumentSearch size={25}/>,
         },
+        {
+            label: 'Metamask Auth',
+            href: '/auth',
+            icon: <GiFox size={25}/>,
+        },
     ];
-
-    useEffect(
-        () => {
-            console.log(pathname)
-        }
-    )
 
     return (
         <nav aria-label="Main Nav" className="mt-6 flex flex-col space-y-5">
