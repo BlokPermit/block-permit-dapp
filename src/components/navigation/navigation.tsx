@@ -1,11 +1,11 @@
 import React, {FC, ReactNode, useEffect} from 'react';
-import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardFill} from "react-icons/all";
+import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
 import {useRouter} from "next/router";
 import Link from "next/link";
 
 
 const Navigation: FC = () => {
-    const { pathname } = useRouter();
+    const {pathname} = useRouter();
     const adminRoutes: {
         label: string;
         href: string;
@@ -14,7 +14,7 @@ const Navigation: FC = () => {
         {
             label: 'Dashboard',
             href: '/dashboard',
-            icon: <RiDashboardFill size={25}/>,
+            icon: <RiDashboardLine size={25}/>,
         },
         {
             label: 'Projects',
