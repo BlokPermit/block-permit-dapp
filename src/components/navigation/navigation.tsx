@@ -1,6 +1,7 @@
 import React, {FC, ReactNode, useEffect} from 'react';
 import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardFill} from "react-icons/all";
 import {useRouter} from "next/router";
+import Link from "next/link";
 
 
 const Navigation: FC = () => {
@@ -36,7 +37,7 @@ const Navigation: FC = () => {
     return (
         <nav aria-label="Main Nav" className="mt-6 flex flex-col space-y-5">
             {adminRoutes.map((item, index) => (
-                <a
+                <Link
                     key={index}
                     href={item.href}
                     className={`flex items-center gap-2 rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-100 ${pathname == item.href ? 'bg-gray-100' : ''}`}
@@ -44,7 +45,7 @@ const Navigation: FC = () => {
 
                     <div className="pr-3">{item.icon}</div>
                     <span className="text-md font-medium"> {item.label} </span>
-                </a>
+                </Link>
             ))}
         </nav>
     );
