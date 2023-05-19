@@ -16,6 +16,7 @@
     "production:build": "npx prisma generate && npx prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@moralisweb3/next": "^2.21.0",
     "@prisma/client": "^4.14.1",
     "@types/node": "20.1.7",
     "@types/react": "18.2.6",

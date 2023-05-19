@@ -1,37 +1,82 @@
-import React, {useContext} from 'react';
-import {AuthContext} from "@/context/AuthContext";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import {signIn, useSession} from "next-auth/react";
+import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
+import { useRouter } from "next/router";
+import { useAuthRequestChallengeEvm } from "@moralisweb3/next";
+import {useEffect} from "react";
+
+function SignIn() {
+    const { data: session, status } = useSession();
+    const { connectAsync } = useConnect();
+    const { disconnectAsync } = useDisconnect();
+    const { isConnected } = useAccount();
+    const { signMessageAsync } = useSignMessage();
+    const { requestChallengeAsync } = useAuthRequestChallengeEvm();
+    const { push } = useRouter();
+
+    useEffect(() => {
+        if (status === 'authenticated' && session) {
+            push('/dashboard');
+        }
+    }, [status, session, push]);
+
+    const handleAuth = async () => {
+        if (isConnected) {
+            await disconnectAsync();
+        }
+
+        const { account, chain } = await connectAsync({
+            connector: new MetaMaskConnector(),
+        });
+
+        /*
+        # Additional smart contract authentication using AuthenticationOwner smart contract.
+
+        const isAllowed = await ourSmartContract.checkAccess(account);
+
+        if (!isAllowed) {
+            setError('You are not allowed to access the application.');
+            return;
+        }
+         */
+
+        // @ts-ignore
+        const { message } = await requestChallengeAsync({
+            address: account,
+            chainId: chain.id,
+        });
+
+        const signature = await signMessageAsync({ message });
+
+        // @ts-ignore
+        const { url } = await signIn("moralis-auth", {
+            message,
+            signature,
+            redirect: false,
+            callbackUrl: "/dashboard",
+        });
+
+        await push(url);
+    };
 
 
-const Auth = () => {
-    const {account, connectWallet, error} = useContext(AuthContext);
     return (
-        <div className="container">
-            <div className="box">
-                <h1 className="block text-xl">
-                    MetaMask
-                </h1>
-                {account ? (
-                    <span className="block mt-2">Connected.</span>
-                ) : (
-                    <span className="block mt-2">Please connect a wallet.</span>
-                )}
-
-
-                {account ? (
-                    <div className="account-box mt-2">
-                        Your address:  <p className="shadow-border text-orange-500 pt-1">{account}</p>
-                    </div>
-                ) : (
-                    <button
-                        className="inline-block rounded-lg px-4 py-2 text-sm font-medium text-white-500 hover:text-orange-500 bg-orange-500 hover:bg-gray-50 focus:relative mt-4" onClick={connectWallet}
-                    >
-                        Connect Wallet
-                    </button>
-                )}
-                {error && <p className={`error shadow-border`}>{`Error: ${error}`}</p>}
-            </div>
+        <div className="flex flex-col items-center justify-center h-full ">
+            <img
+                src="/images/metamask-logo.png"
+                alt="Metamask Logo"
+                className="w-500 h-300 mb-4"
+            />
+            <h1 className="text-4xl font-semibold mb-4 pt-10 text-black">Login with Metamask</h1>
+            <p className="text-gray-500 mb-8">Please connect a wallet.</p>
+            <button
+                className="py-3 px-6 bg-orange-400 hover:bg-orange-500 text-white rounded-3xl font-medium"
+                onClick={handleAuth}
+            >
+                Connect Wallet
+            </button>
         </div>
     );
-};
+}
 
-export default Auth;
+export default SignIn;

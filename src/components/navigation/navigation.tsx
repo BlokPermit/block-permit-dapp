@@ -1,5 +1,5 @@
 import React, {FC, ReactNode} from 'react';
-import {AiOutlineFundProjectionScreen, GiFox, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
+import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
 import {useRouter} from "next/router";
 import Link from "next/link";
 
@@ -25,11 +25,6 @@ const Navigation: FC = () => {
             label: 'Documents',
             href: '/documents',
             icon: <HiOutlineDocumentSearch size={25}/>,
-        },
-        {
-            label: 'Metamask Auth',
-            href: '/auth',
-            icon: <GiFox size={25}/>,
         },
     ];
 
