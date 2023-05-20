@@ -1,6 +1,8 @@
 import React from 'react';
 import {getSession} from "next-auth/react";
 import cache from "memory-cache";
+import DocumentPlaceholder from "@/components/placeholders/DocumentPlaceholder";
+import ProjectPlaceholder from "@/components/placeholders/ProjectPlaceholder";
 
 const Dashboard = () => {
 
@@ -8,22 +10,8 @@ const Dashboard = () => {
         <div className="mt-2">
             <h1 className="text-neutral-500 text-2xl font-semibold">Recent projects</h1>
             <div className="flex flex-wrap mt-3">
-                {Array.from({length: 3}).map((_, index) => (
-                    <div key={index} className="border border-neutral-200 shadow rounded-md p-5 max-w-sm w-full mr-6 my-2">
-                        <div className="animate-pulse flex space-x-4">
-                            <div className="rounded-full bg-neutral-300 h-10 w-10"></div>
-                            <div className="flex-1 space-y-6 py-1">
-                                <div className="h-2 bg-neutral-300 rounded"></div>
-                                <div className="space-y-3">
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                                        <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                                    </div>
-                                    <div className="h-2 bg-neutral-300 rounded"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {Array.from({length: 3}).map(() => (
+                    <ProjectPlaceholder/>
                 ))}</div>
         </div>
         <div className="mt-10">
@@ -35,52 +23,15 @@ const Dashboard = () => {
             </span>
             </div>
             <div className="flex flex-wrap mt-3">
-                {Array.from({length: 5}).map((_, index) => (
-                    <div key={index} className="border border-neutral-200 shadow rounded-md p-5 max-w-sm w-full mr-6 my-2">
-                        <div className="animate-pulse flex space-x-4">
-                            <div className="rounded-full bg-neutral-300 h-10 w-10"></div>
-                            <div className="flex-1 space-y-6 py-1">
-                                <div className="h-2 bg-neutral-300 rounded"></div>
-                                <div className="space-y-3">
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                                        <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                                    </div>
-                                    <div className="h-2 bg-neutral-300 rounded"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {Array.from({length: 5}).map(() => (
+                    <ProjectPlaceholder/>
                 ))}</div>
         </div>
         <div className="mt-10">
             <h1 className="text-neutral-500 text-2xl font-semibold mt-10">Recent document</h1>
             <div className="flex flex-wrap mt-3">
-                {Array.from({length: 3}).map((_, index) => (
-                    <div key={index} className="border border-neutral-200 shadow rounded-md p-5 max-w-xs w-full mr-6 my-2 ">
-                        <div className="animate-pulse flex space-x-4">
-                            <div className="flex-1 space-y-6 py-1">
-                                <div className="h-2 bg-neutral-300 rounded"></div>
-                                <div className="space-y-3">
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                                        <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                                    </div>
-                                    <div className="h-2 bg-neutral-300 rounded"></div>
-
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                                        <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                                    </div>
-                                    <div className="h-2 bg-neutral-300 rounded"></div>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                                        <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {Array.from({length: 3}).map(() => (
+                    <DocumentPlaceholder/>
                 ))}</div>
         </div>
     </div>);
