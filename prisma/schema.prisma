@@ -31,3 +31,17 @@ model Investor {
   Project   Project? @relation(fields: [projectId], references: [id])
   projectId Int?
 }
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String?
+  address  String
+  userRole UserRole
+}
+
+enum UserRole {
+  PROJECT_MANAGER
+  OPINION_PROVIDER
+  ADMINISTRATIVE_AUTHORITY
+}
