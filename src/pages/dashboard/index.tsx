@@ -5,7 +5,6 @@ import DocumentPlaceholder from "@/components/placeholders/DocumentPlaceholder";
 import ProjectPlaceholder from "@/components/placeholders/ProjectPlaceholder";
 
 const Dashboard = () => {
-
     return (<div className="px-12 pt-6">
         <div className="mt-2">
             <h1 className="text-neutral-500 text-2xl font-semibold">Recent projects</h1>
@@ -16,7 +15,7 @@ const Dashboard = () => {
         </div>
         <div className="mt-10">
             <div className="flex items-center">
-                <h1 className="text-neutral-500 text-2xl font-semibold mr-3">Awaiting your approval</h1><span
+                <h1 className="text-neutral-500 text-2xl font-semibold mr-3">Awaiting approval</h1><span
                 className="inline-flex items-center justify-center rounded-full bg-amber-100 px-2.5 py-0.5 text-amber-700  h-1/4 mt-0.5"
             >
             <p className="whitespace-nowrap text-sm">1 new project</p>
@@ -34,6 +33,7 @@ const Dashboard = () => {
                     <DocumentPlaceholder/>
                 ))}</div>
         </div>
+
     </div>);
 };
 
