@@ -10,10 +10,10 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
     const router = useRouter();
     const showSidebar = router.pathname !== '/auth';
     return (
-        <div className={'flex flex-row h-screen bg-neutral-100'}>
+        <div className='flex flex-row h-screen bg-neutral-100'>
             {showSidebar && <Sidebar />}
             <div className={'w-full'}>
-                <main className={'py-10 px-20 w-full h-full'}>{children}</main>
+                <main className={' w-full h-full'}>{children}</main>
             </div>
         </div>
     );

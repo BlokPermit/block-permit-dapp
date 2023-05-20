@@ -37,7 +37,7 @@ const Navigation: FC = () => {
                     className={`flex items-center gap-2 rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-100 ${pathname == item.href ? 'bg-gray-100' : ''}`}
                 >
 
-                    <div className="pr-3">{item.icon}</div>
+                    <div className="pr-2">{item.icon}</div>
                     <span className="text-md font-medium"> {item.label} </span>
                 </Link>
             ))}

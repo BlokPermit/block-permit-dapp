@@ -3,8 +3,9 @@ import {getSession} from "next-auth/react";
 import cache from "memory-cache";
 
 const Dashboard = () => {
-    return (
+    return (<div className="px-12 py-12">
         <h1 className="text-black text-3xl font-semibold">Dashboard</h1>
+        </div>
     );
 };
 

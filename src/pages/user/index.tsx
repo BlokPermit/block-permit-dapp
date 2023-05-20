@@ -6,7 +6,7 @@ import {useUser} from "@/context/UserContext";
 const Documents = () => {
     const {accountAddress} = useUser();
     return (
-        <div>
+        <div className="px-12 py-12">
 
         <div className="flex mb-8">
             <Jazzicon
