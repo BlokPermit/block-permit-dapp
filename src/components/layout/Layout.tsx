@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from 'react';
-import Sidebar from "@/components/sidebar/sidebar";
+import Sidebar from "@/components/sidebar/Sidebar";
 import {useRouter} from "next/router";
 
 interface LayoutProps {

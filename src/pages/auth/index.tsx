@@ -1,18 +1,21 @@
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
-import {signIn, useSession} from "next-auth/react";
-import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
-import { useRouter } from "next/router";
-import { useAuthRequestChallengeEvm } from "@moralisweb3/next";
+import {MetaMaskConnector} from "wagmi/connectors/metaMask";
+import { signIn, useSession} from "next-auth/react";
+import {useAccount, useConnect, useSignMessage, useDisconnect} from "wagmi";
+import {useRouter} from "next/router";
+import {useAuthRequestChallengeEvm} from "@moralisweb3/next";
 import {useEffect} from "react";
+import {useUser} from "@/context/UserContext";
 
 function SignIn() {
-    const { data: session, status } = useSession();
-    const { connectAsync } = useConnect();
-    const { disconnectAsync } = useDisconnect();
-    const { isConnected } = useAccount();
-    const { signMessageAsync } = useSignMessage();
-    const { requestChallengeAsync } = useAuthRequestChallengeEvm();
-    const { push } = useRouter();
+    const {data: session, status} = useSession();
+    const {connectAsync} = useConnect();
+    const {disconnectAsync} = useDisconnect();
+    const {isConnected} = useAccount();
+    const {signMessageAsync} = useSignMessage();
+    const {requestChallengeAsync} = useAuthRequestChallengeEvm();
+    const {push} = useRouter();
+    const { setAccountAddress } = useUser();
+
 
     useEffect(() => {
         if (status === 'authenticated' && session) {
@@ -25,9 +28,11 @@ function SignIn() {
             await disconnectAsync();
         }
 
-        const { account, chain } = await connectAsync({
+        const {account, chain} = await connectAsync({
             connector: new MetaMaskConnector(),
         });
+
+        setAccountAddress(account);
 
         /*
         # Additional smart contract authentication using AuthenticationOwner smart contract.
@@ -41,15 +46,15 @@ function SignIn() {
          */
 
         // @ts-ignore
-        const { message } = await requestChallengeAsync({
+        const {message} = await requestChallengeAsync({
             address: account,
             chainId: chain.id,
         });
 
-        const signature = await signMessageAsync({ message });
+        const signature = await signMessageAsync({message});
 
         // @ts-ignore
-        const { url } = await signIn("moralis-auth", {
+        const {url} = await signIn("moralis-auth", {
             message,
             signature,
             redirect: false,

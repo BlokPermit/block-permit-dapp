@@ -11,11 +11,8 @@ const Dashboard = () => {
 export async function getServerSideProps(context: any) {
     const session = await getSession(context);
 
-
-
     // redirect if not authenticated
     if (!session) {
-        console.log('no session', session);
         return {
             redirect: {
                 destination: "/auth",
@@ -24,11 +21,9 @@ export async function getServerSideProps(context: any) {
         };
     }
 
-    console.log('is session', session.expires);
-
     return {
-        props: { user: session.user },
-    };
+        props: {}
+    }
 }
 
 export default Dashboard;
