@@ -1,8 +1,12 @@
 import React from 'react';
 
-const DocumentPlaceholder = () => {
+interface PlaceholderProps {
+    key: number
+}
+
+const DocumentPlaceholder = (props: PlaceholderProps) => {
     return (
-        <div className="border border-neutral-200 shadow rounded-md p-5 max-w-xs w-full mr-6 my-2 ">
+        <div key={props.key} className="border border-neutral-200 shadow rounded-md p-5 max-w-xs w-full mr-6 my-2 ">
             <div className="animate-pulse flex space-x-4">
                 <div className="flex-1 space-y-6 py-1">
                     <div className="h-2 bg-neutral-300 rounded"></div>

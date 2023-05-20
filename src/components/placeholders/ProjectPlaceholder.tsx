@@ -1,8 +1,12 @@
 import React from 'react';
 
-function ProjectPlaceholder() {
+interface PlaceholderProps {
+    key: number
+}
+
+function ProjectPlaceholder(props: PlaceholderProps) {
     return (
-        <div className="border border-neutral-200 shadow rounded-md p-5 max-w-sm w-full mr-6 my-2">
+        <div key={props.key} className="border border-neutral-200 shadow rounded-md p-5 max-w-sm w-full mr-6 my-2">
             <div className="animate-pulse flex space-x-4">
                 <div className="rounded-full bg-neutral-300 h-10 w-10"></div>
                 <div className="flex-1 space-y-6 py-1">
