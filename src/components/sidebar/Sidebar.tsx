@@ -1,18 +1,13 @@
 import Navigation from "@/components/navigation/Navigation";
 import Jazzicon from "react-jazzicon";
 import {useUser} from "@/context/UserContext";
-import {useEffect, useState} from "react";
+import Link from "next/link";
+import {useRouter} from "next/router";
 
 export default function Sidebar() {
-    const { accountAddress } = useUser();
-    const [seed, setSeed] = useState<number| null>(null);
+    const {pathname} = useRouter();
+    const {accountAddress} = useUser();
 
-    useEffect(() => {
-        if (!seed) {
-            const generatedSeed = Math.round(Math.random() * 10000000);
-            setSeed(generatedSeed);
-        }
-    }, [seed]);
     return (
 
         <div style={{width: 350}} className="flex h-screen flex-col justify-between border-e bg-white">
@@ -27,9 +22,9 @@ export default function Sidebar() {
             </div>
 
             <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-                <a href="@/app/components/page#" className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
+                <Link href="/user" className={`flex items-center gap-2  p-4 hover:bg-gray-50 ${pathname == "/user" ? 'bg-gray-100' : 'bg-white'}`}>
                     <Jazzicon
-                        seed={seed as number}
+                        seed={10015}
                         diameter={40}
                     />
 
@@ -40,7 +35,7 @@ export default function Sidebar() {
                             <span className="text-neutral-500">{accountAddress}</span>
                         </p>
                     </div>
-                </a>
+                </Link>
             </div>
         </div>
     )
