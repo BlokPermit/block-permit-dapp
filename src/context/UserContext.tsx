@@ -1,4 +1,4 @@
-import React, {createContext, FC, ReactNode, useContext, useState} from 'react';
+import React, {createContext, FC, ReactNode, useContext, useEffect, useState} from 'react';
 
 interface LayoutProps {
     children: ReactNode;
@@ -17,7 +17,23 @@ const UserContext = createContext<UserContextType>({
 export const useUser = () => useContext(UserContext);
 
 export const UserProvider: FC<LayoutProps> = ({ children }) => {
-    const [accountAddress, setAccountAddress] = useState<string | null>(null);
+    const [accountAddress, setAccountAddressState] = useState<string | null>(null);
+
+    useEffect(() => {
+        const storedAddress = localStorage.getItem('accountAddress');
+        if (storedAddress) {
+            setAccountAddressState(storedAddress);
+        }
+    }, []);
+
+    const setAccountAddress = (address: string | null) => {
+        setAccountAddressState(address);
+        if (address) {
+            localStorage.setItem('accountAddress', address);
+        } else {
+            localStorage.removeItem('accountAddress');
+        }
+    };
 
     const authContextValue: UserContextType = {
         accountAddress,
@@ -30,3 +46,4 @@ export const UserProvider: FC<LayoutProps> = ({ children }) => {
         </UserContext.Provider>
     );
 };
+

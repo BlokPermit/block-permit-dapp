@@ -3,7 +3,7 @@ import React from 'react';
 
 const Projects = () => {
     return (
-        <div className="text-black">Hello you are on page Projects.</div>
+        <h1 className="text-black text-3xl font-semibold">Projects</h1>
     );
 };
 

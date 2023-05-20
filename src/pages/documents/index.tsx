@@ -3,7 +3,7 @@ import React from 'react';
 
 const Documents = () => {
     return (
-        <div className="text-black">Hello you are on page Documents.</div>
+        <h1 className="text-black text-3xl font-semibold">Documents</h1>
     );
 };
 
