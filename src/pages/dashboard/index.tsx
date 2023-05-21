@@ -4,14 +4,13 @@ import ProjectPlaceholder from "@/components/placeholders/ProjectPlaceholder";
 import ProtectedRoute from "@/components/protectedRoute/ProtectedRoute";
 
 const Dashboard = () => {
-
     return (<ProtectedRoute>
         <div className="px-12 pt-6">
             <div className="mt-2">
                 <h1 className="text-neutral-500 text-2xl font-semibold">Recent projects</h1>
                 <div className="flex flex-wrap mt-3">
                     {Array.from({length: 3,}).map((value, index: number) => (
-                        <ProjectPlaceholder key={index}/>
+                        <ProjectPlaceholder myKey={index}/>
                     ))}</div>
             </div>
             <div className="mt-10">
@@ -24,19 +23,20 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-wrap mt-3">
                     {Array.from({length: 5}).map((value, index) => (
-                        <ProjectPlaceholder key={index}/>
+                        <ProjectPlaceholder myKey={index}/>
                     ))}</div>
             </div>
             <div className="mt-10">
                 <h1 className="text-neutral-500 text-2xl font-semibold mt-10">Recent document</h1>
                 <div className="flex flex-wrap mt-3">
                     {Array.from({length: 3}).map((value, index) => (
-                        <DocumentPlaceholder key={index}/>
+                        <DocumentPlaceholder myKey={index}/>
                     ))}</div>
             </div>
 
         </div>
     </ProtectedRoute>);
 };
+
 
 export default Dashboard;

@@ -13,7 +13,7 @@ export const Layout: FC<LayoutProps> = ({children}) => {
         <div className='flex flex-row h-screen bg-neutral-50'>
             {showSidebar && <div className="w-1/6"><Sidebar/></div>}
             <div className={'w-5/6'}>
-                <main className={' w-full h-full'}>{children}</main>
+                <main className={'w-full h-full'}>{children}</main>
             </div>
         </div>
     );
