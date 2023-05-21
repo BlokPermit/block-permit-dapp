@@ -1,5 +1,5 @@
 import React from 'react';
-import ProtectedRoute from "@/components/protectedRoute/ProteectedRoute";
+import ProtectedRoute from "@/components/protectedRoute/ProtectedRoute";
 
 const Projects = () => {
     return (<ProtectedRoute>

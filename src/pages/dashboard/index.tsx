@@ -1,7 +1,7 @@
 import React from 'react';
 import DocumentPlaceholder from "@/components/placeholders/DocumentPlaceholder";
 import ProjectPlaceholder from "@/components/placeholders/ProjectPlaceholder";
-import ProtectedRoute from "@/components/protectedRoute/ProteectedRoute";
+import ProtectedRoute from "@/components/protectedRoute/ProtectedRoute";
 
 const Dashboard = () => {
 
