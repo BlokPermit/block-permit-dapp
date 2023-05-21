@@ -1,6 +1,7 @@
 import React, {FC, ReactNode} from 'react';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
+import {LoadingAnimation} from "@/components/loading-animation/LoadingAnimation";
 
 interface Props {
     children: ReactNode;
@@ -11,7 +12,7 @@ const ProtectedRoute: FC<Props> = ({children}) => {
     const {push} = useRouter();
 
     if (status === "loading") {
-        return <p>Loading...</p>
+        return <LoadingAnimation/>
     }
 
     if (status === "unauthenticated") {

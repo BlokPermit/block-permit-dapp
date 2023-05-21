@@ -16,7 +16,7 @@ const IconButton = (props: IconButtonProps) => {
         return (
             // @ts-ignore
             <Link href={href}
-                  className="inline-flex items-center gap-2 rounded border border-sky-400 bg-sky-400 px-8 py-3 text-white hover:bg-transparent hover:text-sky-400 focus:outline-none focus:ring active:text-sky-300"
+                  className="inline-flex items-center gap-2  rounded-3xl border border-sky-400 bg-sky-400 px-8 py-3 text-white hover:bg-transparent hover:text-sky-400 focus:outline-none focus:ring active:text-sky-300"
             >
                 <span className="text-sm font-medium"> {props.text} </span>
 

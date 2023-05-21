@@ -17,7 +17,7 @@ const AnimatedOutlinedIconButton = (props: OutlineIconButtonProps) => {
         return (
             // @ts-ignore
             <Link href={href}
-                  className="group relative inline-flex items-center overflow-hidden rounded border border-current px-8 py-3 text-sky-400 focus:outline-none focus:ring active:text-sky-300"
+                  className="group relative inline-flex items-center overflow-hidden  rounded-3xl border border-current px-8 py-3 text-sky-400 focus:outline-none focus:ring active:text-sky-300"
             >
          <span className="absolute -end-full transition-all group-hover:end-4">
     {props.icon}
