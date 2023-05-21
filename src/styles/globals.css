@@ -2,8 +2,19 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../../public/fonts/TitilliumWeb-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     background: #f5f5f5;
+}
+
+body {
+    font-family: 'Titillium Web', sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -47,7 +58,7 @@ body::-webkit-scrollbar {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, white, orange, darkorange, white);
+    background: linear-gradient(90deg, white, skyblue, deepskyblue, white);
     animation: animate 4s linear infinite;
     background-size: 500%;
     filter: blur(1px)
