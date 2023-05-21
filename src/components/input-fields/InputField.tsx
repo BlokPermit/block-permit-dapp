@@ -9,8 +9,8 @@ interface InputFieldProps {
 
 const InputField = (props: InputFieldProps) => {
     return (
-        <div>
-            <label className="block text-xs font-medium text-gray-700">
+        <div className="my-3">
+            <label className="block text-xs font-medium text-gray-700 pl-3">
                 {props.label}
             </label>
 
@@ -18,7 +18,7 @@ const InputField = (props: InputFieldProps) => {
                 type={props.type}
                 id={props.id}
                 placeholder={props.placeholder}
-                className="mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                className="mt-1 w-full rounded-2xl border-gray-200 shadow-sm sm:text-sm h-12"
             />
         </div>
     );

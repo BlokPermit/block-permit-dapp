@@ -25,7 +25,7 @@ const SearchInput = () => {
             <input
                 value={searchQuery || ""}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-black bg-neutral-200 focus:bg-neutral-200 rounded-full focus:outline-none focus:ring-[1px] focus:ring-sky-50 placeholder:text-neutal-400"
+                className="px-5 py-1 w-2/3 sm:px-5 sm:py-3 flex-1 text-black bg-neutral-100 focus:bg-grey-100 rounded-full focus:outline-none focus:ring-[1px] focus:ring-sky-50 placeholder:text-neutal-400"
                 placeholder="What are you looking for?"
             />
 

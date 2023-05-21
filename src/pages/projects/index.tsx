@@ -1,5 +1,5 @@
 import React from 'react';
-import ProtectedRoute from "@/components/protectedRoute/ProtectedRoute";
+import ProtectedRoute from "@/components/protected-route/ProtectedRoute";
 import {AiOutlineAppstoreAdd} from "react-icons/all";
 import AnimatedIconButton from "@/components/buttons/AnimatedIconButton";
 import SearchInput from "@/components/search/SearchInput";
@@ -13,12 +13,13 @@ const Projects = () => {
                         <h1 className="text-neutral-500 text-2xl font-semibold mr-6">Projects</h1>
                         <SearchInput/>
                     </div>
-                    <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20}/>} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
+                    <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20}/>} isLink={true}
+                                        href={"/projects/addProject"}></AnimatedIconButton>
                 </div>
                 <div className="mt-8">
                     <div className="flex flex-wrap mt-3">
                         {Array.from({length: 5,}).map((value, index: number) => (
-                            <ProjectPlaceholder myKey={index}/>
+                            <ProjectPlaceholder key={index} myKey={index}/>
                         ))}</div>
                 </div>
                 <div className="mt-8">
@@ -31,7 +32,7 @@ const Projects = () => {
                     </div>
                     <div className="flex flex-wrap mt-3">
                         {Array.from({length: 3}).map((value, index) => (
-                            <ProjectPlaceholder myKey={index}/>
+                            <ProjectPlaceholder key={index} myKey={index}/>
                         ))}</div>
                     <div className="mt-10">
                         <div className="flex items-center">
@@ -43,7 +44,7 @@ const Projects = () => {
                         </div>
                         <div className="flex flex-wrap mt-3">
                             {Array.from({length: 10,}).map((value, index: number) => (
-                                <ProjectPlaceholder myKey={index}/>
+                                <ProjectPlaceholder key={index} myKey={index}/>
                             ))}</div>
                     </div>
                 </div>

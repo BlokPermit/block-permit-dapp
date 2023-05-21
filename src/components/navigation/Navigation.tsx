@@ -14,17 +14,17 @@ const Navigation: FC = () => {
         {
             label: 'Dashboard',
             href: '/dashboard',
-            icon: <RiDashboardLine size={25}/>,
+            icon: <RiDashboardLine size={26}/>,
         },
         {
             label: 'Projects',
             href: '/projects',
-            icon: <AiOutlineFundProjectionScreen size={25}/>,
+            icon: <AiOutlineFundProjectionScreen size={26}/>,
         },
         {
             label: 'Documents',
             href: '/documents',
-            icon: <HiOutlineDocumentSearch size={25}/>,
+            icon: <HiOutlineDocumentSearch size={26}/>,
         },
     ];
 
@@ -34,11 +34,13 @@ const Navigation: FC = () => {
                 <Link
                     key={index}
                     href={item.href}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-3 text-gray-700 hover:bg-gray-100 ${pathname == item.href ? 'bg-gray-100' : ''}`}
+                    className={`flex items-center gap-2 hover:text-main-200  px-4 py-2 text-gray-70 ${pathname == item.href ? 'border-r-4 border-main-200 rounded-sm' : ''}`}
                 >
 
-                    <div className="pr-2">{item.icon}</div>
-                    <span className="text-md font-medium"> {item.label} </span>
+                    <div
+                        className={`pr-2  ${pathname == item.href ? 'text-main-200' : ''}`}>{item.icon}</div>
+                    <span
+                        className={`text-lg  ${pathname == item.href ? 'text-main-200 font-bold' : ''}`}> {item.label} </span>
                 </Link>
             ))}
         </nav>

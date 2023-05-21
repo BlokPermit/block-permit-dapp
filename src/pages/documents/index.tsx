@@ -1,5 +1,5 @@
 import React from 'react';
-import ProtectedRoute from "@/components/protectedRoute/ProtectedRoute";
+import ProtectedRoute from "@/components/protected-route/ProtectedRoute";
 import SearchInput from "@/components/search/SearchInput";
 import AnimatedIconButton from "@/components/buttons/AnimatedIconButton";
 import {AiFillFileAdd} from "react-icons/all";
@@ -11,7 +11,8 @@ const Documents = () => {
                     <h1 className="text-neutral-500 text-2xl font-semibold mr-6">Documents</h1>
                     <SearchInput/>
                 </div>
-                <AnimatedIconButton text={"Upload Document"} icon={<AiFillFileAdd/>} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
+                <AnimatedIconButton text={"Upload Document"} icon={<AiFillFileAdd/>} isLink={true}
+                                    href={"/projects/addProject"}></AnimatedIconButton>
             </div>
         </ProtectedRoute>
     );

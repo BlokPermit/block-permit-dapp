@@ -8,7 +8,6 @@ export default NextAuth({
             if (user) {
                 token.user = user;
             }
-            console.log(user);
             return token;
         },
         async session({session, token}) {
