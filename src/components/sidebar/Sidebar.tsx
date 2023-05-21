@@ -10,7 +10,7 @@ export default function Sidebar() {
 
     return (
 
-        <div className="flex h-screen flex-col justify-between border-e bg-white fixed left-0 width-100">
+        <div className="flex h-screen flex-col justify-between border-e bg-white fixed left-0 w-1/6">
             <div className="px-4 py-6">
     <span
         className="grid h-10 w-32 place-content-center rounded-lg bg-grey-100 text-xs text-gray-600"
@@ -32,7 +32,7 @@ export default function Sidebar() {
                         <p className="text-xs">
                             <strong className="block font-2xl text-black">Test User</strong>
 
-                            <span className="text-neutral-500">{accountAddress}</span>
+                            <span className="text-neutral-500 break-all">{accountAddress}</span>
                         </p>
                     </div>
                 </Link>
