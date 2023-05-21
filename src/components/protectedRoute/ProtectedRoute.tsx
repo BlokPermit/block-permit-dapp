@@ -4,7 +4,6 @@ import {useRouter} from "next/router";
 
 interface Props {
     children: ReactNode;
-
 }
 
 const ProtectedRoute: FC<Props> = ({children}) => {
