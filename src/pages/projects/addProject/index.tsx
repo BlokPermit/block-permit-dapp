@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import InputField from "@/components/inputFields/InputField";
 import AnimatedIconButton from "@/components/buttons/AnimatedIconButton";
 import {AiOutlineSend} from "react-icons/all";
+import ErrorNotification from "@/components/notifications/ErrorNotification";
+import SuccessNotification from "@/components/notifications/SuccessNotification";
 
 const AddProject = () => {
+    const [isError, setIsError] = useState(null);
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
@@ -28,9 +31,12 @@ const AddProject = () => {
             }
 
             const result = await response.json();
-            alert(`Is this your full name: ${result.data}`);
+            // @ts-ignore
+            setIsError(false);
         } catch (error: any) {
             console.error('Error:', error.message);
+            // @ts-ignore
+            setIsError(true);
             // Handle the error appropriately
         }
     };
@@ -41,6 +47,8 @@ const AddProject = () => {
                 <InputField id={"first"} label={"First"} type={"text"} placeholder={"First"}/>
                 <InputField id={"last"} label={"Last"} type={"text"} placeholder={"Last"}/>
                 <AnimatedIconButton type="submit" text={"Submit"} icon={<AiOutlineSend/>} href="/projects/addProject"></AnimatedIconButton>
+                {isError === true && (<ErrorNotification error={"test"}/>)}
+                {isError === false && (<SuccessNotification title={"Success"} message={"Created project."}/>)}
             </form>
         </div>
     );
