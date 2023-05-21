@@ -22,6 +22,7 @@
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
+    "aws-sdk": "^2.1381.0",
     "axios": "^1.4.0",
     "dotenv-cli": "^7.2.1",
     "ethers": "^6.3.0",

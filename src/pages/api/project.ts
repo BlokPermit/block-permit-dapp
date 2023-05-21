@@ -1,13 +1,14 @@
-import { prisma } from "db/client.ts";
+import { Project } from "@prisma/client";
+import { prisma } from "../../util/prisma-client";
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) {
   const { method } = req;
 
   switch (method) {
     case "POST":
-      const data = req.body;
+      const data: Project = req.body;
 
-      const project = await prisma.project.create({
+      const project: any = await prisma.project.create({
         data: data,
       });
 
