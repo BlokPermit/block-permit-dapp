@@ -13,3 +13,15 @@ export const saveDocument = async (file: File) => {
 
     return data.path;
 };
+
+export const getDocument = async (path: string) => {
+    const { data, error } = await supabase.storage
+        .from("blokcejn-bucket")
+        .download(path);
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
