@@ -1,21 +1,20 @@
 import { Project } from "@prisma/client";
-import { prisma } from "../../util/prisma-client";
+import { prisma } from "../../util/PrismaClient";
+import { NextApiRequest, NextApiResponse } from "next";
+import { saveDocument } from "@/lib/DocumentService";
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
     case "POST":
-      const data: Project = req.body;
+      const data = req.body;
 
-      const project: any = await prisma.project.create({
+      const project = await prisma.project.create({
         data: data,
       });
 
       res.status(201).json(project);
-      break;
-    case "GET":
-      res.status(200).json({ name: "John Doe" });
       break;
     default:
       res.status(405).end(`Method ${method} Not Allowed`);

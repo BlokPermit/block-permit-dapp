@@ -21,6 +21,7 @@ model Project {
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
+  documentUrl                    String?
 }
 
 model Investor {
