@@ -11,38 +11,67 @@ datasource db {
 }
 
 model Project {
-  id                             Int        @id @default(autoincrement())
-  investors                      Investor[]
-  contactName                    String
-  contactEmail                   String
-  contactPhone                   String
-  legalBodyName                  String
-  legalBodyAddress               String
+  id                             Int                     @id @default(autoincrement())
+  smartContractAddress           String
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
-  documentUrl                    String?
-}
-
-model Investor {
-  id        Int      @id @default(autoincrement())
-  name      String
-  address   String
-  taxId     String
-  Project   Project? @relation(fields: [projectId], references: [id])
-  projectId Int?
+  documentUrls                   String[]
+  investments                    Investment[]
+  ProjectManager                 ProjectManager          @relation(fields: [projectManagerId], references: [id])
+  projectManagerId               Int
+  AdministrativeAuthority        AdministrativeAuthority @relation(fields: [administrativeAuthorityId], references: [id])
+  administrativeAuthorityId      Int
+  OpinionProvider                OpinionProvider         @relation(fields: [opinionProviderId], references: [id])
+  opinionProviderId              Int
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name     String?
-  address  String
-  userRole UserRole
+  id                      Int                      @id @default(autoincrement())
+  name                    String
+  email                   String                   @unique
+  phone                   String?
+  streetAddress           String
+  walletAddress           String
+  ProjectManager          ProjectManager?
+  OpinionProvider         OpinionProvider?
+  AdministrativeAuthority AdministrativeAuthority?
 }
 
-enum UserRole {
-  PROJECT_MANAGER
-  OPINION_PROVIDER
-  ADMINISTRATIVE_AUTHORITY
+model ProjectManager {
+  id      Int       @id @default(autoincrement())
+  user    User      @relation(fields: [userId], references: [id])
+  userId  Int       @unique
+  Project Project[]
+}
+
+model OpinionProvider {
+  id      Int       @id @default(autoincrement())
+  user    User      @relation(fields: [userId], references: [id])
+  userId  Int       @unique
+  Project Project[]
+}
+
+model AdministrativeAuthority {
+  id      Int       @id @default(autoincrement())
+  user    User      @relation(fields: [userId], references: [id])
+  userId  Int       @unique
+  Project Project[]
+}
+
+model Investment {
+  id         Int      @id @default(autoincrement())
+  Investor   Investor @relation(fields: [investorId], references: [id])
+  investorId Int
+  Project    Project? @relation(fields: [projectId], references: [id])
+  projectId  Int?
+  amount     Decimal
+}
+
+model Investor {
+  id            Int          @id @default(autoincrement())
+  name          String
+  streetAddress String
+  taxId         String
+  investments   Investment[]
 }
