@@ -11,60 +11,22 @@ datasource db {
 }
 
 model Project {
-  id                             Int                     @id @default(autoincrement())
+  id                             Int          @id @default(autoincrement())
   smartContractAddress           String
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
   documentUrls                   String[]
   investments                    Investment[]
-  ProjectManager                 ProjectManager          @relation(fields: [projectManagerId], references: [id])
-  projectManagerId               Int
-  AdministrativeAuthority        AdministrativeAuthority @relation(fields: [administrativeAuthorityId], references: [id])
-  administrativeAuthorityId      Int
-  Opinion                        Opinion[]
-}
-
-model Opinion {
-  id         Int             @id @default(autoincrement())
-  Project    Project?        @relation(fields: [projectId], references: [id])
-  projectId  Int?
-  opinion    String
-  provider   OpinionProvider @relation(fields: [providerId], references: [id])
-  providerId Int
 }
 
 model User {
-  id                      Int                      @id @default(autoincrement())
-  name                    String
-  email                   String                   @unique
-  phone                   String?
-  streetAddress           String
-  walletAddress           String
-  ProjectManager          ProjectManager?
-  OpinionProvider         OpinionProvider?
-  AdministrativeAuthority AdministrativeAuthority?
-}
-
-model ProjectManager {
-  id      Int       @id @default(autoincrement())
-  user    User      @relation(fields: [userId], references: [id])
-  userId  Int       @unique
-  Project Project[]
-}
-
-model OpinionProvider {
-  id      Int       @id @default(autoincrement())
-  user    User      @relation(fields: [userId], references: [id])
-  userId  Int       @unique
-  Opinion Opinion[]
-}
-
-model AdministrativeAuthority {
-  id      Int       @id @default(autoincrement())
-  user    User      @relation(fields: [userId], references: [id])
-  userId  Int       @unique
-  Project Project[]
+  id            Int     @id @default(autoincrement())
+  name          String
+  email         String  @unique
+  phone         String?
+  streetAddress String
+  walletAddress String
 }
 
 model Investment {
