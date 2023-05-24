@@ -22,8 +22,16 @@ model Project {
   projectManagerId               Int
   AdministrativeAuthority        AdministrativeAuthority @relation(fields: [administrativeAuthorityId], references: [id])
   administrativeAuthorityId      Int
-  OpinionProvider                OpinionProvider         @relation(fields: [opinionProviderId], references: [id])
-  opinionProviderId              Int
+  Opinion                        Opinion[]
+}
+
+model Opinion {
+  id         Int             @id @default(autoincrement())
+  Project    Project?        @relation(fields: [projectId], references: [id])
+  projectId  Int?
+  opinion    String
+  provider   OpinionProvider @relation(fields: [providerId], references: [id])
+  providerId Int
 }
 
 model User {
@@ -49,7 +57,7 @@ model OpinionProvider {
   id      Int       @id @default(autoincrement())
   user    User      @relation(fields: [userId], references: [id])
   userId  Int       @unique
-  Project Project[]
+  Opinion Opinion[]
 }
 
 model AdministrativeAuthority {
