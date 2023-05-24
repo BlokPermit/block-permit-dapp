@@ -34,13 +34,13 @@ const Navigation: FC = () => {
                 <Link
                     key={index}
                     href={item.href}
-                    className={`flex items-center gap-2 hover:text-main-200  px-4 py-2 text-gray-70 ${pathname == item.href ? 'border-r-4 border-main-200 rounded-sm' : ''}`}
+                    className={`flex items-center gap-2 hover:text-main-200  px-4 py-2 text-gray-70 ${pathname.split("/").slice(0, 2).join("/") == item.href ? 'border-r-4 border-main-200 rounded-sm' : ''}`}
                 >
 
                     <div
-                        className={`pr-2  ${pathname == item.href ? 'text-main-200' : ''}`}>{item.icon}</div>
+                        className={`pr-2  ${pathname.split("/").slice(0, 2).join("/") == item.href ? 'text-main-200' : ''}`}>{item.icon}</div>
                     <span
-                        className={`text-lg  ${pathname == item.href ? 'text-main-200 font-bold' : ''}`}> {item.label} </span>
+                        className={`text-lg  ${pathname.split("/").slice(0, 2).join("/") == item.href ? 'text-main-200 font-bold' : ''}`}> {item.label} </span>
                 </Link>
             ))}
         </nav>

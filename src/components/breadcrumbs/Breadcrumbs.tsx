@@ -27,9 +27,7 @@ export function BreadCrumbs() {
         const crumbLabels = CombineAccumulatively(segmentsRoute);
 
         const crumbs = crumbLinks.map((link: any, index: any) => {
-            console.log(link)
             const route = crumbLabels[index];
-            console.log(route)
             return {
                 link: link,
                 route: route,
@@ -57,7 +55,8 @@ export function BreadCrumbs() {
                         <div className="flex items-center " key={index}>
                             {(index > 0) ? <div className="text-neutral-400 px-4 text-xs">{'>'}</div> : null}
 
-                            <Link href={crumb.link} className="hover:text-neutral-600 align-bottom pt-0.5">
+                            <Link href={crumb.link}
+                                  className={`hover:text-neutral-600 align-bottom pt-0.5  ${router.pathname == crumb.link ? 'text-main-200' : ''}`}>
                                 {crumb.label}
                             </Link>
 

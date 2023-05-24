@@ -33,13 +33,13 @@ const AnimatedIconButton = (props: OutlineIconButtonProps) => {
     return (
         <button
             type={props.type}
-            className="group relative inline-flex items-center overflow-hidden rounded bg-sky-400 px-8 py-3 text-white focus:outline-none focus:ring active:bg-sky-300"
+            className="group relative inline-flex items-center overflow-hidden rounded-3xl bg-gradient-to-l from-main-100 to-main-200 px-8 py-3 text-white focus:outline-none focus:ring active:bg-main-200"
             onClick={props.onClick}
         >
       <span className="absolute -end-full transition-all group-hover:end-4">
         {props.icon}
       </span>
-            <span className="text-sm font-medium transition-all group-hover:me-4">
+            <span className="text-sm font-medium transition-all group-hover:me-4 ">
         {props.text}
       </span>
         </button>
