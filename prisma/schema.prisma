@@ -10,14 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Investor {
+  id            Int       @id @default(autoincrement())
+  name          String
+  streetAddress String
+  taxId         String
+  projects      Project[]
+}
+
 model Project {
-  id                             Int          @id @default(autoincrement())
+  id                             Int        @id @default(autoincrement())
   smartContractAddress           String
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
-  documentUrls                   String[]
-  investments                    Investment[]
+  dpdUrl                         String
+  investors                      Investor[]
 }
 
 model User {
@@ -27,21 +35,4 @@ model User {
   phone         String?
   streetAddress String
   walletAddress String
-}
-
-model Investment {
-  id         Int      @id @default(autoincrement())
-  Investor   Investor @relation(fields: [investorId], references: [id])
-  investorId Int
-  Project    Project? @relation(fields: [projectId], references: [id])
-  projectId  Int?
-  amount     Decimal
-}
-
-model Investor {
-  id            Int          @id @default(autoincrement())
-  name          String
-  streetAddress String
-  taxId         String
-  investments   Investment[]
 }
