@@ -38,6 +38,7 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
     "react-jazzicon": "^1.0.4",
+    "react-lottie": "^1.2.3",
     "react-select": "^5.7.3",
     "react-tailwindcss-select": "^1.8.5",
     "tailwindcss": "3.3.2",
@@ -45,6 +46,7 @@
     "wagmi": "^1.0.5"
   },
   "devDependencies": {
-    "@types/memory-cache": "^0.2.2"
+    "@types/memory-cache": "^0.2.2",
+    "@types/react-lottie": "^1.2.6"
   }
 }
