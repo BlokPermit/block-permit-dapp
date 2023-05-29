@@ -1,6 +1,7 @@
 import React, {ReactNode, useEffect} from 'react';
 import {useSession} from 'next-auth/react';
 import {useRouter} from 'next/router';
+import Alert from "@/components/notifications/Alert";
 
 interface Props {
     children: ReactNode;

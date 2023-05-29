@@ -8,6 +8,8 @@ import "../styles/globals.css";
 import {Layout} from "@/components/layout/Layout";
 import Head from "next/head";
 import {UserProvider} from "@/context/UserContext";
+import {AlertProvider} from "@/context/AlertContext";
+import Alert from "@/components/notifications/Alert";
 
 const {publicClient, webSocketPublicClient} = configureChains(
     [mainnet],
@@ -24,12 +26,15 @@ function MyApp({Component, pageProps}: AppProps) {
         <WagmiConfig config={config}>
             <SessionProvider session={pageProps.session} refetchInterval={0}>
                 <UserProvider>
-                    <Layout>
-                        <Head>
-                            <title>D-Verification</title>
-                        </Head>
-                        <Component {...pageProps} />
-                    </Layout>
+                    <AlertProvider>
+                        <Layout>
+                            <Head>
+                                <title>D-Verification</title>
+                            </Head>
+                            <Component {...pageProps} />
+                            <Alert/>
+                        </Layout>
+                    </AlertProvider>
                 </UserProvider>
             </SessionProvider>
         </WagmiConfig>

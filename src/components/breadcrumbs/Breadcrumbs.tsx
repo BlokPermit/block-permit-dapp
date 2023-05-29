@@ -3,8 +3,8 @@ import {useRouter} from "next/router";
 import React from "react";
 
 const Route2LabelMap = {
-    "/projects/addProject": "Add Project",
-    "/addProject": "Add Project",
+    "/projects/addProject": "Create Project",
+    "/addProject": "Create Project",
     "/projects": "Projects",
     "/projects/[id]": "Project",
     "/barrels/[barrel_id]/settings": "Settings",
@@ -18,10 +18,6 @@ export function BreadCrumbs() {
     React.useEffect(() => {
         const segmentsPath = router.asPath.split("/");
         const segmentsRoute = router.route.split("/");
-        segmentsPath.splice(0, 1)
-        segmentsRoute.splice(0, 1)
-        console.log(segmentsPath)
-        console.log(segmentsRoute)
 
         const crumbLinks = CombineAccumulatively(segmentsPath);
         const crumbLabels = CombineAccumulatively(segmentsRoute);
@@ -35,16 +31,10 @@ export function BreadCrumbs() {
                 label: Route2LabelMap[route] || route,
             };
         });
+        if (crumbs.length > 3) {
+            crumbs.splice(0, 1);
+        }
         setCrumbs(crumbs);
-
-        console.log({
-            router,
-            segmentsPath,
-            segmentsRoute,
-            crumbLinks,
-            crumbLabels,
-            crumbs,
-        });
     }, [router.route]);
 
     return (

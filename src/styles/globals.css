@@ -57,16 +57,17 @@ body::-webkit-scrollbar {
 .loader::before {
     content: '';
     inset: 0;
-    background: linear-gradient(90deg, white, skyblue, deepskyblue, white);
+    background: linear-gradient(90deg, white, #f67362, #f99d91, white);
     animation: animate 20s linear infinite;
     background-size: 500%;
 }
+
 
 .loader::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, white, skyblue, deepskyblue, white);
+    background: linear-gradient(90deg, white, #f67362, #f99d91, white);
     animation: animate 4s linear infinite;
     background-size: 500%;
     filter: blur(1px)

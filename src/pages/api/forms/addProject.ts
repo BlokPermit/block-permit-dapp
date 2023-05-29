@@ -2,6 +2,8 @@ export default function handler(req: any, res: any) {
     // Get data submitted in request's body.
     const body = req.body;
 
+    console.log(body);
+
     // Optional logging to see the responses
     // in the command line where next.js app is running.
 
