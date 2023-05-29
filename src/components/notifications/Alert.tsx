@@ -26,7 +26,7 @@ const Alert = () => {
                 {message}
             </p>
         </div>;
-    }
+    } else return <div></div>;
 };
 
 export default Alert;
