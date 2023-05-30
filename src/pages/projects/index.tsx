@@ -4,6 +4,7 @@ import {AiOutlineAppstoreAdd} from "react-icons/all";
 import AnimatedIconButton from "@/components/buttons/AnimatedIconButton";
 import SearchInput from "@/components/search/SearchInput";
 import ProjectPlaceholder from "@/components/placeholders/ProjectPlaceholder";
+import RoleBasedComponent from "@/components/role-based-component/RoleBasedComponent";
 
 const Projects = () => {
     return (<ProtectedRoute>
@@ -11,7 +12,7 @@ const Projects = () => {
                 <div className="flex justify-between items-center">
                     <div className="flex w-1/2 items-center">
                         <h1 className="text-neutral-500 text-2xl font-semibold mr-6">Projects</h1>
-                        <SearchInput/>
+                        <RoleBasedComponent adminComponent={<SearchInput/>}/>
                     </div>
                     <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20}/>} isLink={true}
                                         href={"/projects/addProject"}></AnimatedIconButton>

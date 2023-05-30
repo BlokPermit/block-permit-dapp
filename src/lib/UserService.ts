@@ -16,7 +16,7 @@ export const loginUser = async (address: string) => {
 export const findUserByAddress = async (address: string) => {
     return prisma.user.findFirst({
         where: {
-            address: address,
+            walletAddress: address,
         }
     });
 }

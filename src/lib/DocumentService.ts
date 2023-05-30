@@ -1,10 +1,11 @@
 import {supabase} from "@/util/SupabaseClient";
+
 export const saveDocument = async (file: File) => {
-    const { data, error } = await supabase.storage
+    const {data, error} = await supabase.storage
         .from("blokcejn-bucket")
-        .upload("public/image1", file, {
-          cacheControl: "3600",
-          upsert: false,
+        .upload(`public/${file.name}`, file, {
+            cacheControl: "3600",
+            upsert: false,
         });
 
     if (error) {
@@ -15,7 +16,7 @@ export const saveDocument = async (file: File) => {
 };
 
 export const getDocument = async (path: string) => {
-    const { data, error } = await supabase.storage
+    const {data, error} = await supabase.storage
         .from("blokcejn-bucket")
         .download(path);
 

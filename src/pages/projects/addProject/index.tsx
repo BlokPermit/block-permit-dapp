@@ -22,12 +22,11 @@ interface Option {
 
 const CreateProject = ({investors}: InvestorsPageProps) => {
     const router = useRouter();
-    const [isError, setIsError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [projectName, setProjectName] = useState<string>("");
-    const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({label: "", value: undefined});
+    const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({label: "Mixed", value: "1"});
     const [description, setDescription] = useState<string>("");
-    const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({label: "", value: undefined});
+    const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({label: "No", value: false});
     const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
     const [selectedInvestors, setSelectedInvestors] = useState<Option[]>([]);
     const {setAlert} = useAlert();
@@ -58,19 +57,23 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         setIsLoading(true);
-        const data = {
-            smartContractAddress: "1231223123",
-            constructionTitle: projectName,
-            constructionImpactsEnvironment: selectedEnvironmentImpact.value,
-            constructionType: selectedConstructionType.label,
-            dpdUrl: "public/image1",
-            investors: {connect: selectedInvestors.map((investor) => ({id: investor.value.id}))}
-        }
-
-        const endpoint = '/api/project';
 
         try {
-            const response = await fetch(endpoint, {
+            const documentUrl = await fetch('api/documents', {
+                method: 'POST',
+                body: selectedDocument,
+            });
+
+            const data = {
+                smartContractAddress: "1231223123",
+                constructionTitle: projectName,
+                constructionImpactsEnvironment: selectedEnvironmentImpact.value,
+                constructionType: selectedConstructionType.label,
+                dpdUrl: documentUrl,
+                investors: {connect: selectedInvestors.map((investor) => ({id: investor.value.id}))}
+            }
+
+            const response = await fetch('/api/project', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,20 +82,18 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
             });
 
             if (!response.ok) {
-                console.log("error");
                 throw new Error('Error occurred');
             }
 
             const result = await response.json();
             console.log(result);
             // @ts-ignore
-            setIsError(false);
             await router.push('/projects');
             setAlert({title: 'Project created!', message: 'You can now view it in projects.', type: 'success'});
             setIsLoading(false);
         } catch (error: any) {
             // @ts-ignore
-            setIsError(true);
+            setAlert({title: '', message: error, type: 'error'});
             // Handle the error appropriately
         }
     };
