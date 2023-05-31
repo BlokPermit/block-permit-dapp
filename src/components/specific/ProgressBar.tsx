@@ -25,8 +25,8 @@ const ProgressBar = (props: ProgressBarProps) => {
             )}
 
             <p className="leading-none">
-              <strong className="block font-medium"> Druga faza </strong>
-              <small className="mt-1"> Pridobivanje projektnih mnenj. </small>
+              <strong className="block font-medium"> Prva faza </strong>
+              <small className="mt-1"> Pridobivanje projektnih pogojev. </small>
             </p>
             <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 rounded-tr-sm bg-inherit"></span>
           </li>
