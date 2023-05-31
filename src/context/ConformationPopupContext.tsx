@@ -1,5 +1,3 @@
-import ConformationPopup from "@/components/generic/notifications/ConformationPopup";
-import { init } from "next/dist/compiled/@vercel/og/satori";
 import { createContext, useState } from "react";
 import { FaInfo } from "react-icons/fa";
 
@@ -8,22 +6,24 @@ export interface ConformationPopupProps {
   title: string;
   message: string;
   popupType: "success" | "error" | "warning" | "info";
+  buttonPrimaryText: string;
   onClickPrimary: () => {} | void;
-  onClickSecondary: () => {} | void;
+  show: boolean;
 }
 
 const initialState: ConformationPopupProps = {
   icon: <FaInfo />,
-  title: "This ConformationPopup is not initialized yet",
-  message: "Please wait for the ConformationPopup to initialize",
+  title: "",
+  message: "",
   popupType: "info",
+  buttonPrimaryText: "Submit",
   onClickPrimary: () => {},
-  onClickSecondary: () => {},
+  show: false,
 };
 
 const ConformationPopupContext = createContext({
   ...initialState,
-  setConformationPopup: ({ icon, title, message, popupType, onClickPrimary, onClickSecondary }: ConformationPopupProps) => {},
+  setConformationPopup: ({ icon, title, message, popupType, buttonPrimaryText, onClickPrimary, show }: ConformationPopupProps) => {},
 });
 
 export const ConformationPopupProvider = ({ children }: any) => {
@@ -31,16 +31,18 @@ export const ConformationPopupProvider = ({ children }: any) => {
   const [title, setTitle] = useState(initialState.title);
   const [message, setMessage] = useState(initialState.message);
   const [popupType, setType] = useState(initialState.popupType);
+  const [buttonPrimaryText, setButtonPrimaryText] = useState(initialState.buttonPrimaryText);
   const [onClickPrimary, setOnClickPrimary] = useState(() => initialState.onClickPrimary);
-  const [onClickSecondary, setOnClickSecondary] = useState(() => initialState.onClickSecondary);
+  const [show, setShow] = useState(initialState.show);
 
-  const setConformationPopup = ({ icon, title, message, popupType, onClickPrimary, onClickSecondary }: ConformationPopupProps) => {
+  const setConformationPopup = ({ icon, title, message, popupType, buttonPrimaryText, onClickPrimary, show }: ConformationPopupProps) => {
     setIcon(icon);
     setTitle(title);
     setMessage(message);
     setType(popupType);
+    setButtonPrimaryText(buttonPrimaryText);
     setOnClickPrimary(onClickPrimary);
-    setOnClickSecondary(onClickSecondary);
+    setShow(show);
   };
 
   return (
@@ -50,8 +52,9 @@ export const ConformationPopupProvider = ({ children }: any) => {
         title,
         message,
         popupType,
+        buttonPrimaryText,
         onClickPrimary,
-        onClickSecondary,
+        show,
         setConformationPopup,
       }}
     >

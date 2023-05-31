@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { findProjectById } from "@/lib/ProjectService";
 import { Investor, Project } from "@prisma/client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import { FaArrowUp, FaFileContract, FaHeading, FaTag } from "react-icons/all";
@@ -11,6 +11,8 @@ import IconCard from "@/components/generic/data-view/IconCard";
 import InvestorsTable from "@/components/specific/InvestorsTable";
 import OpinionProvider from "@/components/specific/OpinionProvider";
 import AttachmentsPopup from "@/components/specific/AttachmentsPopup";
+import useConformationPopup from "@/hooks/ConformationPopupHook";
+import useAlert from "@/hooks/AlertHook";
 
 export const getServerSideProps: GetServerSideProps<{ foundProject: Project | null }> = async () => {
   const project: Project | null = await findProjectById(1);
@@ -18,6 +20,7 @@ export const getServerSideProps: GetServerSideProps<{ foundProject: Project | nu
 };
 
 const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { setConformationPopup } = useConformationPopup();
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
 
@@ -25,6 +28,19 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
   const onDocumentChange = (file: File | null) => {};
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
+
+  const handleSend = () =>
+    setConformationPopup({
+      title: "Send to Opinion Providers",
+      message: "Are you sure you want to send this project to the selected opinion providers?",
+      icon: <FaArrowUp />,
+      popupType: "warning",
+      buttonPrimaryText: "Send",
+      onClickPrimary: () => {
+        console.log("Send to opinion providers");
+      },
+      show: true,
+    });
 
   //Count Selected Opinion Providers
   const [numOfSelected, setNumOfSelected] = useState<number>(0);
@@ -110,7 +126,7 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
         {opinionProviders.map((opinionProvider) => (
           <OpinionProvider opinionProvider={opinionProvider} key={opinionProvider.id} countSelected={countSelected} handleAttachments={() => setIsAttachmentsPopupOpen(true)} handleRemove={() => {}} />
         ))}
-        <IconButton text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={() => {}} />
+        <IconButton text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
       </div>
     </div>
   );
