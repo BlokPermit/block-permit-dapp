@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { findProjectById } from "@/lib/ProjectService";
 import { Investor, Project } from "@prisma/client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import { FaArrowUp, FaFileContract, FaHeading, FaTag } from "react-icons/all";
@@ -12,7 +12,7 @@ import InvestorsTable from "@/components/specific/InvestorsTable";
 import OpinionProvider from "@/components/specific/OpinionProvider";
 import AttachmentsPopup from "@/components/specific/AttachmentsPopup";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
-import useAlert from "@/hooks/AlertHook";
+import ProgressBar from "@/components/specific/ProgressBar";
 
 export const getServerSideProps: GetServerSideProps<{ foundProject: Project | null }> = async () => {
   const project: Project | null = await findProjectById(1);
@@ -29,7 +29,7 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
 
-  const handleSend = () =>
+  const handleSend = () => {
     setConformationPopup({
       title: "Send to Opinion Providers",
       message: "Are you sure you want to send this project to the selected opinion providers?",
@@ -41,6 +41,9 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
       },
       show: true,
     });
+  };
+
+  const [selectedPhase, setSelectedPhase] = useState<number>(1);
 
   //Count Selected Opinion Providers
   const [numOfSelected, setNumOfSelected] = useState<number>(0);
@@ -105,11 +108,11 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
     <div className="px-40 mb-10">
       <BreadCrumbs />
       {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
-      <div className="mb-20 flex justify-between">
+      <div className="flex justify-between mb-10">
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.id}</h1>
         <DocumentDropdown documentId={project.dpdUrl ?? ""} documentType="dpp" isPresent={isDPPPresent} onDocumentChange={onDocumentChange} />
       </div>
-      <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-5">
+      <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
         <div className="col-span-3 pb-12">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Construction details</h2>
           <IconCard icon={<FaHeading />} title="Construction Title" value={project.constructionTitle} />
@@ -121,7 +124,16 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
           <InvestorsTable investors={investors} />
         </div>
       </div>
-      <div className="overflow-x-auto py-10">
+      <div className="overflow-x-auto">
+        <div className="mb-10">
+          <ProgressBar
+            selectedPhase={selectedPhase}
+            actualPhase={2}
+            handlePhaseChange={(phase: number) => {
+              setSelectedPhase(phase);
+            }}
+          />
+        </div>
         <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Opinion Providers</h2>
         {opinionProviders.map((opinionProvider) => (
           <OpinionProvider opinionProvider={opinionProvider} key={opinionProvider.id} countSelected={countSelected} handleAttachments={() => setIsAttachmentsPopupOpen(true)} handleRemove={() => {}} />
