@@ -10,6 +10,7 @@ import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
 import InvestorsTable from "@/components/specific/InvestorsTable";
 import OpinionProvider from "@/components/specific/OpinionProvider";
+import AttachmentsPopup from "@/components/specific/AttachmentsPopup";
 
 export const getServerSideProps: GetServerSideProps<{ foundProject: Project | null }> = async () => {
   const project: Project | null = await findProjectById(1);
@@ -22,6 +23,8 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
 
   const [isDPPPresent, setIsDPDPresent] = useState<boolean>(false);
   const onDocumentChange = (file: File | null) => {};
+
+  const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
 
   //Count Selected Opinion Providers
   const [numOfSelected, setNumOfSelected] = useState<number>(0);
@@ -85,6 +88,7 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
   return (
     <div className="px-40 mb-10">
       <BreadCrumbs />
+      {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
       <div className="mb-20 flex justify-between">
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.id}</h1>
         <DocumentDropdown documentId={project.dpdUrl ?? ""} documentType="dpp" isPresent={isDPPPresent} onDocumentChange={onDocumentChange} />
@@ -104,7 +108,7 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
       <div className="overflow-x-auto py-10">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Opinion Providers</h2>
         {opinionProviders.map((opinionProvider) => (
-          <OpinionProvider opinionProvider={opinionProvider} key={opinionProvider.id} countSelected={countSelected} handleAttachments={() => {}} handleRemove={() => {}} />
+          <OpinionProvider opinionProvider={opinionProvider} key={opinionProvider.id} countSelected={countSelected} handleAttachments={() => setIsAttachmentsPopupOpen(true)} handleRemove={() => {}} />
         ))}
         <IconButton text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={() => {}} />
       </div>
