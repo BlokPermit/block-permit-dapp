@@ -62,17 +62,17 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
 
   return (
     <div className="relative">
-      <div className="inline-flex items-center overflow-hidden rounded-md border bg-white">
-        <span className="flex justify-between border-e px-4 py-2 text-sm/none text-gray-600 hover:bg-gray-50 hover:text-gray-700">
+      <div onClick={() => setIsActive(!isActive)} className="inline-flex items-center overflow-hidden rounded-md border bg-white hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700">
+        <span className="flex justify-between px-2 py-2 text-sm/none text-gray-600">
           <FaFileUpload className="mr-2" />
           {props.documentType === "dpp" && <p>Upload DPP</p>}
           {props.documentType === "dgd" && <p>Upload DGD</p>}
         </span>
 
-        <button onClick={() => setIsActive(!isActive)} className="h-full p-2 text-gray-600 hover:bg-gray-50 hover:text-gray-700">
+        <span className="h-full p-2 text-gray-600">
           <span className="sr-only">Menu</span>
           {isActive ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
-        </button>
+        </span>
       </div>
 
       <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
