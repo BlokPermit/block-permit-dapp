@@ -1,15 +1,25 @@
 import React, {FC, ReactNode} from 'react';
-import {AiOutlineFundProjectionScreen, HiOutlineDocumentSearch, RiDashboardLine} from "react-icons/all";
+import {
+    AiOutlineFundProjectionScreen,
+    AiOutlineUserAdd,
+    HiOutlineDocumentSearch,
+    HiUserAdd,
+    RiDashboardLine
+} from "react-icons/all";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import {useSession} from "next-auth/react";
+import {UserType} from ".prisma/client";
 
 
 const Navigation: FC = () => {
+    const {data: session} = useSession();
     const {pathname} = useRouter();
-    const adminRoutes: {
+    const routes: {
         label: string;
         href: string;
         icon: ReactNode;
+        adminOnly?: boolean;
     }[] = [
         {
             label: 'Dashboard',
@@ -26,7 +36,26 @@ const Navigation: FC = () => {
             href: '/documents',
             icon: <HiOutlineDocumentSearch size={26}/>,
         },
+        {
+            label: 'Add User',
+            href: '/addUser',
+            icon: <AiOutlineUserAdd size={26}/>,
+            adminOnly: true,
+        },
+        {
+            label: 'Add Investor',
+            href: '/addInvestor',
+            icon: <AiOutlineUserAdd size={26}/>,
+            adminOnly: true
+        },
     ];
+
+    const adminRoutes = routes.filter((route) => {
+        if (route.adminOnly) {
+            return session?.user?.userType === UserType.ADMIN;
+        }
+        return true;
+    });
 
     return (
         <nav aria-label="Main Nav" className="mt-6 flex flex-col space-y-5">

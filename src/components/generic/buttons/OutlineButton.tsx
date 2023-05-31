@@ -15,7 +15,7 @@ const OutlineButton = (props: OutlineButtonProps) => {
         return (
             // @ts-ignore
             <Link href={href}
-                  className="inline-block  rounded-3xl border border-sky-400 px-12 py-3 text-sm font-medium text-indigo-400 hover:bg-sky-400 hover:text-white focus:outline-none focus:ring active:bg-sky-300"
+                  className="inline-block rounded-3xl border border-main-400 px-12 py-3 text-sm font-medium text-main-400 hover:bg-main-400 hover:text-white focus:outline-none focus:ring active:bg-main-300"
             >
                 {props.text}
             </Link>
@@ -24,7 +24,7 @@ const OutlineButton = (props: OutlineButtonProps) => {
     return (
         <button
             type={props.type}
-            className="inline-block rounded border border-sky-400 px-12 py-3 text-sm font-medium text-indigo-400 hover:bg-sky-400 hover:text-white focus:outline-none focus:ring active:bg-sky-300"
+            className="inline-block border rounded-3xl border-main-400 px-12 py-3 text-sm font-medium text-main-400 hover:bg-main-400 hover:text-white focus:outline-none focus:ring active:bg-main-300"
             onClick={props.onClick}
         >
             {props.text}

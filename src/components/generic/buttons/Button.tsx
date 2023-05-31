@@ -16,7 +16,7 @@ const Button = (props: ButtonProps) => {
         return (
             // @ts-ignore
             <Link href={href}
-                  className="inline-block  rounded-3xl border border-sky-400 bg-sky-400 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-sky-400 focus:outline-none focus:ring active:text-sky-400"
+                  className="inline-block  rounded-3xl border border-main-400 bg-main-400 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-main-400 focus:outline-none focus:ring active:text-main-400"
             >
                 {props.text}
             </Link>
@@ -25,7 +25,7 @@ const Button = (props: ButtonProps) => {
     return (
         <button
             type={props.type}
-            className="inline-block rounded border border-sky-400 bg-sky-400 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-sky-400 focus:outline-none focus:ring active:text-sky-400"
+            className="inline-block rounded border border-main-400 bg-main-400 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-main-400 focus:outline-none focus:ring active:text-main-400"
             onClick={props.onClick}
         >
             {props.text}
