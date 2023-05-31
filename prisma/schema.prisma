@@ -24,18 +24,21 @@ model Project {
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
-  dpdUrl                         String?
+  dppUrl                         String?
+  dgdUrl                         String?
   investors                      Investor[]
+  users                          User[]
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   name          String
-  email         String   @unique
+  email         String    @unique
   phone         String?
   streetAddress String
   walletAddress String
   userType      UserType
+  projects      Project[]
 }
 
 enum UserType {
