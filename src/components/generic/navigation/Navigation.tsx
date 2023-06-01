@@ -37,13 +37,13 @@ const Navigation: FC = () => {
             icon: <HiOutlineDocumentSearch size={26}/>,
         },
         {
-            label: 'Add User',
+            label: 'Add Users',
             href: '/addUser',
             icon: <AiOutlineUserAdd size={26}/>,
             adminOnly: true,
         },
         {
-            label: 'Add Investor',
+            label: 'Add Investors',
             href: '/addInvestor',
             icon: <AiOutlineUserAdd size={26}/>,
             adminOnly: true

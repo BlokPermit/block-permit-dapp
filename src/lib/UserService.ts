@@ -1,8 +1,16 @@
 import {prisma} from "@/util/PrismaClient";
+import {User} from "@prisma/client";
+
 
 export const registerUser = async (data: any) => {
     return prisma.user.create({
         data: data,
+    });
+}
+
+export const createUsers = async (users: User[]) => {
+    return prisma.user.createMany({
+        data: users,
     });
 }
 
