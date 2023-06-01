@@ -4,7 +4,7 @@ import { Investor, Project } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaFileContract, FaHeading, FaTag } from "react-icons/all";
+import { FaArrowUp, FaFileContract, FaHeading, FaTag, FaTrash } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -36,6 +36,20 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
       icon: <FaArrowUp />,
       popupType: "warning",
       buttonPrimaryText: "Send",
+      onClickPrimary: () => {
+        console.log("Send to opinion providers");
+      },
+      show: true,
+    });
+  };
+
+  const handleRemove = () => {
+    setConformationPopup({
+      title: "Delete Opinion Providers",
+      message: "Are you sure you want to delete this Opinion Provider? This action cannot be undone!",
+      icon: <FaTrash />,
+      popupType: "error",
+      buttonPrimaryText: "Delete",
       onClickPrimary: () => {
         console.log("Send to opinion providers");
       },
@@ -136,7 +150,13 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
         </div>
         <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Opinion Providers</h2>
         {opinionProviders.map((opinionProvider) => (
-          <OpinionProvider opinionProvider={opinionProvider} key={opinionProvider.id} countSelected={countSelected} handleAttachments={() => setIsAttachmentsPopupOpen(true)} handleRemove={() => {}} />
+          <OpinionProvider
+            opinionProvider={opinionProvider}
+            key={opinionProvider.id}
+            countSelected={countSelected}
+            handleAttachments={() => setIsAttachmentsPopupOpen(true)}
+            handleRemove={handleRemove}
+          />
         ))}
         <IconButton text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
       </div>
