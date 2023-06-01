@@ -14,12 +14,9 @@ import useAlert from "@/hooks/AlertHook";
 interface InvestorInput {
     name: string;
     streetAddress: string;
+    email: string;
+    phoneNumber: string;
     taxId: string;
-}
-
-interface Option {
-    value: any;
-    label: string;
 }
 
 
@@ -28,7 +25,9 @@ const AddInvestor = () => {
     const emptyInvestor = {
         name: '',
         streetAddress: '',
-        taxId: ''
+        taxId: '',
+        email: '',
+        phoneNumber: ''
     };
 
     const [userForm, setInvestorForm] = useState<InvestorInput>({...emptyInvestor});
@@ -66,7 +65,7 @@ const AddInvestor = () => {
             setAddedInvestors([]);
             setAlert({title: 'Success!', message: 'Investors added.', type: 'success'});
         } catch (error) {
-            setAlert({title: 'Something went wrong', message: error as string, type: 'error'});
+            setAlert({title: 'Something went wrong', message: 'Error', type: 'error'});
         }
     }
 
@@ -84,25 +83,32 @@ const AddInvestor = () => {
                 </div>
             </div>
             <div className="border-b border-gray-900/10 py-10  ">
-                <div className="flex w-full px-5 space-x-4 justify-between items-center">
-                    <div className="w-1/3">
+                <div className="flex w-full ">
+                    <div className="w-1/2 px-5 space-y-2 ">
                         <InputField id={"name"} name={"name"} label={"Full name"}
                                     placeholder={"Enter display name..."}
                                     type={"text"}
                                     onChange={handleInputChange}
                                     value={userForm.name}/>
+                        <InputField id={"email"} name={"email"} label={"Email"}
+                                    placeholder={"Enter email address..."}
+                                    type={"text"}
+                                    onChange={handleInputChange}
+                                    value={userForm.email}/>
+                        <InputField id={"phoneNumber"} name={"phoneNumber"} label={"Phone"}
+                                    placeholder={"Enter phone number..."}
+                                    type={"text"}
+                                    onChange={handleInputChange}
+                                    value={userForm.phoneNumber}/>
                     </div>
-
-                    <div className="w-1/3">
+                    <div className="w-1/2 px-5 space-y-2">
                         <InputField id={"streetAddress"} name={"streetAddress"}
                                     label={"Street address"}
                                     placeholder={"Enter street address..."}
                                     onChange={handleInputChange}
                                     type={"text"} value={userForm.streetAddress}/>
-                    </div>
-                    <div className="w-1/3">
                         <InputField id={"taxId"} name={"taxId"} label={"Tax Number"}
-                                    placeholder={"Enter investors tax number..."}
+                                    placeholder={"Enter tax number..."}
                                     type={"text"}
                                     onChange={handleInputChange}
                                     value={userForm.taxId}/>
@@ -111,7 +117,7 @@ const AddInvestor = () => {
             </div>
             {addedInvestors.map((user, i) => (
                 <div key={i} className={`border-b ${i == 0 ? "border-t" : null} border-gray-900/10 py-5`}>
-                    <div className="grid grid-cols-4 w-full items-center justify-between">
+                    <div className="grid grid-cols-6 w-full items-center justify-between">
                         <div className="col-span-1">
                             <div className="text-neutral-400">Name</div>
                             <div style={{wordWrap: 'break-word'}}>{user.name}</div>
@@ -123,6 +129,14 @@ const AddInvestor = () => {
                         <div className="col-span-1">
                             <div className="text-neutral-400">Tax Number</div>
                             <div style={{wordWrap: 'break-word'}}>{user.taxId}</div>
+                        </div>
+                        <div className="col-span-1">
+                            <div className="text-neutral-400">Email</div>
+                            <div style={{wordWrap: 'break-word'}}>{user.email}</div>
+                        </div>
+                        <div className="col-span-1">
+                            <div className="text-neutral-400">Phone Number</div>
+                            <div style={{wordWrap: 'break-word'}}>{user.phoneNumber}</div>
                         </div>
                         <div className="col-span-1 text-right pr-5">
                             <Button text={"Remove Investor"} onClick={() => handleRemoveInvestor(i)}/>
