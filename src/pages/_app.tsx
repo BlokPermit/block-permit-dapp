@@ -11,6 +11,8 @@ import { UserProvider } from "@/context/UserContext";
 import { AlertProvider } from "@/context/AlertContext";
 import Alert from "@/components/generic/notifications/Alert";
 import { useRouter } from "next/router";
+import { ConformationPopupProvider } from "@/context/ConformationPopupContext";
+import ConformationPopup from "@/components/generic/notifications/ConformationPopup";
 
 const { publicClient, webSocketPublicClient } = configureChains([mainnet], [publicProvider()]);
 
@@ -25,13 +27,16 @@ function MyApp({ Component, pageProps }: AppProps) {
       <SessionProvider session={pageProps.session} refetchInterval={0}>
         <UserProvider>
           <AlertProvider>
-            <Layout>
-              <Head>
-                <title>D-Verification</title>
-              </Head>
-              <Component {...pageProps} />
-              <Alert />
-            </Layout>
+            <ConformationPopupProvider>
+              <Layout>
+                <Head>
+                  <title>D-Verification</title>
+                </Head>
+                <Component {...pageProps} />
+                <Alert />
+                <ConformationPopup />
+              </Layout>
+            </ConformationPopupProvider>
           </AlertProvider>
         </UserProvider>
       </SessionProvider>
