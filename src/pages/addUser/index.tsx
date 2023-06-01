@@ -101,7 +101,7 @@ const AddUser = () => {
             setAddedUsers([]);
             setAlert({title: 'Success!', message: 'Users added.', type: 'success'});
         } catch (error) {
-            setAlert({title: 'Something went wrong', message: error as string, type: 'error'});
+            setAlert({title: 'Something went wrong', message: 'error', type: 'error'});
         }
     }
 
