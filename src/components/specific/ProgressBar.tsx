@@ -25,7 +25,7 @@ const ProgressBar = (props: ProgressBarProps) => {
             )}
 
             <p className="leading-none">
-              <strong className="block font-medium"> Prva faza </strong>
+              <strong className="block font-medium text-black"> Prva faza </strong>
               <small className="mt-1"> Pridobivanje projektnih pogojev. </small>
             </p>
             <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 rounded-tr-sm bg-inherit"></span>
@@ -44,7 +44,7 @@ const ProgressBar = (props: ProgressBarProps) => {
             )}
 
             <p className="leading-none">
-              <strong className="block font-medium"> Druga faza </strong>
+              <strong className="block font-medium text-black"> Druga faza </strong>
               <small className="mt-1"> Pridobivanje projektnih mnenj. </small>
             </p>
             <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 rounded-tr-sm bg-inherit"></div>
@@ -63,7 +63,7 @@ const ProgressBar = (props: ProgressBarProps) => {
             )}
 
             <p className="leading-none">
-              <strong className="block font-medium"> Tretja faza </strong>
+              <strong className="block font-medium text-black"> Tretja faza </strong>
               <small className="mt-1"> Izdaja gradbenega dovoljenja. </small>
             </p>
           </li>
