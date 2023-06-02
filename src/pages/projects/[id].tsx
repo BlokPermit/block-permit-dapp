@@ -4,7 +4,7 @@ import { Investor, Project } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaBookmark, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
+import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -14,20 +14,30 @@ import AttachmentsPopup from "@/components/specific/AttachmentsPopup";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
 import ProgressBar from "@/components/specific/ProgressBar";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
-import AttachmentCard from "@/components/specific/AttachmentCard";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 
-export const getServerSideProps: GetServerSideProps<{ foundProject: Project | null }> = async () => {
-  //TODO: dynamic id
-  const project: Project | null = await findProjectById("6479cff69ae59a148d3d603f");
-  return { props: { foundProject: project } };
+export const getServerSideProps: GetServerSideProps<{ project: Project | null }> = async (context) => {
+  const id = context.params ? context.params.id : "";
+  let project: Project | null = null;
+
+  try {
+    project = await findProjectById(id?.toString() ?? "");
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!project) {
+    return {
+      notFound: true,
+    };
+  }
+  return { props: { project } };
 };
 
-const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { setConformationPopup } = useConformationPopup();
-  const [project, setProject] = useState<Project | null>(null);
 
   const [isDPPPresent, setIsDPPPresent] = useState<boolean>(true);
   const onDocumentChange = (file: File | null) => {};
@@ -106,16 +116,6 @@ const ProjectPage = ({ foundProject }: InferGetServerSidePropsType<typeof getSer
       name: "Michael Jackson",
     },
   ];
-
-  useEffect(() => {
-    if (foundProject) {
-      setProject(foundProject);
-    }
-  }, [foundProject]);
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
 
   return (
     <div className="px-40 mb-10">
