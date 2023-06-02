@@ -1,4 +1,4 @@
-import {supabase} from "@/util/SupabaseClient";
+import {supabase} from "@/utils/SupabaseClient";
 
 export const saveDocument = async (file: File) => {
     const {data, error} = await supabase.storage

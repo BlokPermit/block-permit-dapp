@@ -6,46 +6,52 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Investor {
-  id            Int       @id @default(autoincrement())
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   streetAddress String
-  taxId         String
-  phoneNumber   String
-  email         String
-  projects      Project[]
+  taxId         String  @unique
+  project       Project @relation(fields: [projectId], references: [id])
+  projectId     String  @db.ObjectId
 }
 
 model Project {
-  id                             Int        @id @default(autoincrement())
-  smartContractAddress           String
+  id                             String     @id @default(auto()) @map("_id") @db.ObjectId
+  smartContractAddress           String     @unique
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
-  dppUrl                         String?
-  dgdUrl                         String?
+  dppUrl                         String?    @unique
+  dgdUrl                         String?    @unique
   investors                      Investor[]
-  users                          User[]
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  name          String
-  email         String    @unique
-  phone         String?
-  streetAddress String
-  walletAddress String
-  userType      UserType
-  projects      Project[]
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  email            String         @unique
+  phone            String?
+  streetAddress    String
+  walletAddress    String         @unique
+  userType         UserType
+  projectAddresses String[]
+  notifications    Notification[]
+}
+
+type Notification {
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+  content   String?
+  projectId String   @db.ObjectId
 }
 
 enum UserType {
   ADMIN
-  OPINION_PROVIDER
+  ASSESSMENT_PROVIDER
   PROJECT_MANAGER
   ADMINISTRATIVE_AUTHORITY
 }

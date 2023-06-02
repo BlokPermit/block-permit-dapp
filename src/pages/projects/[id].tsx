@@ -15,7 +15,8 @@ import useConformationPopup from "@/hooks/ConformationPopupHook";
 import ProgressBar from "@/components/specific/ProgressBar";
 
 export const getServerSideProps: GetServerSideProps<{ foundProject: Project | null }> = async () => {
-  const project: Project | null = await findProjectById(1);
+  //TODO: dynamic id
+  const project: Project | null = await findProjectById("647764b036d900177fe0d201");
   return { props: { foundProject: project } };
 };
 

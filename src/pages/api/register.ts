@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { prisma } from "@/util/PrismaClient";
+import { prisma } from "@/utils/PrismaClient";
 import { NextApiRequest, NextApiResponse } from "next";
 import {registerUser} from "@/lib/UserService";
 

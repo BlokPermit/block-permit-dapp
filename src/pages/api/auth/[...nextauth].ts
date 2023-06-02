@@ -8,6 +8,7 @@ export default NextAuth({
         async jwt({token, user}) {
             if (user) {
                 token.user = await findUserByAddress(token.address as string);
+                console.log(token.user);
             }
             return token;
         },

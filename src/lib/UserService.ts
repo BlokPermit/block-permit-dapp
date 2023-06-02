@@ -1,4 +1,4 @@
-import {prisma} from "@/util/PrismaClient";
+import {prisma} from "@/utils/PrismaClient";
 import {User} from "@prisma/client";
 
 

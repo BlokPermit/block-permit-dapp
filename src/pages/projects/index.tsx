@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useEffect} from "react";
 import ProtectedRoute from "@/components/generic/navigation/ProtectedRoute";
 import { AiOutlineAppstoreAdd } from "react-icons/all";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
 import SearchInput from "@/components/generic/input/SearchInput";
 import ProjectPlaceholder from "@/components/generic/placeholders/ProjectPlaceholder";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
+import {provider} from "../../utils/EthereumClient";
 
 const Projects = () => {
   return (

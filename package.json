@@ -16,6 +16,7 @@
     "production:build": "npx prisma generate && npx prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@metamask/sdk": "^0.3.0",
     "@moralisweb3/next": "^2.21.0",
     "@prisma/client": "^4.14.1",
     "@supabase/supabase-js": "^2.22.0",
@@ -26,12 +27,14 @@
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
     "dotenv-cli": "^7.2.1",
-    "ethers": "^6.3.0",
+    "ethers": "^5.7.2",
+    "fs": "^0.0.1-security",
     "memory-cache": "^0.2.0",
     "moralis": "^2.21.0",
     "next": "13.4.2",
     "next-auth": "^4.22.1",
     "next-transpile-modules": "^10.0.0",
+    "path": "^0.12.7",
     "postcss": "8.4.23",
     "prisma": "^4.14.1",
     "react": "18.2.0",
@@ -43,6 +46,7 @@
     "react-tailwindcss-select": "^1.8.5",
     "tailwindcss": "3.3.2",
     "typescript": "5.0.4",
+    "viem": "^0.3.40",
     "wagmi": "^1.0.5"
   },
   "devDependencies": {

@@ -15,6 +15,14 @@ import {LoadingAnimation} from "@/components/generic/loading-animation/LoadingAn
 import {useRouter} from "next/router";
 import useAlert from "@/hooks/AlertHook";
 import {useSession} from "next-auth/react";
+import {ethers} from "ethers";
+import {provider} from "../../../utils/EthereumClient";
+import MetaMaskSDK from '@metamask/sdk';
+import {JsonRpcSigner, Web3Provider} from "@ethersproject/providers";
+import {getConnectedAddress} from "../../../utils/MetamaskUtils";
+import {array} from "zod";
+import list from "postcss/lib/list";
+import {AddressZero} from "@ethersproject/constants";
 
 interface Option {
     label: string;
@@ -59,46 +67,51 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
         event.preventDefault();
         setIsLoading(true);
 
-        try {
-            const documentUrl = await fetch("api/documents", {
-                method: "POST",
-                body: selectedDocument,
-            });
+    try {
+      /*const documentUrl = await fetch("api/documents", {
+        method: "POST",
+        body: selectedDocument,
+      });*/
 
-            const data = {
-                smartContractAddress: "1231223123",
-                constructionTitle: projectName,
-                constructionImpactsEnvironment: selectedEnvironmentImpact.value,
-                constructionType: selectedConstructionType.label,
-                dpdUrl: documentUrl,
-                investors: {connect: selectedInvestors.map((investor) => ({id: investor.value.id}))},
-            };
+      const data = {
+        constructionTitle: projectName,
+        constructionImpactsEnvironment: selectedEnvironmentImpact.value,
+        constructionType: selectedConstructionType.label,
+        dppUrl: "dppUrl",
+        investors: { connect: selectedInvestors.map((investor) => ({ id: investor.value.id })) },
+        smartContractAddress: AddressZero
+      };
 
+      const accounts = await ethereum.request({method: 'eth_accounts'});
+      let connectedAddress: string = getConnectedAddress(accounts);
 
-            const response = await fetch("/api/project", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
+      const response = await fetch("/api/project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectData: data,
+          walletAddress: connectedAddress
+        })
+      });
 
             if (!response.ok) {
                 throw new Error("Error occurred");
             }
 
-            const result = await response.json();
-            console.log(result);
-            // @ts-ignore
-            await router.push("/projects");
-            setAlert({title: "Project created!", message: "You can now view it in projects.", type: "success"});
-            setIsLoading(false);
-        } catch (error: any) {
-            // @ts-ignore
-            setAlert({title: "", message: 'Error', type: "error"});
-            // Handle the error appropriately
-        }
-    };
+      const result = await response.json();
+      console.log(result);
+      // @ts-ignore
+      await router.push("/projects");
+      setAlert({ title: "Project created!", message: "You can now view it in projects.", type: "success" });
+      setIsLoading(false);
+    } catch (error: any) {
+      // @ts-ignore
+      setAlert({ title: "", message: error.message, type: "error" });
+      // Handle the error appropriately
+    }
+  };
 
     return (
         <div>
@@ -192,19 +205,19 @@ export const getStaticProps: GetStaticProps<InvestorsPageProps> = async () => {
         const response = await axios.get("http://localhost:3000/api/investors");
         const investors: Investor[] = response.data;
 
-        return {
-            props: {
-                investors,
-            },
-        };
-    } catch (error) {
-        console.error("Error fetching investors:", error);
-        return {
-            props: {
-                investors: [],
-            },
-        };
-    }
+    return {
+      props: {
+        investors,
+      },
+    };
+  } catch (error: Error) {
+    console.error("Error fetching investors:", error.message);
+    return {
+      props: {
+        investors: [],
+      },
+    };
+  }
 };
 
 export default CreateProject;
