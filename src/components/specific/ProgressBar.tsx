@@ -5,11 +5,12 @@ interface ProgressBarProps {
   actualPhase: number;
   selectedPhase: number;
   handlePhaseChange: (phase: number) => void;
+  className?: string;
 }
 
 const ProgressBar = (props: ProgressBarProps) => {
   return (
-    <div>
+    <div className={`${props.className}`}>
       <div>
         <ol className="grid grid-cols-1 divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white sm:grid-cols-3">
           <li

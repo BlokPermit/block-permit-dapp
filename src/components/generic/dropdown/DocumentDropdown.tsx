@@ -12,18 +12,17 @@ interface DocumentDropdownProps {
 const DocumentDownload = (props: DocumentDropdownProps) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   return (
-    <div className="relative">
-      <div className="inline-flex items-center overflow-hidden rounded-md border text-md bg-main-200 hover:bg-white text-white hover:text-main-200 hover:cursor-pointer">
-        <span className="flex justify-between items-center border-e px-4 py-2 text-inherit">
+    <div>
+      <div className="inline-flex items-center overflow-hidden rounded-md border text-md hover:cursor-pointer">
+        <span className="flex justify-between items-center border-e p-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
           <FaFileDownload className="mr-2" size={18} />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
 
-        <button onClick={() => setIsActive(!isActive)} className="h-full p-2 text-inherit">
-          <span className="sr-only">Menu</span>
-          {isActive ? <FaChevronUp size={15} /> : <FaChevronDown size={15} />}
-        </button>
+        <span onClick={() => setIsActive(!isActive)} className="p-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+          <button>{isActive ? <FaChevronUp size={15} /> : <FaChevronDown size={15} />}</button>
+        </span>
       </div>
 
       <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
