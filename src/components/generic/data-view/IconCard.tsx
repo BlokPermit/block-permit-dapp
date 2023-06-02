@@ -7,11 +7,12 @@ interface IconCardProps {
   value: string;
   className?: string;
   icon: any;
+  trailing?: any;
 }
 
 const IconCard = (props: IconCardProps) => {
   return (
-    <article className={`${props.className} rounded-lg border border-gray-200 bg-white p-3 mb-3`}>
+    <article className={`${props.className} rounded-lg border border-gray-200 bg-white p-3 mb-3 flex justify-between items-center`}>
       <div className="flex items-center gap-4">
         <span className="hidden rounded-full bg-gray-100 p-2 text-gray-600 sm:block">{props.icon}</span>
 
@@ -21,6 +22,7 @@ const IconCard = (props: IconCardProps) => {
           <p className="text-lg font-medium text-gray-900">{props.value}</p>
         </div>
       </div>
+      <div>{props.trailing}</div>
     </article>
   );
 };
