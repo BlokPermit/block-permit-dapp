@@ -1,30 +1,29 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import {Investor, User} from "@prisma/client";
-import {createUsers, registerUser} from "@/lib/UserService";
-import {createInvestors, getAllInvestors} from "@/lib/InvestorService";
-import {prisma} from "@/util/PrismaClient";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Investor, User } from "@prisma/client";
+import { createUsers, registerUser } from "@/lib/UserService";
+import { createInvestors, getAllInvestors } from "@/lib/InvestorService";
+import { prisma } from "@/utils/PrismaClient";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const {method} = req;
+  const { method } = req;
 
-    switch (method) {
-        case "GET":
-            break;
+  switch (method) {
+    case "GET":
+      break;
 
-        case "POST":
-            const status = await createUsers(req.body);
-            res.status(201).json(status);
-            break;
+    case "POST":
+      console.log(req.body);
+      const status = await createUsers(req.body);
+      res.status(201).json(status);
+      break;
 
-        case "PUT":
+    case "PUT":
+      break;
 
-            break;
+    case "DELETE":
+      break;
 
-        case "DELETE":
-
-            break;
-
-        default:
-            res.status(405).end(`Method ${method} Not Allowed`);
-    }
+    default:
+      res.status(405).end(`Method ${method} Not Allowed`);
+  }
 }
