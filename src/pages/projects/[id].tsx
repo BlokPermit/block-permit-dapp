@@ -18,22 +18,20 @@ import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 
-export const getServerSideProps: GetServerSideProps<{ project: Project | null }> = async (context) => {
+export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
-  let project: Project | null = null;
 
   try {
-    project = await findProjectById(id?.toString() ?? "");
+    let project: Project | null = await findProjectById(id?.toString() ?? "");
+    if (!project) {
+      return {
+        notFound: true,
+      };
+    }
+    return { props: { project } };
   } catch (error) {
     console.log(error);
   }
-
-  if (!project) {
-    return {
-      notFound: true,
-    };
-  }
-  return { props: { project } };
 };
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {

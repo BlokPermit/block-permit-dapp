@@ -81,3 +81,11 @@ export const findProjectById = async (id: string) => {
     throw new Error(error.message);
   }
 };
+
+export const getAllProjects = async () => {
+  try {
+    return await prisma.project.findMany();
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
