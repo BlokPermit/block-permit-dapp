@@ -13,18 +13,17 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   return (
     <div>
-      <div className="inline-flex items-center overflow-hidden rounded-md border text-md hover:cursor-pointer">
-        <span className="flex justify-between items-center border-e p-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
-          <FaFileDownload className="mr-2" size={18} />
+      <div className="inline-flex items-center overflow-hidden rounded-md border text-sm hover:cursor-pointer">
+        <span className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+          <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
 
-        <span onClick={() => setIsActive(!isActive)} className="p-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
-          <button>{isActive ? <FaChevronUp size={15} /> : <FaChevronDown size={15} />}</button>
+        <span onClick={() => setIsActive(!isActive)} className="px-2 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+          {isActive ? <FaChevronUp /> : <FaChevronDown />}
         </span>
       </div>
-
       <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
         <div className="p-2">
           <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
