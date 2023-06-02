@@ -4,6 +4,7 @@ interface SecondaryButtonProps {
   onClick?: () => void;
   text: string;
   icon: any;
+  disabled?: boolean;
 }
 
 interface PrimaryButtonProps {
@@ -20,10 +21,13 @@ const ButtonGroup = (props: ButtonGroupProps) => {
   return (
     <div className="inline-flex rounded-lg border border-gray-100 bg-gray-100 p-1">
       {props.secondaryButtons.map((buttonProps, index) => (
-        <button className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-500 hover:text-main-200 focus:relative" onClick={buttonProps.onClick}>
+        <span
+          className={`${!buttonProps.disabled && "hover:text-main-200 hover:cursor-pointer"} inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-500  focus:relative`}
+          onClick={buttonProps.onClick}
+        >
           {buttonProps.icon}
           {buttonProps.text}
-        </button>
+        </span>
       ))}
 
       <button
