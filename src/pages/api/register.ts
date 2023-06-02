@@ -1,15 +1,20 @@
-import { User } from "@prisma/client";
-import { prisma } from "@/utils/PrismaClient";
-import { NextApiRequest, NextApiResponse } from "next";
-import {registerUser} from "@/lib/UserService";
+import {User} from "@prisma/client";
+import {prisma} from "@/utils/PrismaClient";
+import {NextApiRequest, NextApiResponse} from "next";
+import {checkUserOnBlockchain, registerUser} from "@/lib/UserService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { method } = req;
+    const {method} = req;
 
     switch (method) {
         case "POST":
-            const user: User = await registerUser(req.body);
-            res.status(201).json(user);
+            const isAllowed: boolean = await checkUserOnBlockchain(req.body);
+            console.log(isAllowed);
+            if (!isAllowed) {
+                res.status(401).json(isAllowed);
+                break;
+            }
+            res.status(201).json(isAllowed);
             break;
 
         default:

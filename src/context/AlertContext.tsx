@@ -1,6 +1,6 @@
 import {createContext, useState} from 'react';
 
-const ALERT_TIME = 5000;
+const ALERT_TIME = 8000;
 
 export interface AlertProps {
     title: string;

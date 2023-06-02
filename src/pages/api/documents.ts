@@ -6,11 +6,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     switch (method) {
         case "POST":
-            const filePath: string = await saveDocument(req.body);
-            console.log()
+            const filePath: string | boolean = await saveDocument(req.body);
+            if (filePath === false) {
+                res.status(500).json({error: "Error saving document"});
+                break;
+            }
             res.status(201).json(filePath);
             break;
-
         default:
             res.status(405).end(`Method ${method} Not Allowed`);
     }

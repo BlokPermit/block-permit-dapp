@@ -1,7 +1,6 @@
 import path from "path";
-import {Contract, getDefaultProvider} from "ethers";
+import {Contract} from "ethers";
 import {provider} from "./EthereumClient";
-import {Web3Provider} from "@ethersproject/providers";
 import {readFileSync} from "fs";
 
 export const getContractArtifact = (contractName: string) => {
@@ -16,8 +15,11 @@ export const getContractArtifact = (contractName: string) => {
 export const getOwnerContract = async () => {
     const contractABI = await getContractArtifact("OwnerContract").abi;
     return new Contract(
-        process.env.OWNER_CONTRACT_ADDRESS,
+        process.env.OWNER_CONTRACT_ADDRESS as string,
         contractABI,
         provider
     );
+}
+
+export const getContractABI = async () => {
 }

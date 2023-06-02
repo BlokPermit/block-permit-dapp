@@ -14,15 +14,9 @@ import axios from "axios";
 import {LoadingAnimation} from "@/components/generic/loading-animation/LoadingAnimation";
 import {useRouter} from "next/router";
 import useAlert from "@/hooks/AlertHook";
-import {useSession} from "next-auth/react";
-import {ethers} from "ethers";
-import {provider} from "../../../utils/EthereumClient";
-import MetaMaskSDK from '@metamask/sdk';
-import {JsonRpcSigner, Web3Provider} from "@ethersproject/providers";
-import {getConnectedAddress} from "../../../utils/MetamaskUtils";
-import {array} from "zod";
-import list from "postcss/lib/list";
+import {getConnectedAddress} from "@/utils/MetamaskUtils";
 import {AddressZero} from "@ethersproject/constants";
+import {saveDocument} from "@/lib/DocumentService";
 
 interface Option {
     label: string;
@@ -36,7 +30,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
     const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({label: "Mixed", value: "1"});
     const [description, setDescription] = useState<string>("");
     const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({label: "No", value: false});
-    const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
+    const [selectedDocument, setSelectedDocument] = useState<any>(null);
     const [selectedInvestors, setSelectedInvestors] = useState<Option[]>([]);
     const {setAlert} = useAlert();
 
@@ -54,6 +48,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
         setSelectedEnvironmentImpact(option);
     };
     const handleDocumentChange = (file: File | null) => {
+        console.log(file);
         setSelectedDocument(file);
     };
     const handleProjectNameChange = (value: string) => {
@@ -66,52 +61,51 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         setIsLoading(true);
+        let isDocument: boolean = selectedDocument != null;
 
-    try {
-      /*const documentUrl = await fetch("api/documents", {
-        method: "POST",
-        body: selectedDocument,
-      });*/
-
-      const data = {
-        constructionTitle: projectName,
-        constructionImpactsEnvironment: selectedEnvironmentImpact.value,
-        constructionType: selectedConstructionType.label,
-        dppUrl: "dppUrl",
-        investors: { connect: selectedInvestors.map((investor) => ({ id: investor.value.id })) },
-        smartContractAddress: AddressZero
-      };
-
-      const accounts = await ethereum.request({method: 'eth_accounts'});
-      let connectedAddress: string = getConnectedAddress(accounts);
-
-      const response = await fetch("/api/project", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          projectData: data,
-          walletAddress: connectedAddress
-        })
-      });
-
-            if (!response.ok) {
-                throw new Error("Error occurred");
+        try {
+            let documentPath: string | boolean;
+            if (isDocument) {
+                documentPath = await saveDocument(selectedDocument);
+                if (documentPath == false) throw Error('Error loading document');
             }
 
-      const result = await response.json();
-      console.log(result);
-      // @ts-ignore
-      await router.push("/projects");
-      setAlert({ title: "Project created!", message: "You can now view it in projects.", type: "success" });
-      setIsLoading(false);
-    } catch (error: any) {
-      // @ts-ignore
-      setAlert({ title: "", message: error.message, type: "error" });
-      // Handle the error appropriately
-    }
-  };
+            const project = {
+                constructionTitle: projectName,
+                constructionImpactsEnvironment: selectedEnvironmentImpact.value,
+                constructionType: selectedConstructionType.label,
+                dppUrl: (isDocument) ? documentPath! : null,
+                investors: {connect: selectedInvestors.map((investor) => ({id: investor.value.id}))},
+                smartContractAddress: AddressZero
+            };
+
+            const accounts = await ethereum.request({method: 'eth_accounts'});
+            let connectedAddress: string = getConnectedAddress(accounts);
+
+            const response = await fetch("/api/project", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    projectData: project,
+                    walletAddress: connectedAddress
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Error saving project.");
+            }
+            // @ts-ignore
+            await router.push("/projects");
+            setAlert({title: "Project created!", message: "You can now view it in projects.", type: "success"});
+            setIsLoading(false);
+        } catch (error: any) {
+            // @ts-ignore
+            setAlert({title: "", message: error.message, type: "error"});
+            // Handle the error appropriately
+        }
+    };
 
     return (
         <div>
@@ -205,19 +199,19 @@ export const getStaticProps: GetStaticProps<InvestorsPageProps> = async () => {
         const response = await axios.get("http://localhost:3000/api/investors");
         const investors: Investor[] = response.data;
 
-    return {
-      props: {
-        investors,
-      },
-    };
-  } catch (error: Error) {
-    console.error("Error fetching investors:", error.message);
-    return {
-      props: {
-        investors: [],
-      },
-    };
-  }
+        return {
+            props: {
+                investors,
+            },
+        };
+    } catch (error: any) {
+        console.error("Error fetching investors:", error.message);
+        return {
+            props: {
+                investors: [],
+            },
+        };
+    }
 };
 
 export default CreateProject;

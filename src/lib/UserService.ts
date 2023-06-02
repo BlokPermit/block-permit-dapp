@@ -1,5 +1,7 @@
 import {prisma} from "@/utils/PrismaClient";
 import {User} from "@prisma/client";
+import {Contract} from "ethers";
+import {getOwnerContract} from "@/utils/BlockchainUtils";
 
 
 export const registerUser = async (data: any) => {
@@ -27,4 +29,10 @@ export const findUserByAddress = async (address: string) => {
             walletAddress: address,
         }
     });
+}
+
+export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
+    console.log(address.account);
+    const contract: Contract = await getOwnerContract();
+    return contract.authorizedUsers(address.account);
 }

@@ -9,7 +9,7 @@ export const saveDocument = async (file: File) => {
         });
 
     if (error) {
-        throw error;
+        return false;
     }
 
     return data.path;
