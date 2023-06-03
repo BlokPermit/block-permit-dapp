@@ -1,10 +1,10 @@
 import {ethers} from "ethers";
-import {JsonRpcProvider, Provider} from "@ethersproject/providers";
+import {JsonRpcProvider} from "@ethersproject/providers";
 
 const globalForProvider = global as unknown as {
-    provider: ethers.providers.Provider | undefined;
+    provider: JsonRpcProvider | undefined;
 };
 
-export const provider: Provider =
+export const provider: JsonRpcProvider =
     globalForProvider.provider ??
     new ethers.providers.JsonRpcProvider(process.env.PROVIDER_URL);

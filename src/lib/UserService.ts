@@ -1,6 +1,6 @@
 import {prisma} from "@/utils/PrismaClient";
 import {User} from "@prisma/client";
-import {Contract, ethers, Signer} from "ethers";
+import {Contract} from "ethers";
 import {getOwnerContract} from "@/utils/BlockchainUtils";
 import {provider} from "@/utils/EthereumClient";
 
@@ -27,8 +27,6 @@ export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
 }
 
 export const authorizeUsersOnBlockchain = async (addresses: any, signer: string): Promise<any> => {
-    console.log(signer);
     const contract: Contract = await getOwnerContract();
-    console.log(contract);
     return contract.connect(provider.getSigner(signer)).authorizeUsers(addresses);
 }

@@ -9,7 +9,6 @@ import Dropdown from "@/components/generic/dropdown/Dropdown";
 
 import OutlineButton from "@/components/generic/buttons/OutlineButton";
 import useAlert from "@/hooks/AlertHook";
-import {getConnectedAddress} from "@/utils/MetamaskUtils";
 import {ethers} from "ethers";
 
 interface UserInput {
@@ -24,6 +23,12 @@ interface UserInput {
 interface Option {
     value: any;
     label: string;
+}
+
+declare global {
+    interface Window {
+        ethereum: any;
+    }
 }
 
 const options: Option[] = [

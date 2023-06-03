@@ -23,6 +23,12 @@ interface Option {
     value: any;
 }
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
+
 const CreateProject = ({investors}: InvestorsPageProps) => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
