@@ -4,9 +4,9 @@ import ProjectPlaceholder from "@/components/generic/placeholders/ProjectPlaceho
 import ProtectedRoute from "@/components/generic/navigation/ProtectedRoute";
 
 const Dashboard = () => {
-  return (
-    <ProtectedRoute>
-      <div className="px-12 pt-6">
+    return (
+        <ProtectedRoute>
+            {/* <div className="px-12 pt-6">
         <div className="mt-2">
           <h1 className="text-neutral-500 text-2xl font-semibold">Recent projects</h1>
           <div className="flex flex-wrap mt-3">
@@ -36,9 +36,9 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
-      </div>
-    </ProtectedRoute>
-  );
+      </div>*/}
+        </ProtectedRoute>
+    );
 };
 
 export default Dashboard;

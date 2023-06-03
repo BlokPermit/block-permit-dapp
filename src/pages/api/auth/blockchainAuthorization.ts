@@ -1,18 +1,18 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {authorizeUsersOnBlockchain} from "@/lib/UserService";
+import {checkUserOnBlockchain} from "@/lib/UserService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {method} = req;
 
     switch (method) {
         case "POST":
-            console.log(req.body);
-            const response: boolean = await authorizeUsersOnBlockchain(req.body.addresses, req.body.signer);
-            if (!response) {
-                res.status(500).json(response);
+            const isAllowed: boolean = await checkUserOnBlockchain(req.body);
+            console.log(isAllowed);
+            if (!isAllowed) {
+                res.status(401).json(isAllowed);
                 break;
             }
-            res.status(201).json(response);
+            res.status(201).json(isAllowed);
             break;
 
         default:

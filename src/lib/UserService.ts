@@ -1,14 +1,9 @@
 import {prisma} from "@/utils/PrismaClient";
 import {User} from "@prisma/client";
-import {Contract} from "ethers";
+import {Contract, ethers, Signer} from "ethers";
 import {getOwnerContract} from "@/utils/BlockchainUtils";
+import {provider} from "@/utils/EthereumClient";
 
-
-export const registerUser = async (data: any) => {
-    return prisma.user.create({
-        data: data,
-    });
-}
 
 export const createUsers = async (users: User[]) => {
     return prisma.user.createMany({
@@ -16,13 +11,6 @@ export const createUsers = async (users: User[]) => {
     });
 }
 
-export const loginUser = async (address: string) => {
-    try {
-        return await findUserByAddress(address);
-    } catch (error) {
-        return error;
-    }
-}
 export const findUserByAddress = async (address: string) => {
     return prisma.user.findFirst({
         where: {
@@ -32,7 +20,15 @@ export const findUserByAddress = async (address: string) => {
 }
 
 export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
-    console.log(address.account);
     const contract: Contract = await getOwnerContract();
+    const isOwner: boolean = await contract.owners(address.account)
+    if (isOwner) return isOwner;
     return contract.authorizedUsers(address.account);
+}
+
+export const authorizeUsersOnBlockchain = async (addresses: any, signer: string): Promise<any> => {
+    console.log(signer);
+    const contract: Contract = await getOwnerContract();
+    console.log(contract);
+    return contract.connect(provider.getSigner(signer)).authorizeUsers(addresses);
 }

@@ -33,7 +33,7 @@ function SignIn() {
             connector: new MetaMaskConnector(),
         });
 
-        const response = await fetch("/api/register", {
+        const response = await fetch("/api/auth/blockchainAuthorization", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

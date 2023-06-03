@@ -14,8 +14,10 @@ export const getContractArtifact = (contractName: string) => {
 
 export const getOwnerContract = async () => {
     const contractABI = await getContractArtifact("OwnerContract").abi;
+    console.log(provider);
+
     return new Contract(
-        process.env.OWNER_CONTRACT_ADDRESS as string,
+        process.env.NEXT_PUBLIC_OWNER_CONTRACT_ADDRESS as string,
         contractABI,
         provider
     );
