@@ -1,10 +1,10 @@
 import {Contract} from "ethers";
 import {provider} from "./EthereumClient";
 
-const projectAbi = require('../../contractArtifacts/Project.json');
-const ownerContractAbi = require('../../contractArtifacts/OwnerContract.json');
-const buildingPermitContractAbi = require('../../contractArtifacts/BuildingPermitContract.json');
-const documentContractAbi = require('../../contractArtifacts/DocumentContract.json');
+const projectArtifact = require('../../contractArtifacts/Project.json');
+const ownerContractArtifact = require('../../contractArtifacts/OwnerContract.json');
+const buildingPermitContractArtifact = require('../../contractArtifacts/BuildingPermitContract.json');
+const documentContractArtifact = require('../../contractArtifacts/DocumentContract.json');
 
 export const enum ArtifactType {
     PROJECT_ARTIFACT,
@@ -16,13 +16,13 @@ export const enum ArtifactType {
 export const getContractArtifact = (artifactType: ArtifactType) => {
     switch (artifactType) {
         case ArtifactType.PROJECT_ARTIFACT:
-            return projectAbi;
+            return projectArtifact;
         case ArtifactType.OWNER_ARTIFACT:
-            return ownerContractAbi;
+            return ownerContractArtifact;
         case ArtifactType.BUILDING_PERMIT_ARTIFACT:
-            return buildingPermitContractAbi;
+            return buildingPermitContractArtifact;
         case ArtifactType.DOCUMENT_ARTIFACT:
-            return documentContractAbi;
+            return documentContractArtifact;
         default:
             throw Error('No ARTIFACT type provided.')
     }

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
 import {AiOutlinePlus} from "react-icons/all";
 import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
@@ -17,6 +17,7 @@ import useAlert from "@/hooks/AlertHook";
 import {getConnectedAddress} from "@/utils/MetamaskUtils";
 import {AddressZero} from "@ethersproject/constants";
 import {saveDocument} from "@/lib/DocumentService";
+import {hashFileToBytes32} from "../../../utils/FileUtils";
 
 interface Option {
     label: string;
@@ -36,7 +37,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
     const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({label: "Mixed", value: "1"});
     const [description, setDescription] = useState<string>("");
     const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({label: "No", value: false});
-    const [selectedDocument, setSelectedDocument] = useState<any>(null);
+    const [selectedDocument, setSelectedDocument] = useState<File>(null);
     const [selectedInvestors, setSelectedInvestors] = useState<Option[]>([]);
     const {setAlert} = useAlert();
 
@@ -66,6 +67,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
+
         setIsLoading(true);
         let isDocument: boolean = selectedDocument != null;
 
@@ -95,7 +97,8 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
                 },
                 body: JSON.stringify({
                     projectData: project,
-                    walletAddress: connectedAddress
+                    walletAddress: connectedAddress,
+                    dppHash: isDocument ? await hashFileToBytes32(selectedDocument) : null
                 })
             });
 
