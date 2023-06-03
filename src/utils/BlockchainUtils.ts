@@ -4,7 +4,7 @@ import {provider} from "./EthereumClient";
 import {readFileSync} from "fs";
 
 export const getContractArtifact = (contractName: string) => {
-    const abiPath: string = path.join(__dirname, "..", "..", "..", "..", "contractArtifacts");
+    const abiPath: string = path.join(__dirname, "..", "..", "..", "..", "..", "contractArtifacts");
     const abiFile: string = `${abiPath}/${contractName}.json`;
 
     const artifact: string = readFileSync(abiFile, "utf8");

@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
-import {UserType} from ".prisma/client";
 
 import {AiOutlineUserAdd} from "react-icons/all";
 import InputField from "@/components/generic/input/InputField";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
 import Button from "@/components/generic/buttons/Button";
-import Dropdown from "@/components/generic/dropdown/Dropdown";
 
 import OutlineButton from "@/components/generic/buttons/OutlineButton";
 import useAlert from "@/hooks/AlertHook";
@@ -17,6 +15,7 @@ interface InvestorInput {
     email: string;
     phoneNumber: string;
     taxId: string;
+    projectId: string;
 }
 
 
@@ -27,7 +26,8 @@ const AddInvestor = () => {
         streetAddress: '',
         taxId: '',
         email: '',
-        phoneNumber: ''
+        phoneNumber: '',
+        projectId: ''
     };
 
     const [userForm, setInvestorForm] = useState<InvestorInput>({...emptyInvestor});
@@ -50,7 +50,6 @@ const AddInvestor = () => {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-
         try {
             const response = await fetch("/api/investors", {
                 method: "POST",

@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Investor {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   streetAddress String
-  taxId         String  @unique
-  project       Project @relation(fields: [projectId], references: [id])
-  projectId     String  @db.ObjectId
+  taxId         String   @unique
+  project       Project? @relation(fields: [projectId], references: [id])
+  projectId     String?  @db.ObjectId
 }
 
 model Project {
