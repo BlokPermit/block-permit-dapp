@@ -109,6 +109,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
         } catch (error: any) {
             // @ts-ignore
             setAlert({title: "", message: error.message, type: "error"});
+            setIsLoading(false);
             // Handle the error appropriately
         }
     };

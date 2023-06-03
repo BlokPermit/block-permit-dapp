@@ -15,7 +15,6 @@ interface InvestorInput {
     email: string;
     phoneNumber: string;
     taxId: string;
-    projectId: string;
 }
 
 
@@ -27,7 +26,6 @@ const AddInvestor = () => {
         taxId: '',
         email: '',
         phoneNumber: '',
-        projectId: ''
     };
 
     const [userForm, setInvestorForm] = useState<InvestorInput>({...emptyInvestor});
@@ -62,7 +60,11 @@ const AddInvestor = () => {
                 throw new Error("Error occurred");
             }
             setAddedInvestors([]);
-            setAlert({title: 'Success!', message: 'Investors added.', type: 'success'});
+            setAlert({
+                title: 'Success!',
+                message: 'Investors created. You can now add them to project.',
+                type: 'success'
+            });
         } catch (error) {
             setAlert({title: 'Something went wrong', message: 'Error', type: 'error'});
         }

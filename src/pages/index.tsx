@@ -1,26 +1,21 @@
-import React, { ReactNode, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import Alert from "@/components/notifications/Alert";
+import React, {useEffect} from "react";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/router";
 import InitLoadingAnimation from "@/components/generic/loading-animation/InitLoadingAnimation";
 
-interface Props {
-  children: ReactNode;
-}
+function Root() {
+    const {data: session, status} = useSession();
+    const router = useRouter();
 
-function Root({ children }: Props) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+    useEffect(() => {
+        if (status === "authenticated" && session) {
+            router.push("/dashboard");
+        } else if (status === "unauthenticated") {
+            router.push("/auth");
+        }
+    }, [status, session, router.push]);
 
-  useEffect(() => {
-    if (status === "authenticated" && session) {
-      router.push("/dashboard");
-    } else {
-      router.push("/auth");
-    }
-  }, [status, session, router.push]);
-
-  return <InitLoadingAnimation />;
+    return <InitLoadingAnimation/>;
 }
 
 export default Root;

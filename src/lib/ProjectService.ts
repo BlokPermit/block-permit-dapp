@@ -1,13 +1,8 @@
 import {prisma} from "@/utils/PrismaClient";
 import {Project} from "@prisma/client";
-import axios from "axios";
-import {getServerSession} from "next-auth";
-import {useSession} from "next-auth/react";
 import {Contract, ContractFactory} from "ethers";
-import {getContractABI, getContractArtifact} from "../utils/BlockchainUtils";
-import {provider} from "../utils/EthereumClient";
-import {NotFoundError} from "@prisma/client/runtime";
-import {PageNotFoundError} from "next/dist/shared/lib/utils";
+import {ArtifactType, getContractABI, getContractArtifact} from "@/utils/BlockchainUtils";
+import {provider} from "@/utils/EthereumClient";
 
 const {ethers} = require("ethers");
 const querystring = require("node:querystring");
@@ -18,7 +13,7 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
     if (isAuthorized(signer)) {
         try {
             console.log(getContractABI("Project"));
-            return new Contract(address, getContractABI("Project"), await ethers.getSigner(signer));
+            return new Contract(address, getContractABI(ArtifactType.PROJECT_ARTIFACT), await ethers.getSigner(signer));
         } catch (error: Error) {
             throw error;
         }
@@ -36,7 +31,7 @@ export const createProject = async (data: Project, walletAddress: string) => {
         });
 
         // Deploys a new Project smart contract on a blockchain
-        const contractArtifact: any = getContractArtifact("Project");
+        const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
 
         const contractFactory: ContractFactory = new ContractFactory(contractArtifact.abi, contractArtifact.bytecode, await provider.getSigner(walletAddress));
 
