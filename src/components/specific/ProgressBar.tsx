@@ -1,10 +1,10 @@
-import { use, useState } from "react";
-import { FaCheckCircle, FaClock, FaRegClock, FaTimes } from "react-icons/fa";
+import { ProjectPhase } from "@/models/ProjectModel";
+import { FaCheckCircle, FaClock } from "react-icons/fa";
 
 interface ProgressBarProps {
-  actualPhase: number;
-  selectedPhase: number;
-  handlePhaseChange: (phase: number) => void;
+  actualPhase: ProjectPhase;
+  selectedPhase: ProjectPhase;
+  handlePhaseChange: (phase: ProjectPhase) => void;
   className?: string;
 }
 
@@ -14,12 +14,14 @@ const ProgressBar = (props: ProgressBarProps) => {
       <div>
         <ol className="grid grid-cols-1 divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white sm:grid-cols-3">
           <li
-            className={`z-10 relative flex items-center justify-center gap-2 p-4 ${props.actualPhase >= 1 && "hover:cursor-pointer hover:bg-gray-100"} ${props.selectedPhase === 1 && "bg-gray-100"}`}
+            className={`z-10 relative flex items-center justify-center gap-2 p-4 ${props.actualPhase >= ProjectPhase.PHASE_1 && "hover:cursor-pointer hover:bg-gray-100"} ${
+              props.selectedPhase === ProjectPhase.PHASE_1 && "bg-gray-100"
+            }`}
             onClick={() => {
-              if (props.actualPhase >= 1) props.handlePhaseChange(1);
+              if (props.actualPhase >= ProjectPhase.PHASE_1) props.handlePhaseChange(ProjectPhase.PHASE_1);
             }}
           >
-            {props.actualPhase >= 2 ? (
+            {props.actualPhase >= ProjectPhase.PHASE_2 ? (
               <FaCheckCircle className="hover:cursor-pointer" color={props.selectedPhase === 1 ? "#E88777" : "rgba(128, 128, 128, 0.8)"} size={22} />
             ) : (
               <FaClock color={"rgba(128, 128, 128, 0.8)"} size={22} />
@@ -33,12 +35,14 @@ const ProgressBar = (props: ProgressBarProps) => {
           </li>
 
           <li
-            className={`z-1 relative flex items-center justify-center gap-2 p-4 ${props.actualPhase >= 2 && "hover:cursor-pointer hover:bg-gray-100"} ${props.selectedPhase === 2 && "bg-gray-100"}`}
+            className={`z-1 relative flex items-center justify-center gap-2 p-4 ${props.actualPhase >= ProjectPhase.PHASE_2 && "hover:cursor-pointer hover:bg-gray-100"} ${
+              props.selectedPhase === ProjectPhase.PHASE_2 && "bg-gray-100"
+            }`}
             onClick={() => {
-              if (props.actualPhase >= 2) props.handlePhaseChange(2);
+              if (props.actualPhase >= ProjectPhase.PHASE_2) props.handlePhaseChange(ProjectPhase.PHASE_2);
             }}
           >
-            {props.actualPhase >= 2 ? (
+            {props.actualPhase >= ProjectPhase.PHASE_2 ? (
               <FaCheckCircle className="hover:cursor-pointer" color={props.selectedPhase === 2 ? "#E88777" : "rgba(128, 128, 128, 0.8)"} size={22} />
             ) : (
               <FaClock color={"rgba(128, 128, 128, 0.8)"} size={22} />
@@ -52,13 +56,15 @@ const ProgressBar = (props: ProgressBarProps) => {
           </li>
 
           <li
-            className={`flex items-center justify-center gap-2 p-4 ${props.actualPhase === 3 && "hover:cursor-pointer hover:bg-gray-100"} ${props.selectedPhase === 3 && "bg-gray-100"}`}
+            className={`flex items-center justify-center gap-2 p-4 ${props.actualPhase === ProjectPhase.PHASE_3 && "hover:cursor-pointer hover:bg-gray-100"} ${
+              props.selectedPhase === ProjectPhase.PHASE_3 && "bg-gray-100"
+            }`}
             onClick={() => {
-              if (props.actualPhase === 3) props.handlePhaseChange(3);
+              if (props.actualPhase === ProjectPhase.PHASE_3) props.handlePhaseChange(ProjectPhase.PHASE_3);
             }}
           >
-            {props.actualPhase === 3 ? (
-              <FaCheckCircle className="hover:cursor-pointer" color={props.selectedPhase === 3 ? "#E88777" : "rgba(128, 128, 128, 0.8)"} size={22} />
+            {props.actualPhase === ProjectPhase.PHASE_3 ? (
+              <FaCheckCircle className="hover:cursor-pointer" color={props.selectedPhase === ProjectPhase.PHASE_3 ? "#E88777" : "rgba(128, 128, 128, 0.8)"} size={22} />
             ) : (
               <FaClock color={"rgba(128, 128, 128, 0.8)"} size={22} />
             )}
