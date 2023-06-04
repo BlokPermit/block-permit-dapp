@@ -10,6 +10,7 @@ import { Project } from "@prisma/client";
 import { useRouter } from "next/router";
 import ProgressBar from "@/components/specific/ProgressBar";
 import { ProjectModel, ProjectPhase } from "@/models/ProjectModel";
+import InputField from "@/components/generic/input/InputField";
 
 export const getServerSideProps: any = async () => {
   try {
@@ -34,6 +35,7 @@ export const getServerSideProps: any = async () => {
 const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const [selectedPhase, setSelectedPhase] = React.useState<number>(1);
+  const [searchText, setSearchText] = React.useState<string>("");
 
   return (
     <ProtectedRoute>
@@ -45,9 +47,12 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
           </div>
           <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20} />} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
         </div>
-        <div className="mt-6">
+        <div className="mt-10">
           <div className="my-3">
             <ProgressBar actualPhase={ProjectPhase.PHASE_3} selectedPhase={selectedPhase} handlePhaseChange={(phase: ProjectPhase) => setSelectedPhase(phase)} />
+          </div>
+          <div className="my-3">
+            <InputField id={searchText} label={""} placeholder={"Search Projects"} type={"text"} onChange={(e) => setSearchText(e.target.value)} />
           </div>
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-left">
@@ -63,7 +68,12 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
               <tbody className="divide-y divide-gray-200">
                 {projects.map(
                   (project: ProjectModel) =>
-                    project.projectPhase == selectedPhase && (
+                    project.projectPhase == selectedPhase &&
+                      (project.baseProject.constructionTitle.includes(searchText)
+                      || project.baseProject.constructionType.includes(searchText)
+                      || project.baseProject.id.includes(searchText)
+                          || searchText.length === 0)
+                      && (
                       <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.baseProject.id} onClick={() => router.push(`/projects/${project.baseProject.id}`)}>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.baseProject.id}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionTitle}</td>
