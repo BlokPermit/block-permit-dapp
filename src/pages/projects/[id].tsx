@@ -1,6 +1,6 @@
 import { findProjectById } from "@/lib/ProjectService";
 import { Project } from "@prisma/client";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
@@ -42,9 +42,9 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const onDocumentChange = (file: File | null) => {};
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
-    useEffect(() => {
-        setRecentProject(project.id);
-    }, [])
+  useEffect(() => {
+    setRecentProject(project.id);
+  }, []);
   const handleSend = () => {
     setConformationPopup({
       title: "Send to Opinion Providers",
@@ -160,7 +160,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         }
       />
       <RoleBasedComponent
-        opinionProviderComponent={
+        assessmentProviderComponent={
           <div>
             <div className="grid grid-cols-4 gap-5 mb-10">
               <IconCard icon={<FaUser />} title="Project Manager" value={"Marko Skače"} />
