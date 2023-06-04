@@ -13,7 +13,7 @@ function Root() {
         } else if (status === "unauthenticated") {
             router.push("/auth");
         }
-    }, [status, session, router.push]);
+    }, [status, session]);
 
     return <InitLoadingAnimation/>;
 }

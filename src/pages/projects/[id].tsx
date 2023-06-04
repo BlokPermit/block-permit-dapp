@@ -1,6 +1,6 @@
 import {findProjectById} from "@/lib/ProjectService";
 import {Project} from "@prisma/client";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {InferGetServerSidePropsType} from "next";
 import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
 import {
@@ -27,6 +27,7 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
+import {setRecentProject} from "@/utils/LocalStorageUtil";
 
 export const getServerSideProps: any = async (context: any) => {
     const id = context.params ? context.params.id : "";
@@ -53,6 +54,9 @@ const ProjectPage = ({project}: InferGetServerSidePropsType<typeof getServerSide
 
     const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
 
+    useEffect(() => {
+        setRecentProject(project.id);
+    }, [])
     const handleSend = () => {
         setConformationPopup({
             title: "Send to Opinion Providers",
@@ -175,7 +179,7 @@ const ProjectPage = ({project}: InferGetServerSidePropsType<typeof getServerSide
                 }
             />
             <RoleBasedComponent
-                opinionProviderComponent={
+                assessmentProviderComponent={
                     <div>
                         <div className="grid grid-cols-4 gap-5 mb-10">
                             <IconCard icon={<FaUser/>} title="Project Manager" value={"Marko Skače"}/>

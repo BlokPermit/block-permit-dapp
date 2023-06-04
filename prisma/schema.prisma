@@ -22,13 +22,15 @@ model Investor {
 }
 
 model Project {
-  id                             String     @id @default(auto()) @map("_id") @db.ObjectId
-  smartContractAddress           String     @unique
+  id                             String       @id @default(auto()) @map("_id") @db.ObjectId
+  smartContractAddress           String       @unique
   constructionTitle              String
   constructionImpactsEnvironment Boolean
   constructionType               String
-  dppUrl                         String?    @unique
-  dgdUrl                         String?    @unique
+  projectState                   ProjectState @default(AQUIRING_PROJECT_CONDITIONS)
+  dppUrl                         String?      @unique
+  dgdUrl                         String?      @unique
+  createdAt                      DateTime     @default(now())
   investors                      Investor[]
 }
 
@@ -56,4 +58,10 @@ enum UserType {
   ASSESSMENT_PROVIDER
   PROJECT_MANAGER
   ADMINISTRATIVE_AUTHORITY
+}
+
+enum ProjectState {
+  AQUIRING_PROJECT_CONDITIONS
+  AQUIRING_PROJECT_OPINIONS
+  AQUIRING_BUILDING_PERMIT
 }

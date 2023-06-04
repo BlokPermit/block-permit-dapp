@@ -6,14 +6,14 @@ import {UserType} from ".prisma/client";
 interface RoleBasedProps {
     adminComponent?: ReactNode | null;
     administrativeAuthorityComponent?: ReactNode | null;
-    opinionProviderComponent?: ReactNode | null;
+    assessmentProviderComponent?: ReactNode | null;
     projectManagerComponent?: ReactNode | null;
 }
 
 const RoleBasedComponent = ({
                                 adminComponent = null,
                                 administrativeAuthorityComponent = null,
-                                opinionProviderComponent = null,
+                                assessmentProviderComponent = null,
                                 projectManagerComponent = null
                             }: RoleBasedProps) => {
     const {data, status} = useSession();
@@ -30,8 +30,8 @@ const RoleBasedComponent = ({
                 return <>{adminComponent}</>;
             case UserType.ADMINISTRATIVE_AUTHORITY:
                 return <>{administrativeAuthorityComponent}</>;
-            case UserType.OPINION_PROVIDER:
-                return <>{opinionProviderComponent}</>;
+            case UserType.ASSESSMENT_PROVIDER:
+                return <>{assessmentProviderComponent}</>;
             case UserType.PROJECT_MANAGER:
                 return <>{projectManagerComponent}</>;
             default:

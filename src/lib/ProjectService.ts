@@ -3,23 +3,21 @@ import {Project} from "@prisma/client";
 import {Contract, ContractFactory} from "ethers";
 import {ArtifactType, getContractArtifact} from "@/utils/BlockchainUtils";
 import {provider} from "@/utils/EthereumClient";
+import {ProjectState} from ".prisma/client";
 
-const {ethers} = require("ethers");
-const querystring = require("node:querystring");
-
-const URL: string = process.env.BACKEND_URL;
+/*const URL: string = process.env.BACKEND_URL;
 
 async function getContract(contractAddress: string, signer: string): Promise<Contract> {
-  if (isAuthorized(signer)) {
-    try {
-      return new Contract(address, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await ethers.getSigner(signer));
-    } catch (error: Error) {
-      throw error;
+    if (isAuthorized(signer)) {
+        try {
+            return new Contract(address, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await ethers.getSigner(signer));
+        } catch (error: Error) {
+            throw error;
+        }
+    } else {
+        throw new Error("User not authorized");
     }
-  } else {
-    throw new Error("User not authorized");
-  }
-}
+}*/
 
 export const createProject = async (data: Project, walletAddress: string, dppHash: string | null) => {
     console.log(walletAddress);
@@ -66,7 +64,7 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
 
 export const findProjectById = async (id: string) => {
     try {
-        return await prisma.project.findFirst({
+        let project: any = await prisma.project.findFirst({
             where: {
                 id: id,
             },
@@ -74,6 +72,8 @@ export const findProjectById = async (id: string) => {
                 investors: true,
             },
         });
+        project.createdAt = project.createdAt.toISOString();
+        return project;
     } catch (error: any) {
         throw new Error(error.message);
     }
@@ -81,7 +81,40 @@ export const findProjectById = async (id: string) => {
 
 export const getAllProjects = async () => {
     try {
-        return await prisma.project.findMany();
+        let projects: Project[] = await prisma.project.findMany();
+        return projects.map((project) => ({...project, createdAt: project.createdAt.toISOString()}));
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
+export const getRecentProjects = async (projectIds: string[]) => {
+    try {
+        let projects: Project[] = await prisma.project.findMany({
+            where: {
+                id: {
+                    in: projectIds,
+                },
+            },
+        });
+        return projects.map((project: Project) => ({...project, createdAt: project.createdAt.toISOString()}));
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+export const getRecentProjectsByState = async (state: ProjectState) => {
+    try {
+        let projects: Project[] = await prisma.project.findMany({
+            where: {
+                projectState: state
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: 5
+        });
+        if (projects.length == 0) return [];
+        return projects.map((project: Project) => ({...project, createdAt: project.createdAt.toISOString()}));
     } catch (error: any) {
         throw new Error(error.message);
     }

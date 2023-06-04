@@ -10,14 +10,16 @@ export const readFile = (file: File): Promise<ArrayBuffer> => {
     });
 };
 
-export const hashFileToBytes32 = async (file: File): Promise<string> => {
+export const hashFileToBytes32 = async (file: File | null): Promise<string> => {
     try {
-        const fileData = await readFile(file);
+        if (file) {
+            const fileData = await readFile(file);
 
-        const buffer = Buffer.from(fileData);
-        const hash = utils.keccak256(buffer);
+            const buffer = Buffer.from(fileData);
+            const hash = utils.keccak256(buffer);
 
-        return '0x' + hash.substring(2);
+            return '0x' + hash.substring(2);
+        } else throw Error('Document not provided.')
     } catch (error) {
         console.error('Error hashing file:', error);
         throw error;

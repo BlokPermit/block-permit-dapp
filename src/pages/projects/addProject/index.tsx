@@ -17,7 +17,8 @@ import useAlert from "@/hooks/AlertHook";
 import {getConnectedAddress} from "@/utils/MetamaskUtils";
 import {AddressZero} from "@ethersproject/constants";
 import {saveDocument} from "@/lib/DocumentService";
-import {hashFileToBytes32} from "../../../utils/FileUtils";
+import {hashFileToBytes32} from "@/utils/FileUtils";
+import {ProjectState} from ".prisma/client";
 
 interface Option {
     label: string;
@@ -30,6 +31,24 @@ declare global {
     }
 }
 
+const dropdownOptions: Option[] = [
+    {value: "1", label: "Novogradnja - Novozgrajen objekt"},
+    {
+        value: "2",
+        label: "Novogradnja - Prizidava",
+    },
+    {value: "3", label: "Rekonstrukcija"},
+    {
+        value: "4",
+        label: "Odstranitev celotnega objekta"
+    },
+    {value: "5", label: "Legalizacija"},
+    {
+        value: "6",
+        label: "Manjša rekonstrukcija"
+    },
+]
+
 const CreateProject = ({investors}: InvestorsPageProps) => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +56,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
     const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({label: "Mixed", value: "1"});
     const [description, setDescription] = useState<string>("");
     const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({label: "No", value: false});
-    const [selectedDocument, setSelectedDocument] = useState<File>(null);
+    const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
     const [selectedInvestors, setSelectedInvestors] = useState<Option[]>([]);
     const {setAlert} = useAlert();
 
@@ -55,7 +74,6 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
         setSelectedEnvironmentImpact(option);
     };
     const handleDocumentChange = (file: File | null) => {
-        console.log(file);
         setSelectedDocument(file);
     };
     const handleProjectNameChange = (value: string) => {
@@ -83,6 +101,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
                 constructionImpactsEnvironment: selectedEnvironmentImpact.value,
                 constructionType: selectedConstructionType.label,
                 dppUrl: (isDocument) ? documentPath! : null,
+                projectState: ProjectState.AQUIRING_PROJECT_CONDITIONS,
                 investors: {connect: selectedInvestors.map((investor) => ({id: investor.value.id}))},
                 smartContractAddress: AddressZero
             };
@@ -105,15 +124,15 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
             if (!response.ok) {
                 throw new Error("Error saving project.");
             }
+
+            let createdProject = await response.json();
             // @ts-ignore
-            await router.push("/projects");
+            await router.push(`/projects/${createdProject.id}`);
             setAlert({title: "Project created!", message: "You can now view it in projects.", type: "success"});
             setIsLoading(false);
         } catch (error: any) {
-            // @ts-ignore
             setAlert({title: "", message: error.message, type: "error"});
             setIsLoading(false);
-            // Handle the error appropriately
         }
     };
 
@@ -143,14 +162,7 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
                                         <Dropdown
                                             label={"Construction Type"}
                                             onChange={handleDropdownChange}
-                                            options={[
-                                                {value: "1", label: "Mixed"},
-                                                {
-                                                    value: "2",
-                                                    label: "Mixed",
-                                                },
-                                                {value: "3", label: "Mixed"},
-                                            ]}
+                                            options={dropdownOptions}
                                         />
                                     </div>
                                     <div className="w-1/5">
