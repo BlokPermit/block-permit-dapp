@@ -21,7 +21,7 @@ export const getServerSideProps: any = async () => {
                 acquiringOpinionsProjects
             },
         };
-    } catch (error: Error) {
+    } catch (error: any) {
         console.error(error.message);
     }
 };

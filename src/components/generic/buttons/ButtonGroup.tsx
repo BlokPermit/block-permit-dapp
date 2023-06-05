@@ -22,6 +22,7 @@ const ButtonGroup = (props: ButtonGroupProps) => {
     <div className="inline-flex rounded-lg border border-gray-100 bg-gray-100 p-1">
       {props.secondaryButtons.map((buttonProps, index) => (
         <span
+            key={index}
           className={`${!buttonProps.disabled && "hover:text-main-200 hover:cursor-pointer"} inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm text-gray-500  focus:relative`}
           onClick={buttonProps.onClick}
         >

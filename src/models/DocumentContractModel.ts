@@ -6,5 +6,5 @@ export interface DocumentContractModel {
     isClosed: boolean;
     assessmentDueDate: Date;
     mainDocumentUpdateRequested: boolean;
-    requestedAssessmentDueDate?: Date;
+    requestedAssessmentDueDate: Date | null;
 }

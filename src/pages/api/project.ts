@@ -1,7 +1,6 @@
 import {Project} from "@prisma/client";
 import {createProject, getRecentProjects} from "@/lib/ProjectService";
 import {NextApiRequest, NextApiResponse} from "next";
-import {getContractArtifact} from "../../utils/BlockchainUtils";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {method} = req;
@@ -9,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     switch (method) {
         case "POST":
             console.log(req.body);
-            const project: Project | Error = await createProject(req.body.projectData, req.body.walletAddress, req.body.dppHash);
+            const project: Project | Error = await createProject(req.body.projectData, req.body.walletAddress, req.body.dppHash, req.body.dppUrl);
             res.status(201).json(project);
             break;
         case "GET":

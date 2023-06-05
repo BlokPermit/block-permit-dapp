@@ -24,11 +24,12 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
     }
 }*/
 
-export const createProject = async (data: Project, walletAddress: string, dppHash: string | null) => {
+export const createProject = async (data: Project, walletAddress: string, dppHash: string | null, dppUrl: string | null) => {
     console.log(walletAddress);
     try {
+        const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
         // Deploys a new Project smart contract on a blockchain
-        const contractFactory: ContractFactory = new ContractFactory(getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, contractArtifact.bytecode, await provider.getSigner(walletAddress));
+        const contractFactory: ContractFactory = new ContractFactory(contractArtifact.abi, contractArtifact.bytecode, await provider.getSigner(walletAddress));
 
         const contract: Contract = await contractFactory.deploy();
         await contract.deployed();
@@ -36,16 +37,15 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
 
         if (dppHash != null) {
             await contract.connect(await provider.getSigner(walletAddress)).setDPP({
-                id: data.dppUrl,
+                id: dppUrl,
                 owner: walletAddress,
                 documentHash: dppHash
             });
-            console.log("DPP set.");
         }
 
         // Inserts Project and links it within User
         data.smartContractAddress = contract.address;
-        data.createdAt = dateFromTimestamp(await contract.dateCreated());
+        data.createdAt = parseInt(await contract.dateCreated());
         let project: Project = await prisma.project.create({
             data: data,
         });
@@ -69,7 +69,7 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
 export const findProjectById = async (id: string) => {
     try {
         // Queries DB
-        const baseProject: Project = await prisma.project.findFirst({
+        const baseProject: Project | null = await prisma.project.findFirst({
             where: {
                 id: id,
             },
@@ -78,6 +78,8 @@ export const findProjectById = async (id: string) => {
             },
         });
 
+        if (!baseProject) throw new Error("Project not found");
+
         // Queries blockchain
         const projectContract = new Contract(
             baseProject.smartContractAddress,
@@ -85,49 +87,44 @@ export const findProjectById = async (id: string) => {
             provider
         )
 
-        const projectManager: User = await findUserByAddress(
+        const projectManager: User | null = await findUserByAddress(
             await projectContract.projectManager()
         );
 
         let assessmentProviders: User[] = [];
         for (const address of await projectContract.getAssessmentProvidersAddresses()) {
-            assessmentProviders.push(
-                await findUserByAddress(address)
-            );
+            let user: User | null = await findUserByAddress(address);
+            if (user) assessmentProviders.push(user);
         }
 
         const numOfAssessmentProviders: number = parseInt(await projectContract.numOfAssessmentProviders());
 
-        let administrativeAuthority: User | undefined = undefined;
+        let administrativeAuthority: User | null = null;
         const administrativeAuthorityAddress: string = await projectContract.administrativeAuthority();
         if (administrativeAuthorityAddress != AddressZero) {
             administrativeAuthority = await findUserByAddress(administrativeAuthorityAddress);
+            console.log(administrativeAuthority)
         }
 
         const DPP = await projectContract.DPP();
-        const DPPUrl: string | undefined = DPP.id != '' ? DPP.id : undefined;
+        const DPPUrl: string | null = DPP.id != '' ? DPP.id : null;
 
-        const sentDPPs: DocumentContractModel[] | undefined =
-            await projectContract.getSentDPPsLength() != 0
-                ? await getDocumentContractModels(await projectContract.getSentDPPsAddresses())
-                : undefined;
+        const sentDPPs: DocumentContractModel[] = await getDocumentContractModels(await projectContract.getSentDPPsAddresses())
 
         const numOfAssessedDPPs: number = parseInt(await projectContract.numOfAssessedDPPs());
 
         const DGD = await projectContract.DGD();
-        const DGDUrl: string | undefined = DGD.id != '' ? DGD.id : undefined;
+        const DGDUrl: string | null = DGD.id != '' ? DGD.id : null;
 
-        const sentDGDs: DocumentContractModel[] | undefined =
-            await projectContract.getSentDGDsLength() != 0
-                ? await getDocumentContractModels(await projectContract.getSentDGDsAddresses())
-                : undefined;
+        const sentDGDs: DocumentContractModel[] | null = await getDocumentContractModels(await projectContract.getSentDGDsAddresses());
 
         const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
 
 
-        const project: ProjectModel = {
+
+        return {
             baseProject: baseProject,
-            projectManager: projectManager,
+            projectManager: projectManager!,
             assessmentProviders: assessmentProviders,
             numOfAssessmentProviders: numOfAssessmentProviders,
             administrativeAuthority: administrativeAuthority,
@@ -138,10 +135,6 @@ export const findProjectById = async (id: string) => {
             sentDGDs: sentDGDs,
             numOfAssessedDGDs: numOfAssessedDGDs
         };
-
-        project.baseProject.createdAt = project.baseProject.createdAt.toISOString();
-        console.log(project);
-        return project;
     } catch (error: any) {
         throw new Error(error.message);
     }
@@ -160,8 +153,7 @@ export const getAllProjects = async (userAddress: string) => {
                 }
             }
         });*/
-        let projects: Project[] = await prisma.project.findMany({});
-        return projects.map((project) => ({...project, createdAt: project.createdAt.toISOString()}));
+        return await prisma.project.findMany({});
     } catch (error: any) {
         throw new Error(error.message);
     }
@@ -169,14 +161,13 @@ export const getAllProjects = async (userAddress: string) => {
 
 export const getRecentProjects = async (projectIds: string[]) => {
     try {
-        let projects: Project[] = await prisma.project.findMany({
+        return await prisma.project.findMany({
             where: {
                 id: {
                     in: projectIds,
                 },
             },
         });
-        return projects.map((project: Project) => ({...project, createdAt: project.createdAt.toISOString()}));
     } catch (error: any) {
         throw new Error(error.message);
     }
@@ -194,7 +185,7 @@ export const getRecentProjectsByState = async (state: ProjectState) => {
             take: 5
         });
         if (projects.length == 0) return [];
-        return projects.map((project: Project) => ({...project, createdAt: project.createdAt.toISOString()}));
+        return projects;
     } catch (error: any) {
         throw new Error(error.message);
     }
@@ -207,7 +198,7 @@ const getProjectAddressesOfUser = async (walletAddress: string) => {
                 walletAddress: walletAddress
             }
         });
-    } catch (error: Error) {
+    } catch (error: any) {
         throw new Error(error.message);
     }
 }
@@ -222,14 +213,16 @@ const getDocumentContractModels = async (addresses: string[]) => {
             provider
         );
 
-        const assessmentProvider: User = await findUserByAddress(
+        const assessmentProvider: User | null = await findUserByAddress(
             await documentContract.assessmentProvider()
         );
 
-        let requestedAssessmentDueDate: Date | undefined = dateFromTimestamp(
+        if (!assessmentProvider) throw new Error("Assessment provider not found");
+
+        let requestedAssessmentDueDate: Date | null = dateFromTimestamp(
             await documentContract.requestedAssessmentDueDate()
         );
-        if (requestedAssessmentDueDate == new Date(0)) requestedAssessmentDueDate = undefined;
+        if (requestedAssessmentDueDate == new Date(0)) requestedAssessmentDueDate = null;
 
         sentDocumentContracts.push({
             documentContractAddress: address,

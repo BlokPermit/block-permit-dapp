@@ -30,7 +30,7 @@ export const getContractArtifact = (artifactType: ArtifactType) => {
 
 export const getOwnerContract = async () => {
     return new Contract(
-        process.env.NEXT_PUBLIC_OWNER_CONTRACT_ADDRESS as string,
+        process.env.OWNER_CONTRACT_ADDRESS as string,
         await getContractArtifact(ArtifactType.OWNER_ARTIFACT).abi,
         provider
     );

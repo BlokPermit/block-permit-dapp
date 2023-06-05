@@ -2,21 +2,22 @@ import { FaArrowUp, FaCheck, FaClock, FaPaperclip, FaTimes, FaTrash } from "reac
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, { useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
+import {User} from "@prisma/client";
 
 interface OpinionProviderProps {
-  opinionProvider: any;
-  countSelected: (isSelected: boolean, id: number) => void;
-  handleAttachments: (id: number) => void;
-  handleRemove: (id: number) => void;
+  assessmentProvider: User;
+  countSelected: (isSelected: boolean, id: string) => void;
+  handleAttachments: (id: string) => void;
+  handleRemove: (id: string) => void;
 }
 
-const OpinionProvider = (props: OpinionProviderProps) => {
+const AssessmentProviderListItem = (props: OpinionProviderProps) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
 
   return (
-    <div className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
-      <div key={props.opinionProvider.id} className="flex justify-between">
+    <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
+      <div className="flex justify-between">
         <div className="flex justify-between gap-5 items-center">
           <div className="text-lg">
             {status === "waiting to send" && <IconBadge icon={<FaArrowUp />} text="Waiting to Send" badgeType="info" />}
@@ -24,7 +25,7 @@ const OpinionProvider = (props: OpinionProviderProps) => {
             {status === "assessed" && <IconBadge icon={<FaCheck />} text="Ready for Review" badgeType="success" />}
           </div>
           <span className="text-black">
-            <div className="text-lg font-bold">{props.opinionProvider.name}</div>
+            <div className="text-lg font-bold">{props.assessmentProvider.name}</div>
           </span>
         </div>
         <ButtonGroup
@@ -32,12 +33,12 @@ const OpinionProvider = (props: OpinionProviderProps) => {
             {
               text: "Remove",
               icon: <FaTrash />,
-              onClick: () => props.handleRemove(props.opinionProvider.id),
+              onClick: () => props.handleRemove(props.assessmentProvider.id),
             },
             {
               text: "Attachments",
               icon: <FaPaperclip />,
-              onClick: () => props.handleAttachments(props.opinionProvider.id),
+              onClick: () => props.handleAttachments(props.assessmentProvider.id),
             },
           ]}
           primaryButton={{
@@ -45,7 +46,7 @@ const OpinionProvider = (props: OpinionProviderProps) => {
             icon: isSelected ? <FaTimes /> : <FaCheck />,
             onClick: () => {
               setIsSelected(!isSelected);
-              props.countSelected(!isSelected, props.opinionProvider.id);
+              props.countSelected(!isSelected, props.assessmentProvider.id);
             },
           }}
         />
@@ -54,4 +55,4 @@ const OpinionProvider = (props: OpinionProviderProps) => {
   );
 };
 
-export default OpinionProvider;
+export default AssessmentProviderListItem;

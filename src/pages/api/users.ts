@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Investor, User } from "@prisma/client";
-import { createUsers, registerUser } from "@/lib/UserService";
+import { createUsers } from "@/lib/UserService";
 import { createInvestors, getAllInvestors } from "@/lib/InvestorService";
 import { prisma } from "@/utils/PrismaClient";
 

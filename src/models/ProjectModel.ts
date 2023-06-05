@@ -6,12 +6,12 @@ export interface ProjectModel {
   projectManager: User;
   assessmentProviders: User[];
   numOfAssessmentProviders: number;
-  administrativeAuthority?: User;
-  DPPUrl?: string;
-  sentDPPs?: DocumentContractModel[];
+  administrativeAuthority: User | null;
+  DPPUrl: string | null;
+  sentDPPs: DocumentContractModel[];
   numOfAssessedDPPs: number;
-  DGDUrl?: string;
-  sentDGDs?: DocumentContractModel[];
+  DGDUrl: string | null;
+  sentDGDs: DocumentContractModel[];
   numOfAssessedDGDs: number;
 }
 

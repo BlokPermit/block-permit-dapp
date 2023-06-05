@@ -7,28 +7,20 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import { getAllProjects } from "@/lib/ProjectService";
 import { InferGetServerSidePropsType } from "next/types";
 import { Project } from "@prisma/client";
-import {ProjectState} from ".prisma/client";
 import { useRouter } from "next/router";
-import ProgressBar from "@/components/specific/ProgressBar";
-import { ProjectModel, ProjectPhase } from "@/models/ProjectModel";
 import InputField from "@/components/generic/input/InputField";
 import Radio from "@/components/generic/input/Radio";
 
 export const getServerSideProps: any = async () => {
   try {
-    const baseProjects: Project[] = await getAllProjects();
-    const projects: ProjectModel[] = baseProjects.map((project: Project) => {
-      return {
-        baseProject: project,
-        assessmentProviders: [],
-      };
-    });
+    //TODO: get acctual user address
+    const projects: Project[] = await getAllProjects("123");
     return {
       props: {
         projects: projects,
       },
     };
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
     return {
       notFound: true,
@@ -86,21 +78,21 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
                 <tr>
                   <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Name</th>
                   <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Construction Title</th>
-                  <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Constuction Type</th>
+                  <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Construction Type</th>
                   <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Construction Impacts Envitonment</th>
                   <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Assessment Phase</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {projects.map(
-                  (project: ProjectModel) =>
+                  (project: Project) =>
                     (
-                      <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.baseProject.id} onClick={() => router.push(`/projects/${project.baseProject.id}`)}>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.baseProject.id}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionTitle}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionType}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.projectState}</td>
+                      <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.id} onClick={() => router.push(`/projects/${project.id}`)}>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.id}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionTitle}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionType}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Yes" : "No"}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.projectState}</td>
                       </tr>
                     )
                 )}

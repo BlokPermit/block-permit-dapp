@@ -89,6 +89,7 @@ const AddUser = () => {
         setAddedUsers(addedUsers.filter((_, i) => i !== index));
     };
 
+    //TODO: Move all logic to lib folder. Frontend should be separate from logic.
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 

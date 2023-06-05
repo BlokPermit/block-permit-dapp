@@ -1,6 +1,6 @@
 import { AssessmentProviderModel } from "@/models/AssessmentProviderModel";
 import InputField from "../generic/input/InputField";
-import OpinionProvider from "./OpinionProvider";
+import AssessmentProviderListItem from "./AssessmentProviderListItem";
 import { FaCheck, FaPlus, FaSearch } from "react-icons/fa";
 import IconButton from "../generic/buttons/IconButton";
 import { useState } from "react";

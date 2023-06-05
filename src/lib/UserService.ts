@@ -15,11 +15,15 @@ export const createUsers = async (users: User[]) => {
 }
 
 export const findUserByAddress = async (address: string) => {
-    return prisma.user.findUnique({
+    const user = prisma.user.findUnique({
         where: {
             walletAddress: address.toLowerCase(),
         }
     });
+
+    if (!user) throw new Error("User not found");
+
+    return user;
 }
 
 export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
