@@ -6,6 +6,9 @@ import {provider} from "@/utils/EthereumClient";
 
 
 export const createUsers = async (users: User[]) => {
+    for (let user of users) {
+        user.walletAddress = user.walletAddress.toLowerCase();
+    }
     return prisma.user.createMany({
         data: users,
     });
