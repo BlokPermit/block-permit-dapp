@@ -1,9 +1,9 @@
 import { findProjectById } from "@/lib/ProjectService";
 import { Project } from "@prisma/client";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
+import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPlus, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -15,8 +15,10 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import {setRecentProject} from "@/utils/LocalStorageUtil";
+import { setRecentProject } from "@/utils/LocalStorageUtil";
 import { ProjectPhase } from "@/models/ProjectModel";
+import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
+import { AssessmentProviderModel } from "@/models/AssessmentProviderModel";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -42,9 +44,16 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const onDocumentChange = (file: File | null) => {};
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
+  const [isAddAssessmentProvidersOpen, setIsAddAssessmentProvidersOpen] = useState<boolean>(false);
+
   useEffect(() => {
     setRecentProject(project.id);
   }, []);
+
+  const openAddAssessmentProviderPopup = () => {
+    setIsAddAssessmentProvidersOpen(!isAddAssessmentProvidersOpen);
+  };
+
   const handleSend = () => {
     setConformationPopup({
       title: "Send to Opinion Providers",
@@ -142,23 +151,27 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
       </div>
       {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
-      <RoleBasedComponent
-        projectManagerComponent={
-          <div className="overflow-x-auto">
-            <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Opinion Providers</h2>
-            {opinionProviders.map((opinionProvider) => (
-              <OpinionProvider
-                opinionProvider={opinionProvider}
-                key={opinionProvider.id}
-                countSelected={countSelected}
-                handleAttachments={() => setIsAttachmentsPopupOpen(true)}
-                handleRemove={handleRemove}
-              />
-            ))}
-            <IconButton text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
-          </div>
-        }
-      />
+      {/* <RoleBasedComponent
+        projectManagerComponent={ */}
+      <div className="overflow-x-auto">
+        <span className="inline-flex items-center gap-5 mb-5">
+          <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
+          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={openAddAssessmentProviderPopup} />
+          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectId={project.id} />}
+        </span>
+        {opinionProviders.map((opinionProvider) => (
+          <OpinionProvider
+            opinionProvider={opinionProvider}
+            key={opinionProvider.id}
+            countSelected={countSelected}
+            handleAttachments={() => setIsAttachmentsPopupOpen(true)}
+            handleRemove={handleRemove}
+          />
+        ))}
+        <div className="flex justify-end">
+          <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
+        </div>
+      </div>
       <RoleBasedComponent
         assessmentProviderComponent={
           <div>
