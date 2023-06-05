@@ -121,7 +121,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   return (
     <div className="px-40 mb-10">
       <BreadCrumbs />
-      <ProgressBar className="my-16" actualPhase={2} selectedPhase={selectedPhase} handlePhaseChange={(phase: ProjectPhase) => setSelectedPhase(phase)} />
+      {/*<ProgressBar className="my-16" actualPhase={2} selectedPhase={selectedPhase} handlePhaseChange={(phase: ProjectPhase) => setSelectedPhase(phase)} />*/}
       <div className="flex justify-between mb-10">
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.id}</h1>
         <div className="flex items-center gap-2">

@@ -11,7 +11,7 @@ interface ProgressBarProps {
 const ProgressBar = (props: ProgressBarProps) => {
   return (
     <div className={`${props.className}`}>
-      <div>
+      {/*<div>
         <ol className="grid grid-cols-1 divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white sm:grid-cols-3">
           <li
             className={`z-10 relative flex items-center justify-center gap-2 p-4 ${props.actualPhase >= ProjectPhase.PHASE_1 && "hover:cursor-pointer hover:bg-gray-100"} ${
@@ -75,7 +75,7 @@ const ProgressBar = (props: ProgressBarProps) => {
             </p>
           </li>
         </ol>
-      </div>
+      </div>*/}
     </div>
   );
   // <div>

@@ -28,6 +28,7 @@ model Project {
   constructionImpactsEnvironment Boolean
   constructionType               String
   projectState                   ProjectState @default(AQUIRING_PROJECT_CONDITIONS)
+  //TODO: remove urls
   dppUrl                         String?      @unique
   dgdUrl                         String?      @unique
   createdAt                      DateTime     @default(now())

@@ -7,6 +7,7 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import { getAllProjects } from "@/lib/ProjectService";
 import { InferGetServerSidePropsType } from "next/types";
 import { Project } from "@prisma/client";
+import {ProjectState} from ".prisma/client";
 import { useRouter } from "next/router";
 import ProgressBar from "@/components/specific/ProgressBar";
 import { ProjectModel, ProjectPhase } from "@/models/ProjectModel";
@@ -19,7 +20,6 @@ export const getServerSideProps: any = async () => {
     const projects: ProjectModel[] = baseProjects.map((project: Project) => {
       return {
         baseProject: project,
-        projectPhase: ProjectPhase.PHASE_1,
         assessmentProviders: [],
       };
     });
@@ -38,7 +38,6 @@ export const getServerSideProps: any = async () => {
 
 const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const [selectedPhase, setSelectedPhase] = React.useState<number>(1);
   const [searchText, setSearchText] = React.useState<string>("");
   const [environmentImpact, setEnvironmentImpact] = React.useState<boolean>();
 
@@ -53,9 +52,6 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
           <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20} />} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
         </div>
         <div className="mt-10">
-          <div className="my-3">
-            <ProgressBar actualPhase={ProjectPhase.PHASE_3} selectedPhase={selectedPhase} handlePhaseChange={(phase: ProjectPhase) => setSelectedPhase(phase)} />
-          </div>
           <div className="my-3 grid grid-cols-6 gap-4">
             <span className="col-span-4">
               <InputField id={searchText} label={""} placeholder={"Search Projects"} type={"text"} onChange={(e) => setSearchText(e.target.value)} />
@@ -98,18 +94,13 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
               <tbody className="divide-y divide-gray-200">
                 {projects.map(
                   (project: ProjectModel) =>
-                    project.projectPhase == selectedPhase &&
-                    (project.baseProject.constructionImpactsEnvironment == environmentImpact || environmentImpact === undefined) &&
-                    (project.baseProject.constructionTitle.includes(searchText) ||
-                      project.baseProject.constructionType.includes(searchText) ||
-                      project.baseProject.id.includes(searchText) ||
-                      searchText.length === 0) && (
+                    (
                       <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.baseProject.id} onClick={() => router.push(`/projects/${project.baseProject.id}`)}>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.baseProject.id}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionTitle}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionType}</td>
                         <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.projectPhase}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.baseProject.projectState}</td>
                       </tr>
                     )
                 )}

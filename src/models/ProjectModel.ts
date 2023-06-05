@@ -1,15 +1,17 @@
 import { Project, User } from "@prisma/client";
-import { AssessmentProviderModel } from "./AssessmentProviderModel";
+import {DocumentContractModel} from "./DocumentContractModel";
 
 export interface ProjectModel {
   baseProject: Project;
-  projectPhase: ProjectPhase;
-  projectManager?: User;
-  assessmentProviders: AssessmentProviderModel[];
+  projectManager: User;
+  assessmentProviders: User[];
+  numOfAssessmentProviders: number;
+  administrativeAuthority?: User;
+  DPPUrl?: string;
+  sentDPPs?: DocumentContractModel[];
+  numOfAssessedDPPs: number;
+  DGDUrl?: string;
+  sentDGDs?: DocumentContractModel[];
+  numOfAssessedDGDs: number;
 }
 
-export enum ProjectPhase {
-  PHASE_1 = 1,
-  PHASE_2 = 2,
-  PHASE_3 = 3,
-}

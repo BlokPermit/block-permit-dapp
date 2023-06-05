@@ -12,9 +12,9 @@ export const createUsers = async (users: User[]) => {
 }
 
 export const findUserByAddress = async (address: string) => {
-    return prisma.user.findFirst({
+    return prisma.user.findUnique({
         where: {
-            walletAddress: address,
+            walletAddress: address.toLowerCase(),
         }
     });
 }
@@ -22,6 +22,8 @@ export const findUserByAddress = async (address: string) => {
 export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
     const contract: Contract = await getOwnerContract();
     const isOwner: boolean = await contract.owners(address.account)
+    console.log(isOwner);
+    console.log(await contract.authorizedUsers(address.account));
     if (isOwner) return isOwner;
     return contract.authorizedUsers(address.account);
 }
