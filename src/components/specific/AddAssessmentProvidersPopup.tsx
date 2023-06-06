@@ -9,9 +9,11 @@ import useAlert from "../../hooks/AlertHook";
 import {useRouter} from "next/router";
 
 interface AddAssessmentProvidersPopupProps {
+  projectId: string;
   projectAddress: string;
   onClose: () => void;
   onAdd: () => void;
+  existingAssessmentProviders: User[];
 }
 
 const fetchUsers = async (url: string) => {
@@ -34,7 +36,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
   const handleSearch = async () => {
     const encodedSearchQuery = encodeURIComponent(searchQuery);
     const data = await fetchUsers(`/api/users/search?q=${encodedSearchQuery}`);
-    setResults(data.users);
+    setResults(data.users.filter((assessmentProvider: User) => !props.existingAssessmentProviders.some((existingAssessmentProvider: User) => assessmentProvider.id === existingAssessmentProvider.id)));
     setResultsVisible(data.users.length > 0);
   };
 
@@ -94,14 +96,14 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
           <IconButton className={`text-white ${selectedUsers.length === 0 ? "bg-gray-200" : "bg-main-200"}`} text="Submit" icon={<FaPlus />} disabled={selectedUsers.length == 0} onClick={handleAdd}/>
         </div>
         {selectedUsers.length > 0 && (
-          <div className="p-3 border-b border-gray-200">
+          <div className="m-3 border-b border-gray-200">
             {selectedUsers.map((user) => (
               <AssessmentProviderResultItem user={user} handleSelect={handleSelect} isAdded={true} />
             ))}
           </div>
         )}
         {resultsVisible && (
-          <div className="p-3">
+          <div className="m-3">
             {results.map((result) => (
               <span>{!selectedUsers.find((user) => result.id === user.id) && <AssessmentProviderResultItem user={result} handleSelect={handleSelect} />}</span>
             ))}
