@@ -1,9 +1,22 @@
-import { findProjectById } from "@/lib/ProjectService";
-import { ProjectState, User } from "@prisma/client";
-import React, { useEffect, useState } from "react";
-import { InferGetServerSidePropsType } from "next";
-import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPlus, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
+import {findProjectById} from "@/lib/ProjectService";
+import {Investor, ProjectState, User} from "@prisma/client";
+import React, {useEffect, useState} from "react";
+import {InferGetServerSidePropsType} from "next";
+import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
+import {
+  FaArrowUp,
+  FaCalendarPlus,
+  FaFileContract,
+  FaHeading,
+  FaHourglass,
+  FaPaperclip,
+  FaPlus,
+  FaQuestion,
+  FaTag,
+  FaTrash,
+  FaUpload,
+  FaUser
+} from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -15,10 +28,10 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import { setRecentProject } from "@/utils/LocalStorageUtil";
+import {setRecentProject} from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import { ProjectModel } from "@/models/ProjectModel";
-import { DocumentContractModel } from "@/models/DocumentContractModel";
+import {ProjectModel} from "@/models/ProjectModel";
+import {DocumentContractModel} from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import {useRouter} from "next/router";
 
@@ -153,7 +166,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
           <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={openAddAssessmentProviderPopup} />
-          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectAddress={project.baseProject.smartContractAddress} projectId={project.baseProject.id} existingAssessmentProviders={project.assessmentProviders}/>}
+          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onAdd={() => onAssessmentProvidersAdded} onClose={() => setIsAddAssessmentProvidersOpen(false)} projectAddress={project.baseProject.smartContractAddress} projectId={project.baseProject.id} existingAssessmentProviders={project.assessmentProviders}/>}
         </span>
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem
