@@ -19,6 +19,7 @@ import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
 import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
+import InvestorsView from "@/components/specific/InvestorsView";
 import {useRouter} from "next/router";
 
 export const getServerSideProps: any = async (context: any) => {
@@ -101,6 +102,27 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     console.log(selectedAddresses);
   };
 
+  const investors: Investor[] = [
+    {
+        id: "1",
+        name: "Investor 1",
+        email: "investor@gmail.com",
+        phoneNumber: "123456789",
+        taxId: "SI12355",
+      streetAddress: "Street 1",
+      projectId: project.id
+    },
+    {
+      id: "1",
+      name: "Investor 1",
+      email: "investor@gmail.com",
+      phoneNumber: "123456789",
+      taxId: "SI12355",
+      streetAddress: "Street 1",
+      projectId: project.id
+    },
+  ]
+
   return (
     <div className="px-40 mb-10">
       <BreadCrumbs />
@@ -121,7 +143,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
         <div className="border-b col-span-5 border-gray-900/10">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-          {/*<InvestorsTable investors={project.investors} />*/}
+          <InvestorsView investors={investors} />
         </div>
       </div>
       {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
