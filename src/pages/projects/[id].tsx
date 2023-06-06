@@ -1,5 +1,5 @@
 import { findProjectById } from "@/lib/ProjectService";
-import {Project, ProjectState, User} from "@prisma/client";
+import { ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
@@ -17,7 +17,7 @@ import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import {ProjectModel} from "@/models/ProjectModel";
+import { ProjectModel } from "@/models/ProjectModel";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -119,7 +119,9 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
           <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={openAddAssessmentProviderPopup} />
-          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectId={project.baseProject.id} />}
+          {isAddAssessmentProvidersOpen && (
+            <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectId={project.baseProject.id} existingAssessmentProviders={project.assessmentProviders} />
+          )}
         </span>
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem
@@ -134,7 +136,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
         </div>
       </div>
-        {/*} />*/}
+      {/*} />*/}
       <RoleBasedComponent
         assessmentProviderComponent={
           <div>

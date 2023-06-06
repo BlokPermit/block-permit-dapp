@@ -7,6 +7,7 @@ import AssessmentProviderResultItem from "./AssessmentProviderResultItem";
 interface AddAssessmentProvidersPopupProps {
   projectId: string;
   onClose: () => void;
+  existingAssessmentProviders: User[];
 }
 
 const fetchUsers = async (url: string) => {
@@ -26,7 +27,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
   const handleSearch = async () => {
     const encodedSearchQuery = encodeURIComponent(searchQuery);
     const data = await fetchUsers(`/api/users/search?q=${encodedSearchQuery}`);
-    setResults(data.users);
+    setResults(data.users.filter((assessmentProvider: User) => !props.existingAssessmentProviders.some((existingAssessmentProvider: User) => assessmentProvider.id === existingAssessmentProvider.id)));
     setResultsVisible(data.users.length > 0);
   };
 
