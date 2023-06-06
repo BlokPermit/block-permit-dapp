@@ -26,6 +26,39 @@ export const findUserByAddress = async (address: string) => {
     return user;
 }
 
+export const findUsersByName = async (name: string) => {
+    return prisma.user.findMany({
+        where: {
+            OR: [
+                {
+                    name: {
+                        contains: name,
+                        mode: "insensitive"
+                    }
+                },
+                {
+                    email: {
+                        contains: name,
+                        mode: "insensitive"
+                    }
+                },
+                {
+                    phone: {
+                        contains: name,
+                        mode: "insensitive"
+                    }
+                },
+                {
+                    streetAddress: {
+                        contains: name,
+                        mode: "insensitive"
+                    }
+                }
+            ]
+        }
+    });
+}
+
 export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
     const contract: Contract = await getOwnerContract();
     const isOwner: boolean = await contract.owners(address.account)

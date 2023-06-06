@@ -1,21 +1,46 @@
-import { AssessmentProviderModel } from "@/models/AssessmentProviderModel";
-import InputField from "../generic/input/InputField";
-import AssessmentProviderListItem from "./AssessmentProviderListItem";
 import { FaCheck, FaPlus, FaSearch } from "react-icons/fa";
 import IconButton from "../generic/buttons/IconButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { User } from "@prisma/client";
+import AssessmentProviderResultItem from "./AssessmentProviderResultItem";
 
 interface AddAssessmentProvidersPopupProps {
   projectId: string;
   onClose: () => void;
 }
 
+const fetchUsers = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Something went wrong");
+  }
+  return response.json();
+};
+
 const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [resultsVisible, setResultsVisible] = useState<boolean>(false);
+  const [results, setResults] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
-  const handleSearch = () => {
-    setResultsVisible(true);
+  const handleSearch = async () => {
+    const encodedSearchQuery = encodeURIComponent(searchQuery);
+    const data = await fetchUsers(`/api/users/search?q=${encodedSearchQuery}`);
+    setResults(data.users);
+    setResultsVisible(data.users.length > 0);
+  };
+
+  const handleSelect = async (user: User, action: "add" | "remove") => {
+    if (action === "remove") {
+      setSelectedUsers(selectedUsers.filter((selectedUser) => selectedUser.id !== user.id));
+    }
+    if (action === "add") {
+      setSelectedUsers([...selectedUsers, user]);
+    }
+  };
+
+  const handleAdd = async () => {
+    console.log(selectedUsers);
   };
 
   return (
@@ -25,14 +50,20 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
         <div className="grid grid-cols-7 gap-2 m-3">
           <input className="col-span-5 border-none rounded-lg p-3 bg-gray-200" type="text" placeholder="Search Assessment Providers" onChange={(e) => setSearchQuery(e.target.value)} />
           <IconButton className="bg-gray-200" text="Search" icon={<FaSearch />} onClick={handleSearch} />
-          <IconButton className="bg-main-200 text-white" text="Submit" icon={<FaPlus />} />
+          <IconButton className="bg-main-200 text-white" text="Submit" icon={<FaPlus />} onClick={handleAdd} />
         </div>
+        {selectedUsers.length > 0 && (
+          <div className="p-3 border-b border-gray-200">
+            {selectedUsers.map((user) => (
+              <AssessmentProviderResultItem user={user} handleSelect={handleSelect} isAdded={true} />
+            ))}
+          </div>
+        )}
         {resultsVisible && (
           <div className="p-3">
-            <span className="p-3 flex justify-between items-center rounded-lg hover:bg-gray-200 hover:cursor-pointer">
-              <div>Jack Nickelson</div>
-              {true && <FaCheck color="green" />}
-            </span>
+            {results.map((result) => (
+              <span>{!selectedUsers.find((user) => result.id === user.id) && <AssessmentProviderResultItem user={result} handleSelect={handleSelect} />}</span>
+            ))}
           </div>
         )}
       </span>
