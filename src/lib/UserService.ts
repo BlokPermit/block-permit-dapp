@@ -1,74 +1,78 @@
-import {prisma} from "@/utils/PrismaClient";
-import {User} from "@prisma/client";
-import {Contract} from "ethers";
-import {getOwnerContract} from "@/utils/BlockchainUtils";
-import {provider} from "@/utils/EthereumClient";
-
+import { prisma } from "@/utils/PrismaClient";
+import { User } from "@prisma/client";
+import { Contract } from "ethers";
+import { getOwnerContract } from "@/utils/BlockchainUtils";
+import { provider } from "@/utils/EthereumClient";
 
 export const createUsers = async (users: User[]) => {
-    for (let user of users) {
-        user.walletAddress = user.walletAddress.toLowerCase();
-    }
-    return prisma.user.createMany({
-        data: users,
-    });
-}
+  for (let user of users) {
+    user.walletAddress = user.walletAddress.toLowerCase();
+  }
+  return prisma.user.createMany({
+    data: users,
+  });
+};
 
 export const findUserByAddress = async (address: string) => {
-    const user = prisma.user.findUnique({
-        where: {
-            walletAddress: address.toLowerCase(),
-        }
-    });
+  const user = prisma.user.findUnique({
+    where: {
+      walletAddress: address.toLowerCase(),
+    },
+  });
 
-    if (!user) throw new Error("User not found");
+  if (!user) throw new Error("User not found");
 
-    return user;
-}
+  return user;
+};
 
 export const findUsersByName = async (name: string) => {
-    return prisma.user.findMany({
-        where: {
-            OR: [
-                {
-                    name: {
-                        contains: name,
-                        mode: "insensitive"
-                    }
-                },
-                {
-                    email: {
-                        contains: name,
-                        mode: "insensitive"
-                    }
-                },
-                {
-                    phone: {
-                        contains: name,
-                        mode: "insensitive"
-                    }
-                },
-                {
-                    streetAddress: {
-                        contains: name,
-                        mode: "insensitive"
-                    }
-                }
-            ]
-        }
-    });
-}
+  return prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          name: {
+            contains: name,
+            mode: "insensitive",
+          },
+        },
+        {
+          email: {
+            contains: name,
+            mode: "insensitive",
+          },
+        },
+        {
+          phone: {
+            contains: name,
+            mode: "insensitive",
+          },
+        },
+        {
+          streetAddress: {
+            contains: name,
+            mode: "insensitive",
+          },
+        },
+      ],
+      AND: [
+        {
+          userType: "ASSESSMENT_PROVIDER",
+        },
+      ],
+    },
+  });
+};
 
 export const checkUserOnBlockchain = async (address: any): Promise<boolean> => {
-    const contract: Contract = await getOwnerContract();
-    const isOwner: boolean = await contract.owners(address.account)
-    console.log(isOwner);
-    console.log(await contract.authorizedUsers(address.account));
-    if (isOwner) return isOwner;
-    return contract.authorizedUsers(address.account);
-}
+  const contract: Contract = await getOwnerContract();
+  const isOwner: boolean = await contract.owners(address.account);
+  console.log(isOwner);
+  console.log(await contract.authorizedUsers(address.account));
+  if (isOwner) return isOwner;
+  return contract.authorizedUsers(address.account);
+};
 
 export const authorizeUsersOnBlockchain = async (addresses: any, signer: string): Promise<any> => {
-    const contract: Contract = await getOwnerContract();
-    return contract.connect(provider.getSigner(signer)).authorizeUsers(addresses);
-}
+  const contract: Contract = await getOwnerContract();
+  return contract.connect(provider.getSigner(signer)).authorizeUsers(addresses);
+};
