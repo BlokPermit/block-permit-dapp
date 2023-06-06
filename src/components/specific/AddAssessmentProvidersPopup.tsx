@@ -54,14 +54,14 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
           <IconButton className="bg-main-200 text-white" text="Submit" icon={<FaPlus />} onClick={handleAdd} />
         </div>
         {selectedUsers.length > 0 && (
-          <div className="p-3 border-b border-gray-200">
+          <div className="m-3 border-b border-gray-200">
             {selectedUsers.map((user) => (
               <AssessmentProviderResultItem user={user} handleSelect={handleSelect} isAdded={true} />
             ))}
           </div>
         )}
         {resultsVisible && (
-          <div className="p-3">
+          <div className="m-3">
             {results.map((result) => (
               <span>{!selectedUsers.find((user) => result.id === user.id) && <AssessmentProviderResultItem user={result} handleSelect={handleSelect} />}</span>
             ))}
