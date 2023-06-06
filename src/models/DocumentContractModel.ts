@@ -4,7 +4,7 @@ export interface DocumentContractModel {
     documentContractAddress: string;
     assessmentProvider: User;
     isClosed: boolean;
-    assessmentDueDate: Date;
+    assessmentDueDate: number;
     mainDocumentUpdateRequested: boolean;
-    requestedAssessmentDueDate: Date | null;
+    requestedAssessmentDueDate: number | null;
 }

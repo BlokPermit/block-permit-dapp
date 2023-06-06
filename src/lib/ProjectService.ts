@@ -9,6 +9,7 @@ import {ProjectModel} from "../models/ProjectModel";
 import {findUserByAddress} from "./UserService";
 import {DocumentContractModel} from "../models/DocumentContractModel";
 import {AddressZero} from "@ethersproject/constants";
+import {getErrorReason} from "../utils/BlockchainUtils";
 
 /*const URL: string = process.env.BACKEND_URL;
 
@@ -51,7 +52,7 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
         });
 
         await prisma.user.update({
-            where: {walletAddress: walletAddress},
+            where: { walletAddress: walletAddress },
             data: {
                 projectAddresses: {
                     push: contract.address,
@@ -119,8 +120,6 @@ export const findProjectById = async (id: string) => {
         const sentDGDs: DocumentContractModel[] | null = await getDocumentContractModels(await projectContract.getSentDGDsAddresses());
 
         const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
-
-
 
         return {
             baseProject: baseProject,
@@ -191,6 +190,41 @@ export const getRecentProjectsByState = async (state: ProjectState) => {
     }
 };
 
+export const addAssessmentProviders = async (projectAddress: string, signerAddress: string, assessmentProvidersAddresses: string[]) => {
+    try {
+        const projectContract = new Contract(
+            projectAddress,
+            getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi,
+            await provider.getSigner(signerAddress)
+        );
+        await projectContract.addAssessmentProviders(assessmentProvidersAddresses);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
+
+    try {
+        for (let assessmentProviderAddress of assessmentProvidersAddresses) {
+            await prisma.user.update({
+                where: { walletAddress: assessmentProviderAddress },
+                data: {
+                    projectAddresses: {
+                        push: projectAddress
+                    }
+                }
+            });
+        }
+        console.log(await prisma.user.findMany({
+            where: {
+                walletAddress: {
+                    in: assessmentProvidersAddresses,
+                },
+            },
+        }));
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+}
+
 const getProjectAddressesOfUser = async (walletAddress: string) => {
     try {
         return await prisma.user.findUnique({
@@ -219,16 +253,14 @@ const getDocumentContractModels = async (addresses: string[]) => {
 
         if (!assessmentProvider) throw new Error("Assessment provider not found");
 
-        let requestedAssessmentDueDate: Date | null = dateFromTimestamp(
-            await documentContract.requestedAssessmentDueDate()
-        );
-        if (requestedAssessmentDueDate == new Date(0)) requestedAssessmentDueDate = null;
+        let requestedAssessmentDueDate: number | null = parseInt(await documentContract.requestedAssessmentDueDate());
+        if (requestedAssessmentDueDate == 0) requestedAssessmentDueDate = null;
 
         sentDocumentContracts.push({
             documentContractAddress: address,
             assessmentProvider: assessmentProvider,
             isClosed: await documentContract.isClosed(),
-            assessmentDueDate: dateFromTimestamp(await documentContract.assessmentDueDate()),
+            assessmentDueDate: parseInt(await documentContract.assessmentDueDate()),
             mainDocumentUpdateRequested: await documentContract.mainDocumentUpdateRequested(),
             requestedAssessmentDueDate: requestedAssessmentDueDate
         });

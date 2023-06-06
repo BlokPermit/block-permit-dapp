@@ -18,6 +18,7 @@ import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
 import {ProjectModel} from "@/models/ProjectModel";
+import {useRouter} from "next/router";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -31,8 +32,10 @@ export const getServerSideProps: any = async (context: any) => {
 };
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+
   useEffect(() => {
-    setRecentProject(project.id);
+    setRecentProject(project.baseProject.id);
   }, []);
 
   const { setConformationPopup } = useConformationPopup();
@@ -46,6 +49,11 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const openAddAssessmentProviderPopup = () => {
     setIsAddAssessmentProvidersOpen(!isAddAssessmentProvidersOpen);
   };
+
+  const onAssessmentProvidersAdded = async () => {
+    await router.push(router.asPath);
+    setIsAddAssessmentProvidersOpen(false);
+  }
 
   const handleRemove = (id: string) => {
     setConformationPopup({
@@ -119,7 +127,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
           <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={openAddAssessmentProviderPopup} />
-          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectId={project.baseProject.id} />}
+          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onClose={() => setIsAddAssessmentProvidersOpen(false)} projectAddress={project.baseProject.smartContractAddress} onAdd={onAssessmentProvidersAdded}/>}
         </span>
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem

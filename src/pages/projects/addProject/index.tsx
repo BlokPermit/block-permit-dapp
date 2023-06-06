@@ -83,7 +83,6 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
         setSelectedInvestors(investors);
     };
 
-    //TODO: Move to lib folder. Logic should be in service.
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
@@ -106,17 +105,14 @@ const CreateProject = ({investors}: InvestorsPageProps) => {
                 smartContractAddress: AddressZero
             };
 
-            const accounts = await window.ethereum.request({method: 'eth_accounts'});
-            let connectedAddress: string = getConnectedAddress(accounts);
-
-            const response = await fetch("/api/project", {
+            const response = await fetch("/api/projects", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     projectData: project,
-                    walletAddress: connectedAddress,
+                    walletAddress: await getConnectedAddress(window),
                     dppHash: isDocument ? await hashFileToBytes32(selectedDocument) : null,
                     dppUrl: (isDocument) ? documentPath! : null,
                 })

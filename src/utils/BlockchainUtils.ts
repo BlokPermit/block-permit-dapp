@@ -36,5 +36,14 @@ export const getOwnerContract = async () => {
     );
 }
 
+export const getErrorReason = (error: any) => {
+    switch (error.code) {
+        case "UNPREDICTABLE_GAS_LIMIT":
+            return error.error.error.data.reason;
+        default:
+            return `Other blockchain error: ${error.code}`;
+    }
+}
+
 export const getContractARTIFACT = async () => {
 }
