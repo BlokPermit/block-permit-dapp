@@ -1,5 +1,5 @@
 import useConformationPopup from "@/hooks/ConformationPopupHook";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 const ConformationPopup = () => {
   const props = useConformationPopup();
@@ -34,7 +34,10 @@ const ConformationPopup = () => {
                 ${props.popupType == "error" && "bg-red-600"} 
                 ${props.popupType == "warning" && "bg-main-200"} 
                 ${props.popupType == "info" && "bg-gray-200"}`}
-                onClick={props.onClickPrimary}
+                onClick={() => {
+                  props.onClickPrimary
+                  setShow(false);
+                }}
               >
                 {props.buttonPrimaryText}
               </button>

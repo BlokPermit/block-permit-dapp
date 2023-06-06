@@ -1,151 +1,131 @@
-import {useState} from "react";
-import {AiFillFileAdd} from "react-icons/ai";
-import {FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash} from "react-icons/fa";
-import {downloadDocument} from "@/lib/DocumentService";
+import { useState } from "react";
+import { AiFillFileAdd } from "react-icons/ai";
+import { FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash } from "react-icons/fa";
+import { downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 
 interface DocumentDropdownProps {
-    documentId: string;
-    documentType: "dpp" | "dgd";
-    isPresent: boolean;
-    fileName?: string;
-    onDocumentChange: (file: File | null) => void;
+  documentId: string;
+  documentType: "dpp" | "dgd";
+  isPresent: boolean;
+  fileName?: string;
 }
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
-    const [isActive, setIsActive] = useState<boolean>(false);
-    const {setAlert} = useAlert();
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const { setAlert } = useAlert();
 
-    async function downloadFile() {
-        try {
-            if (props.fileName != null) {
-                const file: Blob | boolean = await downloadDocument(props.fileName);
-                if (file == false) throw Error('Failed to download document. Please try again.');
+  async function downloadFile() {
+    try {
+      if (props.fileName != null) {
+        const file: Blob | boolean = await downloadDocument(props.fileName);
+        if (file == false) throw Error("Failed to download document. Please try again.");
 
-                const blobURL = window.URL.createObjectURL(file as Blob);
+        const blobURL = window.URL.createObjectURL(file as Blob);
 
-                const downloadLink = document.createElement('a');
-                downloadLink.href = blobURL;
-                downloadLink.setAttribute('download', props.fileName);
-                downloadLink.click();
-            }
-        } catch (error: Error | any) {
-            setAlert({title: "", message: error.message, type: "error"});
-        }
+        const downloadLink = document.createElement("a");
+        downloadLink.href = blobURL;
+        downloadLink.setAttribute("download", props.fileName);
+        downloadLink.click();
+      }
+    } catch (error: Error | any) {
+      setAlert({ title: "", message: error.message, type: "error" });
     }
+  }
 
-
-    return (
-        <div>
-            <div
-                className="inline-flex items-center overflow-hidde bg-main-200 hover:bg-white rounded-md border text-sm hover:cursor-pointer">
-        <span
-            className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
-          <FaFileDownload className="mr-2"/>
-            {props.documentType === "dpp" && <p>Download DPP</p>}
-            {props.documentType === "dgd" && <p>Download DGD</p>}
+  return (
+    <div>
+      <div className="inline-flex items-center overflow-hidde bg-main-200 hover:bg-white rounded-md border text-sm hover:cursor-pointer">
+        <span className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+          <FaFileDownload className="mr-2" />
+          {props.documentType === "dpp" && <p>Download DPP</p>}
+          {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
 
-                <span onClick={() => setIsActive(!isActive)}
-                      className="py-2 px-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
-          {isActive ? <FaChevronUp/> : <FaChevronDown/>}
+        <span onClick={() => setIsActive(!isActive)} className="py-2 px-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+          {isActive ? <FaChevronUp /> : <FaChevronDown />}
         </span>
-            </div>
-            <div
-                className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"}
-                role="menu">
-                <div className="p-2">
-                    <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
+      </div>
+      <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
+        <div className="p-2">
+          <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
 
-                    <button onClick={downloadFile}
-                            className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            role="menuitem">
-                        Download
-                    </button>
+          <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
+            Download
+          </button>
 
-                    <button
-                        className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                        role="menuitem">
-                        Update
-                    </button>
-                </div>
-
-                <div className="p-2">
-                    <strong className="block p-2 text-xs font-medium uppercase text-gray-400">Danger Zone</strong>
-
-                    <button
-                        className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                        role="menuitem">
-                        <FaTrash/>
-                        Delete
-                    </button>
-                </div>
-            </div>
+          <button className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
+            Update
+          </button>
         </div>
-    );
+
+        <div className="p-2">
+          <strong className="block p-2 text-xs font-medium uppercase text-gray-400">Danger Zone</strong>
+
+          <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">
+            <FaTrash />
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const DocumentUpload = (props: DocumentDropdownProps) => {
-    const [isActive, setIsActive] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean>(false);
 
-    const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        props.onDocumentChange(file);
-    };
+  const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    saveDocument(file);
+  };
 
-    return (
-        <div className="relative">
-            <div
-                onClick={() => setIsActive(!isActive)}
-                className="inline-flex items-center overflow-hidden rounded-md border bg-main-200 hover:cursor-pointer hover:bg-gray-50 text-white hover:text-main-200"
-            >
-        <span className="flex justify-between items-center px-2 py-2 text-md text-inherit">
-          <FaFileUpload className="mr-2" size={19}/>
-            {props.documentType === "dpp" && <p>Upload DPP</p>}
-            {props.documentType === "dgd" && <p>Upload DGD</p>}
+  return (
+    <div className="relative">
+      <div
+        onClick={() => setIsActive(!isActive)}
+        className="inline-flex items-center overflow-hidden rounded-md border bg-main-200 hover:cursor-pointer hover:bg-gray-50 text-white hover:text-main-200"
+      >
+        <span className="flex justify-between items-center px-2 py-2 text-sm text-inherit">
+          <FaFileUpload className="mr-2" size={19} />
+          {props.documentType === "dpp" && <p>Upload DPP</p>}
+          {props.documentType === "dgd" && <p>Upload DGD</p>}
         </span>
 
-                <span className="h-full p-2 text-inherit">{isActive ? <FaChevronUp size={15}/> :
-                    <FaChevronDown size={15}/>}</span>
-            </div>
+        <span className="h-full p-2 text-inherit">{isActive ? <FaChevronUp size={15} /> : <FaChevronDown size={15} />}</span>
+      </div>
 
-            <div
-                className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"}
-                role="menu">
-                <div className="p-5">
-                    <div className="text-center">
-                        <AiFillFileAdd className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true"/>
-                        <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
-                            <label
-                                htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md  font-semibold text-main-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-main-200 focus-within:ring-offset-2 hover:text-main-500"
-                            >
-                                <span>Upload a file</span>
-                                <input id="file-upload" name="file-upload" type="file" className="sr-only"
-                                       onChange={handleDocumentChange}/>
-                            </label>
-                        </div>
-                        <p className="text-xs leading-5 text-gray-600">PDF, DOCX, PNG up to 10MB</p>
-                    </div>
-                </div>
+      <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
+        <div className="p-5">
+          <div className="text-center">
+            <AiFillFileAdd className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
+            <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
+              <label
+                htmlFor="file-upload"
+                className="relative cursor-pointer rounded-md  font-semibold text-main-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-main-200 focus-within:ring-offset-2 hover:text-main-500"
+              >
+                <span>Upload a file</span>
+                <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleDocumentChange} />
+              </label>
             </div>
+            <p className="text-xs leading-5 text-gray-600">PDF, DOCX, PNG up to 10MB</p>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 const DocumentDropdown = (props: DocumentDropdownProps) => {
-    return (
-        <>
-            {props.isPresent ? (
-                <DocumentDownload documentId={props.documentId} documentType={props.documentType}
-                                  isPresent={props.isPresent} onDocumentChange={props.onDocumentChange}
-                                  fileName={props.fileName}/>
-            ) : (
-                <DocumentUpload documentId={props.documentId} documentType={props.documentType}
-                                isPresent={props.isPresent} onDocumentChange={props.onDocumentChange}/>
-            )}
-        </>
-    );
+  return (
+    <>
+      {props.isPresent ? (
+        <DocumentDownload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} fileName={props.fileName} />
+      ) : (
+        <DocumentUpload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} />
+      )}
+    </>
+  );
 };
 
 export default DocumentDropdown;

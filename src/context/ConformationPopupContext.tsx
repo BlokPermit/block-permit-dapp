@@ -1,5 +1,5 @@
-import { createContext, useState } from "react";
-import { FaInfo } from "react-icons/fa";
+import {createContext, useState} from "react";
+import {FaInfo} from "react-icons/fa";
 
 export interface ConformationPopupProps {
   icon: any;

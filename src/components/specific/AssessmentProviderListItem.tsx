@@ -1,11 +1,13 @@
-import { FaArrowUp, FaCheck, FaClock, FaPaperclip, FaTimes, FaTrash } from "react-icons/all";
+import { FaArrowUp, FaCalendar, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes } from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import {User} from "@prisma/client";
+import { User } from "@prisma/client";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
 
 interface OpinionProviderProps {
   assessmentProvider: User;
+  documentContract: DocumentContractModel;
   countSelected: (isSelected: boolean, id: string) => void;
   handleAttachments: (id: string) => void;
   handleRemove: (id: string) => void;
@@ -15,6 +17,17 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
 
+  useEffect(() => {
+    if (props.documentContract) {
+      setStatus("sent");
+      if (props.documentContract.isClosed) {
+        setStatus("assessed");
+        return;
+      }
+      return;
+    }
+    setStatus("waiting to send");
+  });
   return (
     <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
       <div className="flex justify-between">
@@ -29,26 +42,46 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
           </span>
         </div>
         <ButtonGroup
-          secondaryButtons={[
-            {
-              text: "Remove",
-              icon: <FaTrash />,
-              onClick: () => props.handleRemove(props.assessmentProvider.id),
-            },
-            {
-              text: "Attachments",
-              icon: <FaPaperclip />,
-              onClick: () => props.handleAttachments(props.assessmentProvider.id),
-            },
-          ]}
-          primaryButton={{
-            text: isSelected ? "Deselect" : "Select",
-            icon: isSelected ? <FaTimes /> : <FaCheck />,
-            onClick: () => {
-              setIsSelected(!isSelected);
-              props.countSelected(!isSelected, props.assessmentProvider.id);
-            },
-          }}
+          secondaryButtons={
+            status === "sent"
+              ? [
+                  {
+                    text: props.documentContract.requestedAssessmentDueDate!.toDateString(),
+                    icon: <FaCalendar />,
+                    onClick: () => {},
+                    disabled: true,
+                  },
+                  {
+                    text: "Attachments",
+                    icon: <FaPaperclip />,
+                    onClick: () => props.handleAttachments(props.assessmentProvider.id),
+                  },
+                ]
+              : [
+                  {
+                    text: "Attachments",
+                    icon: <FaPaperclip />,
+                    onClick: () => props.handleAttachments(props.assessmentProvider.id),
+                  },
+                ]
+          }
+          primaryButton={
+            status === "waiting to send"
+              ? {
+                  text: isSelected ? "Deselect" : "Select",
+                  icon: isSelected ? <FaTimes /> : <FaCheck />,
+                  onClick: () => {
+                    setIsSelected(!isSelected);
+                    props.countSelected(!isSelected, props.assessmentProvider.id);
+                  },
+                }
+              : {
+                  text: status === "assessed" ? "Review" : "Sent",
+                  icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
+                  onClick: status === "assessed" ? () => {} : () => {},
+                  disabled: status === "assessed" ? false : true,
+                }
+          }
         />
       </div>
     </div>

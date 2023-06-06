@@ -17,7 +17,8 @@ import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import {ProjectModel} from "@/models/ProjectModel";
+import { ProjectModel } from "@/models/ProjectModel";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
 import {useRouter} from "next/router";
 
 export const getServerSideProps: any = async (context: any) => {
@@ -39,9 +40,6 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   }, []);
 
   const { setConformationPopup } = useConformationPopup();
-
-  const [isDPPPresent, setIsDPPPresent] = useState<boolean>(true);
-  const onDocumentChange = (file: File | null) => {};
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
   const [isAddAssessmentProvidersOpen, setIsAddAssessmentProvidersOpen] = useState<boolean>(false);
@@ -90,11 +88,17 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       icon: <FaArrowUp />,
       popupType: "warning",
       buttonPrimaryText: "Send",
-      onClickPrimary: () => {
-        console.log(selectedAssessmentProviders);
-      },
+      onClickPrimary: () => sendToAssessmentProviders,
       show: true,
     });
+  };
+
+  const sendToAssessmentProviders = () => {
+    const selectedAddresses: string[] = selectedAssessmentProviders.map((assessmentProviderId: string) => {
+      const assessmentProvider = project.assessmentProviders.find((assessmentProvider: User) => assessmentProvider.id === assessmentProviderId);
+      if (assessmentProvider) return assessmentProvider.walletAddress;
+    });
+    console.log(selectedAddresses);
   };
 
   return (
@@ -105,7 +109,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.baseProject.id}</h1>
         <div className="flex items-center gap-2">
           <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => setIsAttachmentsPopupOpen(true)} />
-          <DocumentDropdown documentId={project.dppUrl ?? ""} documentType="dpp" isPresent={isDPPPresent} onDocumentChange={onDocumentChange} fileName={project.dppUrl} />
+          <DocumentDropdown documentId={project.dppUrl ?? ""} documentType="dpp" isPresent={project.dppUrl !== undefined} fileName={project.dppUrl} />
         </div>
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
@@ -117,7 +121,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
         <div className="border-b col-span-5 border-gray-900/10">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-          {/*<InvestorsTable investors={project} />*/}
+          {/*<InvestorsTable investors={project.investors} />*/}
         </div>
       </div>
       {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
@@ -132,6 +136,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem
             assessmentProvider={assessmentProvider}
+            documentContract={project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)}
             key={assessmentProvider.id}
             countSelected={countSelected}
             handleAttachments={() => setIsAttachmentsPopupOpen(true)}
@@ -173,7 +178,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             </div>
             <h2 className="text-2xl font-semibold my-5">Upload Assessment</h2>
             <InputField label="" type="text" id={"attachment"} placeholder={"Assessment Name"} />
-            <DocumentInput onDocumentChange={onDocumentChange} />
+            <DocumentInput onDocumentChange={() => {}} />
             <div className="flex justify-end gap-4">
               <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Add Attachments" icon={<FaPaperclip />} onClick={() => setIsAttachmentsPopupOpen(true)} />
               <IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200" text="Upload" icon={<FaUpload />} onClick={() => {}} />
