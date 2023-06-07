@@ -1,22 +1,9 @@
-import {findProjectById} from "@/lib/ProjectService";
-import {Investor, ProjectState, User} from "@prisma/client";
-import React, {useEffect, useState} from "react";
-import {InferGetServerSidePropsType} from "next";
-import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
-import {
-  FaArrowUp,
-  FaCalendarPlus,
-  FaFileContract,
-  FaHeading,
-  FaHourglass,
-  FaPaperclip,
-  FaPaperPlane,
-  FaPlus,
-  FaQuestion,
-  FaTag,
-  FaUpload,
-  FaUser
-} from "react-icons/all";
+import { findProjectById } from "@/lib/ProjectService";
+import { Investor, ProjectState, User } from "@prisma/client";
+import React, { useEffect, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
+import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
+import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -27,19 +14,14 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import {setRecentProject} from "@/utils/LocalStorageUtil";
+import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import {ProjectModel} from "@/models/ProjectModel";
-import {DocumentContractModel} from "@/models/DocumentContractModel";
+import { ProjectModel } from "@/models/ProjectModel";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
-import {
-  getFileNamesFromDirectory,
-  getFileNamesWithHashesFromDirectory,
-  getFilesFromDirectory
-} from "../../lib/DocumentService";
-import {LoadingAnimation} from "../../components/generic/loading-animation/LoadingAnimation";
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
+import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 
 export const getServerSideProps: any = async (context: any) => {
@@ -115,14 +97,16 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
       let assessmentProvidersInfo: object[] = project.assessmentProviders.map((assessmentProvider: User) => {
         const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
-        if (matchingAssessmentProvider) return {
-          assessmentProviderId: assessmentProvider.id,
-          assessmentProviderAddress: assessmentProvider.walletAddress
-        };
+        if (matchingAssessmentProvider)
+          return {
+            assessmentProviderId: assessmentProvider.id,
+            assessmentProviderAddress: assessmentProvider.walletAddress,
+          };
       });
 
       assessmentProvidersInfo = assessmentProvidersInfo.filter((info: object) => info !== undefined);
 
+      //TODO: Create a interface to avoid typescript errors.
       let documentContractStructs: object[] = [];
       const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
       const connectedAddress = await getConnectedAddress(window);
@@ -135,32 +119,30 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
         documentContractStructs.push({
           assessmentProvider: info.assessmentProviderAddress,
-          attachments: attachments
-        })
+          attachments: attachments,
+        });
       }
 
       const body = {
         projectAddress: project.baseProject.smartContractAddress,
         signerAddress: connectedAddress,
         documentContractStructs: documentContractStructs,
-      }
+      };
 
       const response = await fetch(`/api/projects/${path}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
-        setIsLoading(false);
         router.reload();
       }
     } catch (e: any) {
       setAlert({ title: "", message: e.message, type: "error" });
-      setIsLoading(false);
     }
   };
 

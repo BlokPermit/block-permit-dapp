@@ -4,17 +4,17 @@ import { AiOutlineAppstoreAdd } from "react-icons/all";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
 import SearchInput from "@/components/generic/input/SearchInput";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
-import { getAllProjects } from "@/lib/ProjectService";
+import { getAllProjectsFromDatabase } from "@/lib/ProjectService";
 import { InferGetServerSidePropsType } from "next/types";
-import { Project } from "@prisma/client";
+import { Project, ProjectState } from "@prisma/client";
 import { useRouter } from "next/router";
 import InputField from "@/components/generic/input/InputField";
 import Radio from "@/components/generic/input/Radio";
+import ProgressBar from "@/components/specific/ProgressBar";
 
 export const getServerSideProps: any = async () => {
   try {
-    //TODO: get acctual user address
-    const projects: Project[] = await getAllProjects("123");
+    const projects: Project[] = await getAllProjectsFromDatabase("1");
     return {
       props: {
         projects: projects,
@@ -32,6 +32,18 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
   const router = useRouter();
   const [searchText, setSearchText] = React.useState<string>("");
   const [environmentImpact, setEnvironmentImpact] = React.useState<boolean>();
+  const [projectState, setProjectState] = React.useState<ProjectState>(ProjectState.AQUIRING_PROJECT_CONDITIONS);
+
+  const filter = (project: Project): boolean => {
+    return (
+      (project.constructionTitle.toLowerCase().includes(searchText.toLowerCase()) ||
+        project.constructionType.toLowerCase().includes(searchText.toLowerCase()) ||
+        `Proj-${project.id}`.toLowerCase().includes(searchText.toLowerCase()) ||
+        searchText === "") &&
+      (environmentImpact === undefined || project.constructionImpactsEnvironment === environmentImpact) &&
+      projectState === project.projectState
+    );
+  };
 
   return (
     <ProtectedRoute>
@@ -44,6 +56,7 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
           <AnimatedIconButton text={"Add Project"} icon={<AiOutlineAppstoreAdd size={20} />} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
         </div>
         <div className="mt-10">
+          <ProgressBar actualState={ProjectState.AQUIRING_BUILDING_PERMIT} selectedState={projectState} handleStateChange={(state: ProjectState) => setProjectState(state)} />
           <div className="my-3 grid grid-cols-6 gap-4">
             <span className="col-span-4">
               <InputField id={searchText} label={""} placeholder={"Search Projects"} type={"text"} onChange={(e) => setSearchText(e.target.value)} />
@@ -83,20 +96,19 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
                   <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Assessment Phase</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
-                {projects.map(
-                  (project: Project) =>
-                    (
-                      <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.id} onClick={() => router.push(`/projects/${project.id}`)}>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.id}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionTitle}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionType}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Yes" : "No"}</td>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.projectState}</td>
-                      </tr>
-                    )
-                )}
-              </tbody>
+              {projects.map((project: Project) => (
+                <tbody className="divide-y divide-gray-200">
+                  {filter(project) && (
+                    <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.id} onClick={() => router.push(`/projects/${project.id}`)}>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.id}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionTitle}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionType}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Yes" : "No"}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.projectState}</td>
+                    </tr>
+                  )}
+                </tbody>
+              ))}
             </table>
           </div>
         </div>
