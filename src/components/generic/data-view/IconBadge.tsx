@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface IconBadgeProps {
   icon: any;
@@ -17,8 +17,8 @@ const IconBadge = (props: IconBadgeProps) => {
         setTextColor("text-green-700");
         break;
       case "warning":
-        setBgColor("bg-main-100");
-        setTextColor("text-main-700");
+        setBgColor("bg-main-200");
+        setTextColor("text-white");
         break;
       case "danger":
         setBgColor("bg-red-100");

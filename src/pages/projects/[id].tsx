@@ -37,7 +37,6 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const router = useRouter();
   const { setConformationPopup } = useConformationPopup();
   useEffect(() => {
-    console.log(project.DPPUrl);
     setRecentProject(project.baseProject.id);
   }, []);
 
@@ -65,16 +64,32 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       icon: <FaArrowUp />,
       popupType: "warning",
       buttonPrimaryText: "Send",
-      onClickPrimary: () => sendToAssessmentProviders,
+      onClickPrimary: sendToAssessmentProviders,
       show: true,
     });
   };
 
   const sendToAssessmentProviders = () => {
-    const selectedAddresses: string[] = selectedAssessmentProviders.map((assessmentProviderId: string) => {
-      const assessmentProvider = project.assessmentProviders.find((assessmentProvider: User) => assessmentProvider.id === assessmentProviderId);
-      if (assessmentProvider) return assessmentProvider.walletAddress;
-    });
+    let selectedAddresses: string[] = [];
+    if (selectedAssessmentProviders.length === 0) {
+      if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) {
+        selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
+          const existingDocumentContract = project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
+          if (!existingDocumentContract) return assessmentProvider.walletAddress;
+        });
+      } else if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_OPINIONS) {
+        selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
+          const existingDocumentContract = project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
+          if (!existingDocumentContract) return assessmentProvider.walletAddress;
+        });
+      }
+    } else {
+      selectedAddresses = selectedAssessmentProviders.map((assessmentProviderId: string) => {
+        const assessmentProvider = project.assessmentProviders.find((assessmentProvider: User) => assessmentProvider.id === assessmentProviderId);
+        if (assessmentProvider) return assessmentProvider.walletAddress;
+      });
+    }
+    selectedAddresses = selectedAddresses.filter((address: string) => address !== undefined);
     console.log(selectedAddresses);
   };
 

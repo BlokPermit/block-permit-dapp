@@ -32,7 +32,7 @@ const ButtonGroup = (props: ButtonGroupProps) => {
         </span>
       ))}
 
-      <button
+      <span
         className={`${
           !props.primaryButton.disabled && "text-main-200 bg-white hover:cursor-pointer hover:bg-main-200 hover:text-white"
         } inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm shadow-sm focus:relative text-gray-700 bg-gray-300`}
@@ -40,7 +40,7 @@ const ButtonGroup = (props: ButtonGroupProps) => {
       >
         {props.primaryButton.icon}
         {props.primaryButton.text}
-      </button>
+      </span>
     </div>
   );
 };

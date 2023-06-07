@@ -45,7 +45,7 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
             status === "sent"
               ? [
                   {
-                    text: props.documentContract.requestedAssessmentDueDate!.toString(),
+                    text: props.documentContract.assessmentDueDate!.toString(),
                     icon: <FaCalendar />,
                     onClick: () => {},
                     disabled: true,
