@@ -5,10 +5,10 @@ import { downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 import DocumentInput from "../input/DocumentInput";
 import IconButton from "../buttons/IconButton";
-import {ProjectModel} from "../../../models/ProjectModel";
-import {getConnectedAddress} from "../../../utils/MetamaskUtils";
-import {hashFileToBytes32} from "../../../utils/FileUtils";
-import {LoadingAnimation} from "../loading-animation/LoadingAnimation";
+import { ProjectModel } from "../../../models/ProjectModel";
+import { getConnectedAddress } from "../../../utils/MetamaskUtils";
+import { hashFileToBytes32 } from "../../../utils/FileUtils";
+import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -42,9 +42,7 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
     }
   }
 
-  async function updateFile() {
-
-  }
+  async function updateFile() {}
 
   return (
     <div>
@@ -95,7 +93,6 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
   };
 
   const uploadDocument = async () => {
-
     try {
       if (file) {
         const documentUrl = await saveDocument(file, props.path);
@@ -104,17 +101,17 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
           projectAddress: props.projectAddress,
           signerAddress: await getConnectedAddress(window),
           documentUrl: documentUrl,
-          documentHash: await hashFileToBytes32(file)
-        }
+          documentHash: await hashFileToBytes32(file),
+        };
 
-        const path = props.documentType == 'dpp' ? "setDPP" : "setDGD";
+        const path = props.documentType == "dpp" ? "setDPP" : "setDGD";
 
         const response = await fetch(`/api/projects/${path}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         });
 
         if (response.ok) {
@@ -162,14 +159,23 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
   return (
     <>
       {props.isPresent ? (
-        <DocumentDownload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} fileName={props.fileName} onDocumentChange={props.onDocumentChange} />
+        <DocumentDownload
+          documentId={props.documentId}
+          documentType={props.documentType}
+          isPresent={props.isPresent}
+          fileName={props.fileName}
+          onDocumentChange={props.onDocumentChange}
+          path={""}
+          projectAddress={""}
+        />
       ) : (
-        <DocumentUpload documentId={props.documentId}
-                        documentType={props.documentType}
-                        isPresent={props.isPresent}
-                        onDocumentChange={props.onDocumentChange}
-                        path={props.path}
-                        projectAddress={props.projectAddress}
+        <DocumentUpload
+          documentId={props.documentId}
+          documentType={props.documentType}
+          isPresent={props.isPresent}
+          onDocumentChange={props.onDocumentChange}
+          path={props.path}
+          projectAddress={props.projectAddress}
         />
       )}
     </>

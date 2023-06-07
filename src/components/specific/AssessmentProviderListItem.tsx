@@ -2,20 +2,44 @@ import { FaArrowUp, FaCalendar, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes } 
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import { User } from "@prisma/client";
+import { ProjectState, User } from "@prisma/client";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
-import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
+import { dateFromTimestamp, formatDate } from "../../utils/DateUtils";
+import AttachmentsPopup from "./AttachmentsPopup";
+import { getAllFilesInDirectory, saveDocument } from "@/lib/DocumentService";
+import { useRouter } from "next/router";
 
 interface OpinionProviderProps {
   assessmentProvider: User;
+  projectId: string;
+  projectState: ProjectState;
   documentContract: DocumentContractModel;
+  isMainDocumentPresent: boolean;
   countSelected: (isSelected: boolean, id: string) => void;
-  handleAttachments: (id: string) => void;
 }
 
 const AssessmentProviderListItem = (props: OpinionProviderProps) => {
+  const router = useRouter();
+  const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
+  const [unsentAttachments, setUnsentAttachments] = useState<string[]>([]);
+
+  const getUnsentAttachments = async () => {
+    const unsentAttachments = await getAllFilesInDirectory(
+      `public/projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
+    );
+    if (typeof unsentAttachments !== "boolean") {
+      setUnsentAttachments(unsentAttachments);
+    }
+  };
+
+  const handleAdd = async (file: File | undefined) => {
+    if (file) {
+      await saveDocument(file, `projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`);
+      router.reload();
+    }
+  };
 
   useEffect(() => {
     if (props.documentContract) {
@@ -27,64 +51,77 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
       return;
     }
     setStatus("waiting to send");
-  });
+    getUnsentAttachments();
+  }, []);
+
   return (
-    <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
-      <div className="flex justify-between">
-        <div className="flex justify-between gap-5 items-center">
-          <div className="text-lg">
-            {status === "waiting to send" && <IconBadge icon={<FaArrowUp />} text="Waiting to Send" badgeType="info" />}
-            {status === "sent" && <IconBadge icon={<FaClock />} text="Waiting for Assessment" badgeType="warning" />}
-            {status === "assessed" && <IconBadge icon={<FaCheck />} text="Ready for Review" badgeType="success" />}
-          </div>
-          <span className="text-black">
-            <div className="text-lg font-bold">{props.assessmentProvider.name}</div>
-          </span>
-        </div>
-        <ButtonGroup
-          secondaryButtons={
-            status === "sent"
-              ? [
-                  {
-                    text: formatDate(dateFromTimestamp(props.documentContract.assessmentDueDate!)),
-                    icon: <FaCalendar />,
-                    onClick: () => {},
-                    disabled: true,
-                  },
-                  {
-                    text: "Attachments",
-                    icon: <FaPaperclip />,
-                    onClick: () => props.handleAttachments(props.assessmentProvider.id),
-                  },
-                ]
-              : [
-                  {
-                    text: "Attachments",
-                    icon: <FaPaperclip />,
-                    onClick: () => props.handleAttachments(props.assessmentProvider.id),
-                  },
-                ]
-          }
-          primaryButton={
-            status === "waiting to send"
-              ? {
-                  text: isSelected ? "Deselect" : "Select",
-                  icon: isSelected ? <FaTimes /> : <FaCheck />,
-                  onClick: () => {
-                    setIsSelected(!isSelected);
-                    props.countSelected(!isSelected, props.assessmentProvider.id);
-                  },
-                }
-              : {
-                  text: status === "assessed" ? "Review" : "Sent",
-                  icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
-                  onClick: status === "assessed" ? () => {} : () => {},
-                  disabled: status === "assessed" ? false : true,
-                }
-          }
+    <>
+      {isAttachmentsPopupOpen && (
+        <AttachmentsPopup
+          existingAttachments={props.documentContract ? props.documentContract.attachments ?? [] : unsentAttachments}
+          onAdd={handleAdd}
+          onClose={() => setIsAttachmentsPopupOpen(false)}
         />
+      )}
+      <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
+        <div className="flex justify-between">
+          <div className="flex justify-between gap-5 items-center">
+            <div className="text-lg">
+              {status === "waiting to send" && <IconBadge icon={<FaArrowUp />} text="Waiting to Send" badgeType="info" />}
+              {status === "sent" && <IconBadge icon={<FaClock />} text="Waiting for Assessment" badgeType="warning" />}
+              {status === "assessed" && <IconBadge icon={<FaCheck />} text="Ready for Review" badgeType="success" />}
+            </div>
+            <span className="text-black">
+              <div className="text-lg font-bold">{props.assessmentProvider.name}</div>
+            </span>
+          </div>
+          {props.isMainDocumentPresent && (
+            <ButtonGroup
+              secondaryButtons={
+                status === "sent"
+                  ? [
+                      {
+                        text: formatDate(dateFromTimestamp(props.documentContract.assessmentDueDate!)),
+                        icon: <FaCalendar />,
+                        onClick: () => {},
+                        disabled: true,
+                      },
+                      {
+                        text: "Attachments",
+                        icon: <FaPaperclip />,
+                        onClick: () => setIsAttachmentsPopupOpen(true),
+                      },
+                    ]
+                  : [
+                      {
+                        text: "Attachments",
+                        icon: <FaPaperclip />,
+                        onClick: () => setIsAttachmentsPopupOpen(true),
+                      },
+                    ]
+              }
+              primaryButton={
+                status === "waiting to send"
+                  ? {
+                      text: isSelected ? "Deselect" : "Select",
+                      icon: isSelected ? <FaTimes /> : <FaCheck />,
+                      onClick: () => {
+                        setIsSelected(!isSelected);
+                        props.countSelected(!isSelected, props.assessmentProvider.id);
+                      },
+                    }
+                  : {
+                      text: status === "assessed" ? "Review" : "Sent",
+                      icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
+                      onClick: status === "assessed" ? () => {} : () => {},
+                      disabled: status === "assessed" ? false : true,
+                    }
+              }
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

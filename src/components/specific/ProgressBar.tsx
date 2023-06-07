@@ -16,7 +16,7 @@ const ProgressBar = (props: ProgressBarProps) => {
       <div>
         <ol className="grid grid-cols-1 divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white sm:grid-cols-3">
           {projectStateArray.map((state, index) => (
-            <>
+            <div key={index}>
               <li
                 className={`z-10 relative flex items-center justify-center gap-2 p-4 ${projectStateArray.indexOf(props.actualState) >= index && "hover:cursor-pointer hover:bg-gray-100"} ${
                   props.selectedState === state && "bg-gray-100"
@@ -37,7 +37,7 @@ const ProgressBar = (props: ProgressBarProps) => {
                 </p>
                 <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 rounded-tr-sm bg-inherit"></span>
               </li>
-            </>
+            </div>
           ))}
         </ol>
       </div>

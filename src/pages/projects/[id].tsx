@@ -8,7 +8,6 @@ import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
 import AssessmentProviderListItem from "@/components/specific/AssessmentProviderListItem";
-import AttachmentsPopup from "@/components/specific/AttachmentsPopup";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
 import ProgressBar from "@/components/specific/ProgressBar";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
@@ -21,7 +20,7 @@ import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -39,10 +38,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const { setConformationPopup } = useConformationPopup();
   useEffect(() => {
     setRecentProject(project.baseProject.id);
-    console.log(project);
   }, []);
-
-  const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
 
   const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
@@ -99,18 +95,16 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       const body = {
         projectAddress: project.baseProject.smartContractAddress,
         signerAddress: getConnectedAddress(window),
-      }
+      };
 
       const response = await fetch(`/api/projects/${path}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
-    } catch (e: any) {
-
-    }
+    } catch (e: any) {}
   };
 
   const onMainDocumentChange = (file: File | null) => {
@@ -128,7 +122,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       projectId: project.id,
     },
     {
-      id: "1",
+      id: "2",
       name: "Investor 1",
       email: "investor@gmail.com",
       phoneNumber: "123456789",
@@ -152,7 +146,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <div className="flex justify-between mb-10">
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.baseProject.id}</h1>
         <div className="flex items-center gap-2">
-          <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => setIsAttachmentsPopupOpen(true)} />
+          <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />
           <DocumentDropdown
             documentId={project.DPPUrl ?? ""}
             documentType="dpp"
@@ -176,7 +170,6 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <InvestorsView investors={investors} />
         </div>
       </div>
-      {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)}/>}
       {/*<RoleBasedComponent*/}
       {/*  projectManagerComponent={*/}
       <div className="overflow-x-auto">
@@ -195,10 +188,12 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem
             assessmentProvider={assessmentProvider}
+            projectId={project.baseProject.id}
+            projectState={project.baseProject.projectState}
             documentContract={project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)}
             key={assessmentProvider.id}
             countSelected={countSelected}
-            handleAttachments={() => setIsAttachmentsPopupOpen(true)}
+            isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
           />
         ))}
         <div className="flex justify-end">
@@ -238,7 +233,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             <InputField label="" type="text" id={"attachment"} placeholder={"Assessment Name"} />
             <DocumentInput onDocumentChange={() => {}} />
             <div className="flex justify-end gap-4">
-              <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Add Attachments" icon={<FaPaperclip />} onClick={() => setIsAttachmentsPopupOpen(true)} />
+              <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Add Attachments" icon={<FaPaperclip />} onClick={() => {}} />
               <IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200" text="Upload" icon={<FaUpload />} onClick={() => {}} />
             </div>
           </div>

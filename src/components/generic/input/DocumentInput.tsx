@@ -29,7 +29,7 @@ const DocumentInput = ({ label, title, description, onDocumentChange }: Document
             {label}
           </label>
           <div
-            className={`m-3 flex justify-center rounded-lg bg-white ${
+            className={`flex justify-center rounded-lg bg-white ${
               fileName != undefined ? "bg-gradient-to-l from-main-100 to-main-400 border-none" : ""
             } border border-dashed border-gray-900/25 px-6 py-10`}
           >
