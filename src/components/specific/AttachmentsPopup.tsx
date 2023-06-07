@@ -3,6 +3,7 @@ import AttachmentCard from "./AttachmentCard";
 import DocumentInput from "../generic/input/DocumentInput";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import IconButton from "../generic/buttons/IconButton";
+import useAlert from "@/hooks/AlertHook";
 
 interface AttachmentsPopupProps {
   existingAttachments: string[];
@@ -12,6 +13,7 @@ interface AttachmentsPopupProps {
 
 const AttachmentsPopup = (props: AttachmentsPopupProps) => {
   const [file, setFile] = useState<File>();
+  const { setAlert } = useAlert();
   const onDocumentChange = (file: File | null) => {
     if (file) {
       setFile(file);
@@ -31,6 +33,10 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
             {props.existingAttachments.map((attachment, index) => (
               <div key={index} className="w-full">
                 <AttachmentCard
+                  onRemove={(attachmentPath: string) => {
+                    props.existingAttachments.splice(props.existingAttachments.indexOf(attachmentPath), 1);
+                    setAlert({ title: "Attachment Deleted", message: "The attachment was successfuly deleted!", type: "success" });
+                  }}
                   attachment={{
                     attachmentTitle: attachment.split("/").pop() || "",
                     attachmentPath: attachment,

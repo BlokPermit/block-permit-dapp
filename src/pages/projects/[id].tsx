@@ -1,21 +1,22 @@
-import {findProjectById} from "@/lib/ProjectService";
-import {Investor, ProjectState, User} from "@prisma/client";
-import React, {useEffect, useState} from "react";
-import {InferGetServerSidePropsType} from "next";
-import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
+import { findProjectById } from "@/lib/ProjectService";
+import { Investor, ProjectState, User } from "@prisma/client";
+import React, { useEffect, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
+import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import {
-    FaArrowUp,
-    FaCalendarPlus, FaEdit,
-    FaFileContract,
-    FaHeading,
-    FaHourglass,
-    FaPaperclip,
-    FaPaperPlane,
-    FaPlus,
-    FaQuestion,
-    FaTag,
-    FaUpload,
-    FaUser
+  FaArrowUp,
+  FaCalendarPlus,
+  FaEdit,
+  FaFileContract,
+  FaHeading,
+  FaHourglass,
+  FaPaperclip,
+  FaPaperPlane,
+  FaPlus,
+  FaQuestion,
+  FaTag,
+  FaUpload,
+  FaUser
 } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
@@ -27,19 +28,14 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import {setRecentProject} from "@/utils/LocalStorageUtil";
+import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import {ProjectModel} from "@/models/ProjectModel";
-import {DocumentContractModel} from "@/models/DocumentContractModel";
+import { ProjectModel } from "@/models/ProjectModel";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
-import {useRouter} from "next/router";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
-import {
-
-    getFileNamesWithHashesFromDirectory,
-
-} from "../../lib/DocumentService";
-
+import { useRouter } from "next/router";
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
+import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
 
@@ -54,120 +50,122 @@ export const getServerSideProps: any = async (context: any) => {
     }
 };
 
-const ProjectPage = ({project}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-    const router = useRouter();
-    const {setConformationPopup} = useConformationPopup();
-    const {setAlert} = useAlert();
-    useEffect(() => {
-        setRecentProject(project.baseProject.id);
-    }, []);
-    const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
+const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const { setConformationPopup } = useConformationPopup();
+  const { setAlert } = useAlert();
+  useEffect(() => {
+    setRecentProject(project.baseProject.id);
+  }, []);
+  const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
 
-    const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
+  const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
 
-    //Count Selected Opinion Providers
-    const [numOfSelected, setNumOfSelected] = useState<number>(0);
-    const [selectedAssessmentProviders, setSelectedAssessmentProviders] = useState<string[]>([]);
-    const countSelected = (isSelected: boolean, opinionProviderId: string) => {
-        if (isSelected) {
-            setNumOfSelected(numOfSelected + 1);
-            setSelectedAssessmentProviders([...selectedAssessmentProviders, opinionProviderId]);
-        } else {
-            setNumOfSelected(numOfSelected - 1);
-            setSelectedAssessmentProviders(selectedAssessmentProviders.filter((id) => id !== opinionProviderId));
-        }
-    };
-    const handleSend = () => {
-        setConformationPopup({
-            title: "Send to Opinion Providers",
-            message: "Are you sure you want to send this project to the selected opinion providers?",
-            icon: <FaArrowUp/>,
-            popupType: "warning",
-            buttonPrimaryText: "Send",
-            onClickPrimary: sendToAssessmentProviders,
-            show: true,
+  //Count Selected Opinion Providers
+  const [numOfSelected, setNumOfSelected] = useState<number>(0);
+  const [selectedAssessmentProviders, setSelectedAssessmentProviders] = useState<string[]>([]);
+  const countSelected = (isSelected: boolean, opinionProviderId: string) => {
+    if (isSelected) {
+      setNumOfSelected(numOfSelected + 1);
+      setSelectedAssessmentProviders([...selectedAssessmentProviders, opinionProviderId]);
+    } else {
+      setNumOfSelected(numOfSelected - 1);
+      setSelectedAssessmentProviders(selectedAssessmentProviders.filter((id) => id !== opinionProviderId));
+    }
+  };
+  const handleSend = () => {
+    setConformationPopup({
+      title: "Send to Opinion Providers",
+      message: "Are you sure you want to send this project to the selected opinion providers?",
+      icon: <FaArrowUp />,
+      popupType: "warning",
+      buttonPrimaryText: "Send",
+      onClickPrimary: sendToAssessmentProviders,
+      show: true,
+    });
+  };
+
+  const sendToAssessmentProviders = async () => {
+    let selectedAddresses: string[] = [];
+    if (selectedAssessmentProviders.length === 0) {
+      if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) {
+        selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
+          const existingDocumentContract = project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
+          if (!existingDocumentContract) return assessmentProvider.walletAddress;
         });
-    };
+      } else if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_OPINIONS) {
+        selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
+          const existingDocumentContract = project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
+          if (!existingDocumentContract) return assessmentProvider.walletAddress;
+        });
+      }
+    } else {
+      selectedAddresses = selectedAssessmentProviders.map((assessmentProviderId: string) => {
+        const assessmentProvider = project.assessmentProviders.find((assessmentProvider: User) => assessmentProvider.id === assessmentProviderId);
+        if (assessmentProvider) return assessmentProvider.walletAddress;
+      });
+    }
+    selectedAddresses = selectedAddresses.filter((address: string) => address !== undefined);
 
-    const sendToAssessmentProviders = async () => {
-        let selectedAddresses: string[] = [];
-        if (selectedAssessmentProviders.length === 0) {
-            if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) {
-                selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
-                    const existingDocumentContract = project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
-                    if (!existingDocumentContract) return assessmentProvider.walletAddress;
-                });
-            } else if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_OPINIONS) {
-                selectedAddresses = project.assessmentProviders.map((assessmentProvider: User) => {
-                    const existingDocumentContract = project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id);
-                    if (!existingDocumentContract) return assessmentProvider.walletAddress;
-                });
-            }
-        } else {
-            selectedAddresses = selectedAssessmentProviders.map((assessmentProviderId: string) => {
-                const assessmentProvider = project.assessmentProviders.find((assessmentProvider: User) => assessmentProvider.id === assessmentProviderId);
-                if (assessmentProvider) return assessmentProvider.walletAddress;
-            });
+    try {
+      const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
+
+      let assessmentProvidersInfo: { assessmentProviderId: string; assessmentProviderAddress: string }[] = project.assessmentProviders.map((assessmentProvider: User) => {
+        const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
+        if (matchingAssessmentProvider)
+          return {
+            assessmentProviderId: assessmentProvider.id,
+            assessmentProviderAddress: assessmentProvider.walletAddress,
+          };
+      });
+
+      assessmentProvidersInfo = assessmentProvidersInfo.filter((info: object) => info !== undefined);
+
+      //TODO: Create a interface to avoid typescript errors.
+      let documentContractStructs: object[] = [];
+      const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
+      const connectedAddress = await getConnectedAddress(window);
+      for (let info of assessmentProvidersInfo) {
+        let attachments: { id: string; documentHash: string; owner?: string }[] = await getFileNamesWithHashesFromDirectory(
+          `public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`
+        );
+
+        for (let attachment of attachments) {
+          attachment.owner = connectedAddress;
         }
-        selectedAddresses = selectedAddresses.filter((address: string) => address !== undefined);
 
-        try {
-            const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
+        documentContractStructs.push({
+          assessmentProvider: info.assessmentProviderAddress,
+          attachments: attachments,
+        });
+      }
 
-            let assessmentProvidersInfo: object[] = project.assessmentProviders.map((assessmentProvider: User) => {
-                const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
-                if (matchingAssessmentProvider) return {
-                    assessmentProviderId: assessmentProvider.id,
-                    assessmentProviderAddress: assessmentProvider.walletAddress
-                };
-            });
+      const body = {
+        projectAddress: project.baseProject.smartContractAddress,
+        signerAddress: connectedAddress,
+        documentContractStructs: documentContractStructs,
+      };
 
-            assessmentProvidersInfo = assessmentProvidersInfo.filter((info: object) => info !== undefined);
+      const response = await fetch(`/api/projects/${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-            let documentContractStructs: object[] = [];
-            const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
-            const connectedAddress = await getConnectedAddress(window);
-            for (let info of assessmentProvidersInfo) {
-                let attachments: object[] = await getFileNamesWithHashesFromDirectory(`public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`);
+      if (response.ok) {
+        setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
+        router.reload();
+      }
+    } catch (e: any) {
+      setAlert({ title: "", message: e.message, type: "error" });
+    }
+  };
 
-                for (let attachment of attachments) {
-                    attachment.owner = connectedAddress;
-                }
-
-                documentContractStructs.push({
-                    assessmentProvider: info.assessmentProviderAddress,
-                    attachments: attachments
-                })
-            }
-
-            const body = {
-                projectAddress: project.baseProject.smartContractAddress,
-                signerAddress: connectedAddress,
-                documentContractStructs: documentContractStructs,
-            }
-
-            const response = await fetch(`/api/projects/${path}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body)
-            });
-
-            if (response.ok) {
-                setAlert({title: "", message: `${documentType} poslan`, type: "success"});
-                setIsLoading(false);
-                router.reload();
-            }
-        } catch (e: any) {
-            setAlert({title: "", message: e.message, type: "error"});
-            setIsLoading(false);
-        }
-    };
-
-    const onMainDocumentChange = (file: File | null) => {
-        router.push(router.asPath);
-    };
+  const onMainDocumentChange = (file: File | null) => {
+    router.push(router.asPath);
+  };
 
     // public/projects/:projectId/DPP
     // public/project/:projectId/DPP/:assessmentProviderId/attachments
