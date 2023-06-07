@@ -1,4 +1,4 @@
-import {configureChains, WagmiConfig, createConfig} from "wagmi";
+import {configureChains, createConfig, WagmiConfig} from "wagmi";
 import {publicProvider} from "wagmi/providers/public";
 import {SessionProvider} from "next-auth/react";
 import {mainnet} from "wagmi/chains";
@@ -11,6 +11,7 @@ import {AlertProvider} from "@/context/AlertContext";
 import Alert from "@/components/generic/notifications/Alert";
 import {ConformationPopupProvider} from "@/context/ConformationPopupContext";
 import ConformationPopup from "@/components/generic/notifications/ConformationPopup";
+import NextNProgress from "nextjs-progressbar";
 
 const {publicClient, webSocketPublicClient} = configureChains([mainnet], [publicProvider()]);
 
@@ -25,7 +26,8 @@ function MyApp({Component, pageProps}: AppProps) {
             <SessionProvider session={pageProps.session} refetchInterval={0}>
                 <AlertProvider>
                     <ConformationPopupProvider>
-                        <Layout>
+                      <NextNProgress color="#E88778" />
+                      <Layout>
                             <Head>
                                 <title>D-Verification</title>
                             </Head>

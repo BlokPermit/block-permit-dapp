@@ -28,7 +28,6 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
   const [resultsVisible, setResultsVisible] = useState<boolean>(false);
   const [results, setResults] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { setAlert } = useAlert();
   const router = useRouter();
 
@@ -51,8 +50,6 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
   const handleAdd = async () => {
     const addresses: string[] = selectedUsers.map((user: User) => user.walletAddress);
 
-    setIsLoading(true);
-
     try {
       const response = await fetch("/api/projects/addAssessmentProviders", {
         method: "POST",
@@ -69,20 +66,17 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
       if (!response.ok) {
         throw new Error((await response.json()).message);
       } else {
-        setIsLoading(false);
         setAlert({ title: "", message: "Mnenjedajalci dodani.", type: "success" });
-        router.reload();
+        router.push(router.asPath);
         props.onClose();
       }
     } catch (error: any) {
       setAlert({ title: "Error!", message: error.message, type: "error" });
-      setIsLoading(false);
     }
   };
 
   return (
     <div className="fixed z-50 top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-      {isLoading ? <LoadingAnimation /> : null}
       <span className="fixed top-0 left-0 w-full h-full" onClick={props.onClose}></span>
       <span className="bg-white max-w-6xl w-1/2 rounded-lg shadow-xl left-40 bottom-52 relative">
         <div className="grid grid-cols-7 gap-2 m-3">

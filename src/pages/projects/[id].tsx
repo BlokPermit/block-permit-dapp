@@ -1,9 +1,22 @@
-import { findProjectById } from "@/lib/ProjectService";
-import { Investor, ProjectState, User } from "@prisma/client";
-import React, { useEffect, useState } from "react";
-import { InferGetServerSidePropsType } from "next";
-import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
+import {findProjectById} from "@/lib/ProjectService";
+import {Investor, ProjectState, User} from "@prisma/client";
+import React, {useEffect, useState} from "react";
+import {InferGetServerSidePropsType} from "next";
+import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
+import {
+  FaArrowUp,
+  FaCalendarPlus,
+  FaFileContract,
+  FaHeading,
+  FaHourglass,
+  FaPaperclip,
+  FaPaperPlane,
+  FaPlus,
+  FaQuestion,
+  FaTag,
+  FaUpload,
+  FaUser
+} from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -14,13 +27,13 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import { setRecentProject } from "@/utils/LocalStorageUtil";
+import {setRecentProject} from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import { ProjectModel } from "@/models/ProjectModel";
-import { DocumentContractModel } from "@/models/DocumentContractModel";
+import {ProjectModel} from "@/models/ProjectModel";
+import {DocumentContractModel} from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
-import { useRouter } from "next/router";
-import { getConnectedAddress } from "../../utils/MetamaskUtils";
+import {useRouter} from "next/router";
+import {getConnectedAddress} from "../../utils/MetamaskUtils";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -108,7 +121,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   };
 
   const onMainDocumentChange = (file: File | null) => {
-    router.reload();
+    router.push(router.asPath);
   };
 
   const investors: Investor[] = [
