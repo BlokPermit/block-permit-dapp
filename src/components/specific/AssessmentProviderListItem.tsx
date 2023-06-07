@@ -36,8 +36,14 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
 
   const handleAdd = async (file: File | undefined) => {
     if (file) {
-      await saveDocument(file, `projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`);
-      router.reload();
+      const path = `projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`;
+      try {
+        await saveDocument(file, path);
+        setUnsentAttachments([...unsentAttachments, `${path}/${file.name}`]);
+        setIsAttachmentsPopupOpen(false);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

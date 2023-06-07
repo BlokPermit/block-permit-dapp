@@ -27,7 +27,7 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
         </div>
         <div className="p-5 my-5">
           <h2 className="text-xl mb-3 font-semibold">Existing Attachments</h2>
-          <div className="columns-3">
+          <div>
             {props.existingAttachments.map((attachment, index) => (
               <div key={index} className="w-full">
                 <AttachmentCard
@@ -44,7 +44,14 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
           <h2 className="text-xl mb-3 font-semibold">Add Attachments</h2>
           <DocumentInput onDocumentChange={onDocumentChange} />
           <div className="mt-2 flex justify-end">
-            <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200 hover:cursor-pointer" text="Add Attachment" icon={<FaPlus />} onClick={() => props.onAdd(file)} />
+            <IconButton
+              className="bg-main-200 text-white hover:bg-white hover:text-main-200 hover:cursor-pointer"
+              text="Add Attachment"
+              icon={<FaPlus />}
+              onClick={() => {
+                props.onAdd(file);
+              }}
+            />
           </div>
         </div>
       </div>
