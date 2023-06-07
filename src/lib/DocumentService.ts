@@ -65,7 +65,7 @@ export const getFileNamesFromDirectory = async (path: string): Promise<string[]>
   }
 };
 
-export const getFileNamesWithHashesFromDirectory = async (path: string): Promise<object[]> => {
+export const getFileNamesWithHashesFromDirectory = async (path: string): Promise<{ id: string; documentHash: string; owner?: string }[]> => {
   try {
     const { data, error } = await supabase.storage.from("blokcejn-bucket").list(path);
 
@@ -73,7 +73,7 @@ export const getFileNamesWithHashesFromDirectory = async (path: string): Promise
       throw error;
     }
 
-    let files: object[] = [];
+    let files: { id: string; documentHash: string; owner?: string }[] = [];
     for (let file of data) {
       files.push({
         id: `${path}/${file.name}`,

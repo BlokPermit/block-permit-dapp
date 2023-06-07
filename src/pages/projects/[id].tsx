@@ -95,7 +95,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     try {
       const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
 
-      let assessmentProvidersInfo: object[] = project.assessmentProviders.map((assessmentProvider: User) => {
+      let assessmentProvidersInfo: { assessmentProviderId: string; assessmentProviderAddress: string }[] = project.assessmentProviders.map((assessmentProvider: User) => {
         const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
         if (matchingAssessmentProvider)
           return {
@@ -111,7 +111,9 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
       const connectedAddress = await getConnectedAddress(window);
       for (let info of assessmentProvidersInfo) {
-        let attachments: object[] = await getFileNamesWithHashesFromDirectory(`public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`);
+        let attachments: { id: string; documentHash: string; owner?: string }[] = await getFileNamesWithHashesFromDirectory(
+          `public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`
+        );
 
         for (let attachment of attachments) {
           attachment.owner = connectedAddress;
