@@ -11,8 +11,12 @@ export const getRecentProjects = async () => {
                 projectIds: parsedProjectIds
             })
         });
+        if(!response.ok) {
+            return [];
+        }
 
         let projects = await response.json();
+
         // Sort by opened
         return parsedProjectIds.map((projectId: string) => projects.find((project: any) => project.id === projectId));
     }

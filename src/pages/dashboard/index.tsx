@@ -35,6 +35,7 @@ const Dashboard = ({
 
     useEffect(() => {
         fetchProjects();
+        console.log(recentProjects)
     }, []);
 
     const fetchProjects = async () => {

@@ -4,8 +4,7 @@ import {Contract, ContractFactory} from "ethers";
 import {ArtifactType, getContractArtifact} from "@/utils/BlockchainUtils";
 import {provider} from "@/utils/EthereumClient";
 import {ProjectState} from ".prisma/client";
-import {dateFromTimestamp} from "../utils/DateUtils";
-import {ProjectModel} from "../models/ProjectModel";
+
 import {findUserByAddress} from "./UserService";
 import {DocumentContractModel} from "../models/DocumentContractModel";
 import {AddressZero} from "@ethersproject/constants";
@@ -27,7 +26,7 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
     }
 }*/
 
-export const createProject = async (data: Project, walletAddress: string, dppHash: string | null, dppUrl: string | null) => {
+export const createProject = async (data: Project, walletAddress: string) => {
     console.log(walletAddress);
     try {
         const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
@@ -38,14 +37,6 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
         await contract.deployed();
         console.log(`Project contract with address ${contract.address} deployed`);
 
-        if (dppHash != null) {
-            await contract.connect(await provider.getSigner(walletAddress)).setDPP({
-                id: dppUrl,
-                owner: walletAddress,
-                documentHash: dppHash
-            });
-        }
-
         // Inserts Project and links it within User
         data.smartContractAddress = contract.address;
         data.createdAt = parseInt(await contract.dateCreated());
@@ -54,7 +45,7 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
         });
 
         await prisma.user.update({
-            where: { walletAddress: walletAddress },
+            where: {walletAddress: walletAddress},
             data: {
                 projectAddresses: {
                     push: contract.address,
@@ -67,6 +58,16 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
         console.log(error.message);
         throw new Error("Something went wrong in ProjectService.ts");
     }
+};
+
+export const findBaseProjectById = async (id: string) => {
+
+    return prisma.project.findFirst({
+        where: {
+            id: id,
+        },
+    });
+
 };
 
 export const findProjectById = async (id: string) => {
@@ -174,6 +175,20 @@ export const getRecentProjects = async (projectIds: string[]) => {
     }
 };
 
+export const updateProject = async (project: Project) => {
+    try {
+        const { id, ...updatedProject } = project;
+        return await prisma.project.update({
+            where: {
+                id: id,
+            },
+            data: updatedProject
+        });
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
 export const getRecentProjectsByState = async (state: ProjectState) => {
     try {
         let projects: Project[] = await prisma.project.findMany({
@@ -207,7 +222,7 @@ export const addAssessmentProviders = async (projectAddress: string, signerAddre
     try {
         for (let assessmentProviderAddress of assessmentProvidersAddresses) {
             await prisma.user.update({
-                where: { walletAddress: assessmentProviderAddress },
+                where: {walletAddress: assessmentProviderAddress},
                 data: {
                     projectAddresses: {
                         push: projectAddress

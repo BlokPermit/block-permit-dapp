@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+
 
 interface Option {
     label: string;
@@ -9,12 +10,15 @@ interface DoubleRadioButtonsProps {
     label: string;
     options: Option[];
     onRadioChange: (value: Option) => void;
+    initialValue?: Option;
 }
 
-const DoubleRadioButtons = ({label, options, onRadioChange}: DoubleRadioButtonsProps) => {
+const DoubleRadioButtons = ({label, options, onRadioChange, initialValue = options[0]}: DoubleRadioButtonsProps) => {
+    const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>(initialValue);
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         const selectedOption = options.find(option => option.label == value);
+        setSelectedEnvironmentImpact(selectedOption ||initialValue);
         if (selectedOption) {
             onRadioChange(selectedOption);
         }
@@ -34,6 +38,7 @@ const DoubleRadioButtons = ({label, options, onRadioChange}: DoubleRadioButtonsP
                             type="radio"
                             className="h-4 w-4 border-gray-300 text-main-500 focus:ring-main-500"
                             value={option.label}
+                            checked={selectedEnvironmentImpact?.value === option.value}
                             onChange={handleRadioChange}
                         />
                         <label
