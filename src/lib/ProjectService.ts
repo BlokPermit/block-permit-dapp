@@ -1,16 +1,14 @@
-import {prisma} from "@/utils/PrismaClient";
-import {Project, User} from "@prisma/client";
-import {Contract, ContractFactory} from "ethers";
-import {ArtifactType, getContractArtifact} from "@/utils/BlockchainUtils";
-import {provider} from "@/utils/EthereumClient";
-import {ProjectState} from ".prisma/client";
+import { prisma } from "@/utils/PrismaClient";
+import { Project, User } from "@prisma/client";
+import { Contract, ContractFactory } from "ethers";
+import { ArtifactType, getContractArtifact } from "@/utils/BlockchainUtils";
+import { provider } from "@/utils/EthereumClient";
+import { ProjectState } from ".prisma/client";
 
-import {findUserByAddress} from "./UserService";
-import {DocumentContractModel} from "../models/DocumentContractModel";
-import {AddressZero} from "@ethersproject/constants";
-import {getErrorReason} from "../utils/BlockchainUtils";
-import {hashFileToBytes32} from "../utils/FileUtils";
-import {getFileNamesWithHashesFromDirectory} from "./DocumentService";
+import { findUserByAddress } from "./UserService";
+import { DocumentContractModel } from "../models/DocumentContractModel";
+import { AddressZero } from "@ethersproject/constants";
+import { getErrorReason } from "../utils/BlockchainUtils";
 
 /*const URL: string = process.env.BACKEND_URL;
 
@@ -27,7 +25,6 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
 }*/
 
 export const createProject = async (data: Project, walletAddress: string, dppHash: string | null, dppUrl: string | null) => {
-  console.log(walletAddress);
   try {
     const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
     // Deploys a new Project smart contract on a blockchain
@@ -37,21 +34,21 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
     await contract.deployed();
     console.log(`Project contract with address ${contract.address} deployed`);
 
-        // Inserts Project and links it within User
-        data.smartContractAddress = contract.address;
-        data.createdAt = parseInt(await contract.dateCreated());
-        let project: Project = await prisma.project.create({
-            data: data,
-        });
+    // Inserts Project and links it within User
+    data.smartContractAddress = contract.address;
+    data.createdAt = parseInt(await contract.dateCreated());
+    let project: Project = await prisma.project.create({
+      data: data,
+    });
 
-        await prisma.user.update({
-            where: {walletAddress: walletAddress},
-            data: {
-                projectAddresses: {
-                    push: contract.address,
-                },
-            },
-        });
+    await prisma.user.update({
+      where: { walletAddress: walletAddress },
+      data: {
+        projectAddresses: {
+          push: contract.address,
+        },
+      },
+    });
 
     return project;
   } catch (error: Error | any) {
@@ -60,14 +57,20 @@ export const createProject = async (data: Project, walletAddress: string, dppHas
   }
 };
 
-export const findBaseProjectById = async (id: string) => {
-
-    return prisma.project.findFirst({
-        where: {
-            id: id,
-        },
+export const findBaseProjectById = async (id: string): Promise<Project> => {
+  try {
+    const baseProject = await prisma.project.findFirst({
+      where: {
+        id: id,
+      },
     });
 
+    if (baseProject) return baseProject!;
+
+    throw new Error("Project not found");
+  } catch (error: any) {
+    throw error;
+  }
 };
 
 export const findProjectById = async (id: string) => {
@@ -170,17 +173,17 @@ export const getRecentProjects = async (projectIds: string[]) => {
 };
 
 export const updateProject = async (project: Project) => {
-    try {
-        const { id, ...updatedProject } = project;
-        return await prisma.project.update({
-            where: {
-                id: id,
-            },
-            data: updatedProject
-        });
-    } catch (error: any) {
-        throw new Error(error.message);
-    }
+  try {
+    const { id, ...updatedProject } = project;
+    return await prisma.project.update({
+      where: {
+        id: id,
+      },
+      data: updatedProject,
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 };
 
 export const getRecentProjectsByState = async (state: ProjectState) => {
@@ -300,7 +303,6 @@ const getDocumentContractModels = async (addresses: string[]) => {
   return sentDocumentContracts;
 };
 
-const getAttachmentsUrls = (attachments: object[]) => {
-  console.log(attachments);
+const getAttachmentsUrls = (attachments: { id: string }[]) => {
   return attachments.map((attachment) => attachment.id);
 };

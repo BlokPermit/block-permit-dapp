@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { AiFillFileAdd } from "react-icons/ai";
-import { FaArrowUp, FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash } from "react-icons/fa";
-import { downloadDocument, saveDocument } from "@/lib/DocumentService";
+import { FaArrowUp, FaChevronDown, FaChevronUp, FaEdit, FaFileDownload, FaFileUpload, FaTimes, FaTrash } from "react-icons/fa";
+import { deleteDocuments, downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 import DocumentInput from "../input/DocumentInput";
 import IconButton from "../buttons/IconButton";
@@ -9,6 +9,7 @@ import { ProjectModel } from "../../../models/ProjectModel";
 import { getConnectedAddress } from "../../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../../utils/FileUtils";
 import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
+import { useRouter } from "next/router";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -22,13 +23,20 @@ interface DocumentDropdownProps {
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
   const [isActive, setIsActive] = useState<boolean>(false);
+  const [isUpdate, setIsUpdate] = useState<boolean>(false);
+  const [fileForUpdate, setFileForUpdate] = useState<File | null>(null);
   const { setAlert } = useAlert();
+  const router = useRouter();
+
+  const handleDocumentChange = (file: File | null) => {
+    setFileForUpdate(file);
+  };
 
   async function downloadFile() {
     try {
       if (props.fileName != null) {
         const file: Blob | boolean = await downloadDocument(props.fileName);
-        if (file == false) throw Error("Failed to download document. Please try again.");
+        if (!file) throw Error("Failed to download document. Please try again.");
 
         const blobURL = window.URL.createObjectURL(file as Blob);
 
@@ -42,42 +50,88 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
     }
   }
 
-  async function updateFile() {}
+  const updateDocument = async () => {
+    //Current file
+    console.log(props.fileName);
+
+    //New file
+    console.log(fileForUpdate);
+  };
+
+  //TODO: Add Conformation Popup and Blockchain deletion!
+  const deleteDocument = async () => {
+    try {
+      if (props.fileName != null) {
+        await deleteDocuments([props.fileName]);
+        router.push(router.asPath);
+      }
+    } catch (e: any) {
+      setAlert({ title: "Error", message: e.message, type: "error" });
+    }
+  };
 
   return (
     <div>
-      <div className="inline-flex items-center overflow-hidde bg-main-200 hover:bg-white rounded-md border text-sm hover:cursor-pointer">
-        <span onClick={downloadFile} className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+      <div className="inline-flex items-center overflow-hidden bg-white rounded-md border border-main-200 text-sm hover:cursor-pointer">
+        <span onClick={downloadFile} className="inline-flex items-center border-e border-main-200 px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
           <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
 
-        <span onClick={() => setIsActive(!isActive)} className="py-2 px-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
-          {isActive ? <FaChevronUp /> : <FaChevronDown />}
-        </span>
+        <div onClick={() => setIsActive(!isActive)} className="p-2 bg-white text-main-200">
+          <div>{isActive ? <FaChevronUp /> : <FaChevronDown />}</div>
+        </div>
       </div>
-      <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
-        <div className="p-2">
-          <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
+      <div className={!isActive ? "hidden" : "absolute z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border bg-white border-gray-100 shadow-lg"} role="menu">
+        {isUpdate ? (
+          <span>
+            <div
+              className="absolute top-2 right-2 hover:cursor-pointer hover:text-gray-500"
+              onClick={() => {
+                setIsUpdate(false);
+                setFileForUpdate(null);
+              }}
+            >
+              <FaTimes />
+            </div>
+            <DocumentInput onDocumentChange={handleDocumentChange} />
+            {fileForUpdate && (
+              <div className="p-3 flex justify-end">
+                <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Update"} icon={<FaEdit />} onClick={updateDocument} />
+              </div>
+            )}
+          </span>
+        ) : (
+          <>
+            <div className="p-2">
+              <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
 
-          <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
-            Download
-          </button>
+              <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
+                Download
+              </button>
 
-          <button className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
-            Update
-          </button>
-        </div>
+              <button
+                onClick={() => {
+                  setIsUpdate(true);
+                }}
+                className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                role="menuitem"
+              >
+                Update
+              </button>
+            </div>
 
-        <div className="p-2">
-          <strong className="block p-2 text-xs font-medium uppercase text-gray-400">Danger Zone</strong>
+            <div className="p-2">
+              <strong className="block p-2 text-xs font-medium uppercase text-gray-400">Danger Zone</strong>
 
-          <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">
-            <FaTrash />
-            Delete
-          </button>
-        </div>
+              <button onClick={deleteDocument} className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">
+                <FaTrash />
+                Delete
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

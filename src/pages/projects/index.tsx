@@ -38,7 +38,7 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
     return (
       (project.constructionTitle.toLowerCase().includes(searchText.toLowerCase()) ||
         project.constructionType.toLowerCase().includes(searchText.toLowerCase()) ||
-        `Proj-${project.id}`.toLowerCase().includes(searchText.toLowerCase()) ||
+        project.name.toLowerCase().includes(searchText.toLowerCase()) ||
         searchText === "") &&
       (environmentImpact === undefined || project.constructionImpactsEnvironment === environmentImpact) &&
       projectState === project.projectState
@@ -100,7 +100,7 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
                 <tbody className="divide-y divide-gray-200">
                   {filter(project) && (
                     <tr className="hover:cursor-pointer hover:bg-gray-100" key={project.id} onClick={() => router.push(`/projects/${project.id}`)}>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">Proj-{project.id}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.name}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionTitle}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionType}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Yes" : "No"}</td>

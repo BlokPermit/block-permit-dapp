@@ -3,21 +3,7 @@ import { Investor, ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import {
-  FaArrowUp,
-  FaCalendarPlus,
-  FaEdit,
-  FaFileContract,
-  FaHeading,
-  FaHourglass,
-  FaPaperclip,
-  FaPaperPlane,
-  FaPlus,
-  FaQuestion,
-  FaTag,
-  FaUpload,
-  FaUser
-} from "react-icons/all";
+import { FaArrowUp, FaCalendarPlus, FaEdit, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -40,14 +26,14 @@ import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
 
 export const getServerSideProps: any = async (context: any) => {
-    const id = context.params ? context.params.id : "";
+  const id = context.params ? context.params.id : "";
 
-    try {
-        let project: ProjectModel = await findProjectById(id?.toString() ?? "");
-        return {props: {project}};
-    } catch (error) {
-        return {notFound: true};
-    }
+  try {
+    let project: ProjectModel = await findProjectById(id?.toString() ?? "");
+    return { props: { project } };
+  } catch (error) {
+    return { notFound: true };
+  }
 };
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -167,135 +153,123 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     router.push(router.asPath);
   };
 
-    // public/projects/:projectId/DPP
-    // public/project/:projectId/DPP/:assessmentProviderId/attachments
-    // public/project/:projectId/DPP/:assessmentProviderId/assessment
-    // public/project/:projectId/DPP/:assessmentProviderId/assessment/attachments
-    // public/projects/:projectId/DGD
-    // public/project/:projectId/DGD/:assessmentProviderId/attachments
-    // public/project/:projectId/DGD/:assessmentProviderId/assessment
-    // public/project/:projectId/DGD/:assessmentProviderId/assessment/attachments
-    return (
-        <div className="px-40 mb-10">
-            <BreadCrumbs/>
-            <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState}
-                         handleStateChange={(state: ProjectState) => setSelectedState(state)}/>
-            <div className="flex justify-between mb-10">
-                <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
-                <div className="flex items-center gap-2">
-                    <Link href={`/projects/editProject/${project.baseProject.id}`}>
-                        <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white"
-                                    icon={<FaEdit/>} text={"Edit Project"} onClick={() => {
-                        }}/>
-                    </Link>
-                    <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white"
-                                icon={<FaPaperclip/>} text={"Attachments"} onClick={() => {
-                    }}/>
-                    <DocumentDropdown
-                        documentId={project.DPPUrl ?? ""}
-                        documentType="dpp"
-                        isPresent={project.DPPUrl != undefined}
-                        fileName={project.DPPUrl}
-                        path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
-                        onDocumentChange={onMainDocumentChange}
-                        projectAddress={project.baseProject.smartContractAddress}
-                    />
-                </div>
-            </div>
-            <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
-                <div className="col-span-3 pb-12">
-                    <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Construction details</h2>
-                    <IconCard icon={<FaHeading/>} title="Construction Title"
-                              value={project.baseProject.constructionTitle}/>
-                    <IconCard icon={<FaTag/>} title="Construction Type" value={project.baseProject.constructionType}/>
-                    <IconCard icon={<FaFileContract/>} title="Impact on Environment?"
-                              value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"}/>
-                </div>
-                <div className="col-span-5">
-                    <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-                    <InvestorsView investors={project.baseProject.investors}/>
-                </div>
-            </div>
-            {/*<RoleBasedComponent*/}
-            {/*  projectManagerComponent={*/}
-            <div className="overflow-x-auto">
+  // public/projects/:projectId/DPP
+  // public/project/:projectId/DPP/:assessmentProviderId/attachments
+  // public/project/:projectId/DPP/:assessmentProviderId/assessment
+  // public/project/:projectId/DPP/:assessmentProviderId/assessment/attachments
+  // public/projects/:projectId/DGD
+  // public/project/:projectId/DGD/:assessmentProviderId/attachments
+  // public/project/:projectId/DGD/:assessmentProviderId/assessment
+  // public/project/:projectId/DGD/:assessmentProviderId/assessment/attachments
+  return (
+    <div className="px-40 mb-10">
+      <BreadCrumbs />
+      <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
+      <div className="flex justify-between mb-10">
+        <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
+        <div className="flex items-center gap-2">
+          <Link href={`/projects/editProject/${project.baseProject.id}`}>
+            <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaEdit />} text={"Edit Project"} onClick={() => {}} />
+          </Link>
+          <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />
+          <DocumentDropdown
+            documentId={project.DPPUrl ?? ""}
+            documentType="dpp"
+            isPresent={project.DPPUrl != undefined}
+            fileName={project.DPPUrl}
+            path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
+            onDocumentChange={onMainDocumentChange}
+            projectAddress={project.baseProject.smartContractAddress}
+          />
+        </div>
+      </div>
+      <div className="my-10 py-5 border-y border-gray-200">
+        <p className="text-gray-500 text-sm">Description</p>
+        <p className="text-black mt-2">{project.baseProject.description}</p>
+      </div>
+      <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
+        <div className="col-span-3 pb-12">
+          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Construction details</h2>
+          <IconCard icon={<FaHeading />} title="Construction Title" value={project.baseProject.constructionTitle} />
+          <IconCard icon={<FaTag />} title="Construction Type" value={project.baseProject.constructionType} />
+          <IconCard icon={<FaFileContract />} title="Impact on Environment?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
+        </div>
+        <div className="col-span-5">
+          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
+          <InvestorsView investors={project.baseProject.investors} />
+        </div>
+      </div>
+      {/*<RoleBasedComponent*/}
+      {/*  projectManagerComponent={*/}
+      <div className="overflow-x-auto">
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
-          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"}
-                      icon={<FaPlus/>} onClick={() => setIsAddAssessmentProvidersPopupOpen(true)}/>
-            {isAddAssessmentProvidersPopupOpen && (
-                <AddAssessmentProvidersPopup
-                    onClose={() => setIsAddAssessmentProvidersPopupOpen(false)}
-                    projectAddress={project.baseProject.smartContractAddress}
-                    projectId={project.baseProject.id}
-                    existingAssessmentProviders={project.assessmentProviders}
-                />
-            )}
-        </span>
-                {project.assessmentProviders.map((assessmentProvider: User) => (
-                    <AssessmentProviderListItem
-                        assessmentProvider={assessmentProvider}
-                        projectId={project.baseProject.id}
-                        projectState={project.baseProject.projectState}
-                        documentContract={project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)}
-                        key={assessmentProvider.id}
-                        countSelected={countSelected}
-                        isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
-                    />
-                ))}
-                <div className="flex justify-end">
-                    <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200"
-                                text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaPaperPlane/>}
-                                onClick={handleSend}/>
-                </div>
-            </div>
-            {/*} />*/}
-            <RoleBasedComponent
-                assessmentProviderComponent={
-                    <div>
-                        <div className="grid grid-cols-4 gap-5 mb-10">
-                            <IconCard icon={<FaUser/>} title="Project Manager" value={"Marko Skače"}/>
-                            <IconCard
-                                className="col-span-3"
-                                icon={<FaHourglass/>}
-                                title="Assessment Deadline"
-                                value="12.12.2023"
-                                trailing={
-                                    <ButtonGroup
-                                        secondaryButtons={[
-                                            {
-                                                text: "10.11.2021",
-                                                icon: <FaQuestion/>,
-                                                disabled: true,
-                                            },
-                                        ]}
-                                        primaryButton={{
-                                            text: "Request Deadline Extension",
-                                            icon: <FaCalendarPlus/>,
-                                            onClick: () => {
-                                            },
-                                        }}
-                                    />
-                                }
-                            />
-                        </div>
-                        <h2 className="text-2xl font-semibold my-5">Upload Assessment</h2>
-                        <InputField label="" type="text" id={"attachment"} placeholder={"Assessment Name"}/>
-                        <DocumentInput onDocumentChange={() => {
-                        }}/>
-                        <div className="flex justify-end gap-4">
-                            <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white"
-                                        text="Add Attachments" icon={<FaPaperclip/>} onClick={() => {
-                            }}/>
-                            <IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200"
-                                        text="Upload" icon={<FaUpload/>} onClick={() => {
-                            }}/>
-                        </div>
-                    </div>
-                }
+          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={() => setIsAddAssessmentProvidersPopupOpen(true)} />
+          {isAddAssessmentProvidersPopupOpen && (
+            <AddAssessmentProvidersPopup
+              onClose={() => setIsAddAssessmentProvidersPopupOpen(false)}
+              projectAddress={project.baseProject.smartContractAddress}
+              projectId={project.baseProject.id}
+              existingAssessmentProviders={project.assessmentProviders}
             />
+          )}
+        </span>
+        {project.assessmentProviders.map((assessmentProvider: User) => (
+          <AssessmentProviderListItem
+            assessmentProvider={assessmentProvider}
+            projectId={project.baseProject.id}
+            projectState={project.baseProject.projectState}
+            documentContract={project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)}
+            key={assessmentProvider.id}
+            countSelected={countSelected}
+            isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
+          />
+        ))}
+        <div className="flex justify-end">
+          <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaPaperPlane />} onClick={handleSend} />
         </div>
-    );
+      </div>
+      {/*} />*/}
+      <RoleBasedComponent
+        assessmentProviderComponent={
+          <div>
+            <div className="grid grid-cols-4 gap-5 mb-10">
+              <IconCard icon={<FaUser />} title="Project Manager" value={"Marko Skače"} />
+              <IconCard
+                className="col-span-3"
+                icon={<FaHourglass />}
+                title="Assessment Deadline"
+                value="12.12.2023"
+                trailing={
+                  <ButtonGroup
+                    secondaryButtons={[
+                      {
+                        text: "10.11.2021",
+                        icon: <FaQuestion />,
+                        disabled: true,
+                      },
+                    ]}
+                    primaryButton={{
+                      text: "Request Deadline Extension",
+                      icon: <FaCalendarPlus />,
+                      onClick: () => {},
+                    }}
+                  />
+                }
+              />
+            </div>
+            <h2 className="text-2xl font-semibold my-5">Upload Assessment</h2>
+            <InputField label="" type="text" id={"attachment"} placeholder={"Assessment Name"} />
+            <DocumentInput onDocumentChange={() => {}} />
+            <div className="flex justify-end gap-4">
+              <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Add Attachments" icon={<FaPaperclip />} onClick={() => {}} />
+              <IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200" text="Upload" icon={<FaUpload />} onClick={() => {}} />
+            </div>
+          </div>
+        }
+      />
+    </div>
+  );
 };
 
 export default ProjectPage;
