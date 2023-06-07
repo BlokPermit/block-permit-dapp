@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
 import { User } from "@prisma/client";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
+import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
 
 interface OpinionProviderProps {
   assessmentProvider: User;
@@ -45,7 +46,7 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
             status === "sent"
               ? [
                   {
-                    text: props.documentContract.assessmentDueDate!.toString(),
+                    text: formatDate(dateFromTimestamp(props.documentContract.assessmentDueDate!)),
                     icon: <FaCalendar />,
                     onClick: () => {},
                     disabled: true,

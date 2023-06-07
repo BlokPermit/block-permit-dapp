@@ -7,4 +7,6 @@ export interface DocumentContractModel {
     assessmentDueDate: number;
     mainDocumentUpdateRequested: boolean;
     requestedAssessmentDueDate: number | null;
+    attachments: string[] | null;
+    assessmentAttachments: string[] | null;
 }

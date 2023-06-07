@@ -107,9 +107,9 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
           documentHash: await hashFileToBytes32(file)
         }
 
-        const uri = props.documentType == 'dpp' ? "setDPP" : "setDGD";
+        const path = props.documentType == 'dpp' ? "setDPP" : "setDGD";
 
-        const response = await fetch(`/api/projects/${uri}`, {
+        const response = await fetch(`/api/projects/${path}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

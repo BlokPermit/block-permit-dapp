@@ -21,6 +21,7 @@ import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
+import {getConnectedAddress} from "../../utils/MetamaskUtils";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -38,6 +39,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const { setConformationPopup } = useConformationPopup();
   useEffect(() => {
     setRecentProject(project.baseProject.id);
+    console.log(project);
   }, []);
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
@@ -69,7 +71,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     });
   };
 
-  const sendToAssessmentProviders = () => {
+  const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
     if (selectedAssessmentProviders.length === 0) {
       if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) {
@@ -90,7 +92,25 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       });
     }
     selectedAddresses = selectedAddresses.filter((address: string) => address !== undefined);
-    console.log(selectedAddresses);
+
+    try {
+      const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
+
+      const body = {
+        projectAddress: project.baseProject.smartContractAddress,
+        signerAddress: getConnectedAddress(window),
+      }
+
+      const response = await fetch(`/api/projects/${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body)
+      });
+    } catch (e: any) {
+
+    }
   };
 
   const onMainDocumentChange = (file: File | null) => {
@@ -156,7 +176,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <InvestorsView investors={investors} />
         </div>
       </div>
-      {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)} />}
+      {isAttachmentsPopupOpen && <AttachmentsPopup opinionProviderId={0} onClose={() => setIsAttachmentsPopupOpen(false)}/>}
       {/*<RoleBasedComponent*/}
       {/*  projectManagerComponent={*/}
       <div className="overflow-x-auto">

@@ -284,8 +284,15 @@ const getDocumentContractModels = async (addresses: string[]) => {
             isClosed: await documentContract.isClosed(),
             assessmentDueDate: parseInt(await documentContract.assessmentDueDate()),
             mainDocumentUpdateRequested: await documentContract.mainDocumentUpdateRequested(),
-            requestedAssessmentDueDate: requestedAssessmentDueDate
+            requestedAssessmentDueDate: requestedAssessmentDueDate,
+            attachments: getAttachmentsUrls(await documentContract.getAttachments()),
+            assessmentAttachments: getAttachmentsUrls(await documentContract.getAssessmentAttachments())
         });
     }
     return sentDocumentContracts;
+}
+
+const getAttachmentsUrls = (attachments: object[]) => {
+    console.log(attachments);
+    return attachments.map((attachment) => attachment.id)
 }
