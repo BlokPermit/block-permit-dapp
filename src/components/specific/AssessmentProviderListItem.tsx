@@ -10,7 +10,6 @@ interface OpinionProviderProps {
   documentContract: DocumentContractModel;
   countSelected: (isSelected: boolean, id: string) => void;
   handleAttachments: (id: string) => void;
-  handleRemove: (id: string) => void;
 }
 
 const AssessmentProviderListItem = (props: OpinionProviderProps) => {
@@ -46,7 +45,7 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
             status === "sent"
               ? [
                   {
-                    text: props.documentContract.requestedAssessmentDueDate!.toDateString(),
+                    text: props.documentContract.requestedAssessmentDueDate!.toString(),
                     icon: <FaCalendar />,
                     onClick: () => {},
                     disabled: true,

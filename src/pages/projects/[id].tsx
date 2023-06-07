@@ -3,7 +3,7 @@ import { Investor, ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPlus, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
+import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -21,7 +21,6 @@ import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
-import {LoadingAnimation} from "../../components/generic/loading-animation/LoadingAnimation";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -36,30 +35,14 @@ export const getServerSideProps: any = async (context: any) => {
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-
+  const { setConformationPopup } = useConformationPopup();
   useEffect(() => {
     console.log(project.DPPUrl);
     setRecentProject(project.baseProject.id);
   }, []);
 
-  const { setConformationPopup } = useConformationPopup();
-
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
-  const [isAddAssessmentProvidersOpen, setIsAddAssessmentProvidersOpen] = useState<boolean>(false);
-
-  const handleRemove = (id: string) => {
-    setConformationPopup({
-      title: "Delete Opinion Providers",
-      message: "Are you sure you want to delete this Opinion Provider? This action cannot be undone!",
-      icon: <FaTrash />,
-      popupType: "error",
-      buttonPrimaryText: "Delete",
-      onClickPrimary: () => {
-        console.log(id);
-      },
-      show: true,
-    });
-  };
+  const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
 
   const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
 
@@ -118,7 +101,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       streetAddress: "Street 1",
       projectId: project.id,
     },
-  ]
+  ];
   // projects/id/dpp
   // project/id/dpp/assessmentProviderId/attachments
   // project/id/dpp/assessmentProviderId/assessment
@@ -135,13 +118,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.baseProject.id}</h1>
         <div className="flex items-center gap-2">
           <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => setIsAttachmentsPopupOpen(true)} />
-          <DocumentDropdown documentId={project.DPPUrl ?? ""}
-                            documentType="dpp"
-                            isPresent={project.DPPUrl != undefined}
-                            fileName={project.DPPUrl}
-                            path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
-                            onDocumentChange={onMainDocumentChange}
-                            projectAddress={project.baseProject.smartContractAddress}/>
+          <DocumentDropdown
+            documentId={project.DPPUrl ?? ""}
+            documentType="dpp"
+            isPresent={project.DPPUrl != undefined}
+            fileName={project.DPPUrl}
+            path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
+            onDocumentChange={onMainDocumentChange}
+            projectAddress={project.baseProject.smartContractAddress}
+          />
         </div>
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
@@ -151,7 +136,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <IconCard icon={<FaTag />} title="Construction Type" value={project.baseProject.constructionType} />
           <IconCard icon={<FaFileContract />} title="Impact on Environment?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
         </div>
-        <div className="border-b col-span-5 border-gray-900/10">
+        <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
           <InvestorsView investors={investors} />
         </div>
@@ -162,10 +147,10 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <div className="overflow-x-auto">
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
-          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={() => setIsAddAssessmentProvidersOpen(true)} />
-          {isAddAssessmentProvidersOpen && (
+          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={() => setIsAddAssessmentProvidersPopupOpen(true)} />
+          {isAddAssessmentProvidersPopupOpen && (
             <AddAssessmentProvidersPopup
-              onClose={() => setIsAddAssessmentProvidersOpen(false)}
+              onClose={() => setIsAddAssessmentProvidersPopupOpen(false)}
               projectAddress={project.baseProject.smartContractAddress}
               projectId={project.baseProject.id}
               existingAssessmentProviders={project.assessmentProviders}
@@ -179,11 +164,10 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             key={assessmentProvider.id}
             countSelected={countSelected}
             handleAttachments={() => setIsAttachmentsPopupOpen(true)}
-            handleRemove={handleRemove}
           />
         ))}
         <div className="flex justify-end">
-          <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaArrowUp />} onClick={handleSend} />
+          <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaPaperPlane />} onClick={handleSend} />
         </div>
       </div>
       {/*} />*/}

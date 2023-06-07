@@ -1,20 +1,30 @@
 import {Investor} from "@prisma/client";
-import React from "react";
+import React, {useState} from "react";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import {FaPaperPlane} from "react-icons/all";
 import {FaInfo} from "react-icons/fa";
+import InvestorInfoPopup from "./InvestorInfoPopup";
 
 interface InvestorsViewProps {
   investors: Investor[];
 }
 
 const InvestorsView = (props: InvestorsViewProps) => {
-  const [isAddInvestorsToggled, setIsAddInvestorsToggled] = React.useState<boolean>(false);
+  const [isInvestorInfoPopupOpen, setIsInvestorInfoPopupOpen] = useState<boolean>(false);
+  const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
+
+  const handleMoreInfoClick = (investor: Investor) => {
+    if (!investor) return;
+    setSelectedInvestor(investor);
+    setIsInvestorInfoPopupOpen(true);
+  };
+
   return (
     <>
+      {isInvestorInfoPopupOpen && <InvestorInfoPopup investor={selectedInvestor!} onClose={() => setIsInvestorInfoPopupOpen(false)} />}
       <div>
         {props.investors.map((investor: Investor) => (
-            <InvestorListItem investor={investor} />
+          <InvestorListItem investor={investor} moreInfoClick={(investor: Investor) => handleMoreInfoClick(investor)} sendUpdateClick={(investor: Investor) => console.log(investor.id)} />
         ))}
       </div>
     </>
@@ -22,31 +32,38 @@ const InvestorsView = (props: InvestorsViewProps) => {
 };
 
 interface InvestorListItemProps {
-    investor: Investor;
+  investor: Investor;
+  moreInfoClick: (investor: Investor) => void;
+  sendUpdateClick: (investor: Investor) => void;
 }
 const InvestorListItem = (props: InvestorListItemProps) => {
   return (
-      <div key={props.investor.id} className="mb-3 pb-3 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <div className="text-lg">{props.investor.name}</div>
-          <div>
-            <ButtonGroup secondaryButtons={[
+    <div key={props.investor.id} className="mb-3 pb-3">
+      <div className="flex justify-between items-center">
+        <div className="text-lg">{props.investor.name}</div>
+        <div>
+          <ButtonGroup
+            secondaryButtons={[
               {
                 text: "More Info",
                 icon: <FaInfo />,
-                onClick: () => {},
-              }
-            ]} primaryButton={
-              {
-                text: "Send Update",
-                icon: <FaPaperPlane />,
-                onClick: () => {},
-              }
-            } />
-          </div>
+                onClick: () => {
+                  props.moreInfoClick(props.investor);
+                },
+              },
+            ]}
+            primaryButton={{
+              text: "Send Update",
+              icon: <FaPaperPlane />,
+              onClick: () => {
+                props.sendUpdateClick(props.investor);
+              },
+            }}
+          />
         </div>
       </div>
+    </div>
   );
-}
+};
 
 export default InvestorsView;
