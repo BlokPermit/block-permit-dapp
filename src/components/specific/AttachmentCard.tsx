@@ -1,10 +1,11 @@
 import useAlert from "@/hooks/AlertHook";
-import { downloadDocument } from "@/lib/DocumentService";
+import { deleteDocuments, downloadDocument } from "@/lib/DocumentService";
 import { useState } from "react";
 import { FaArrowDown, FaPaperclip, FaRegTrashAlt, FaTrash, FaTrashAlt, FaTrashRestore } from "react-icons/fa";
 
 interface AttachmentCardProps {
   attachment: { attachmentTitle: string; attachmentPath: string };
+  onRemove: (attachmentPath: string) => void;
 }
 
 const AttachmentCard = (props: AttachmentCardProps) => {
@@ -14,7 +15,7 @@ const AttachmentCard = (props: AttachmentCardProps) => {
     try {
       if (props.attachment.attachmentPath != null) {
         const file: Blob | boolean = await downloadDocument(props.attachment.attachmentPath);
-        if (file == false) throw Error("Failed to download document. Please try again.");
+        if (!file) throw Error("Failed to download document. Please try again.");
 
         const blobURL = window.URL.createObjectURL(file as Blob);
 
@@ -27,7 +28,16 @@ const AttachmentCard = (props: AttachmentCardProps) => {
       setAlert({ title: "", message: error.message, type: "error" });
     }
   };
-  const removeAttachment = () => {};
+  const removeAttachment = async () => {
+    try {
+      if (props.attachment.attachmentPath != null) {
+        await deleteDocuments([props.attachment.attachmentPath]);
+        props.onRemove(props.attachment.attachmentPath);
+      }
+    } catch (e: any) {
+      setAlert({ title: "Error", message: e.message, type: "error" });
+    }
+  };
 
   return (
     <div className={`flex justify-between items-center rounded-lg bg-white border-2 mb-4 ${isDownloadHovered ? "border-main-200" : "border-gray-200"}`}>

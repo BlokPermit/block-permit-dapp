@@ -1,18 +1,14 @@
-import { FaArrowUp, FaCalendar, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes } from "react-icons/all";
+import {FaArrowUp, FaCalendar, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes} from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import { ProjectState, User } from "@prisma/client";
-import { DocumentContractModel } from "@/models/DocumentContractModel";
-import { dateFromTimestamp, formatDate } from "../../utils/DateUtils";
+import {ProjectState, User} from "@prisma/client";
+import {DocumentContractModel} from "@/models/DocumentContractModel";
+import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
-import { getAllFilesInDirectory, saveDocument } from "@/lib/DocumentService";
-import { useRouter } from "next/router";
-import {
-  downloadDocument,
-  getFileNamesFromDirectory,
-  getFileNamesWithHashesFromDirectory
-} from "../../lib/DocumentService";
+import {saveDocument} from "@/lib/DocumentService";
+import {useRouter} from "next/router";
+import {getFileNamesFromDirectory} from "../../lib/DocumentService";
 import {getConnectedAddress} from "../../utils/MetamaskUtils";
 import {hashFileToBytes32} from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
@@ -36,11 +32,11 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
   const { setAlert } = useAlert();
 
   const getUnsentAttachments = async () => {
-    const unsentAttachments = await getFileNamesFromDirectory(
+    const files = await getFileNamesFromDirectory(
       `public/projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
     );
-    if (typeof unsentAttachments !== "boolean") {
-      setUnsentAttachments(unsentAttachments);
+    if (typeof files !== "boolean") {
+      setUnsentAttachments(files);
     }
   };
 
@@ -53,11 +49,13 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
         //TODO: store multiple to blockchain if we add multiinput
         const projectManagerAddress: string = await getConnectedAddress(window);
         if (props.documentContract) {
-          const attachmentDocumentStruct = [{
-            id: `${path}/${file.name}`,
-            owner: await getConnectedAddress(window),
-            documentHash: await hashFileToBytes32(file)
-          }]
+          const attachmentDocumentStruct = [
+            {
+              id: `${path}/${file.name}`,
+              owner: await getConnectedAddress(window),
+              documentHash: await hashFileToBytes32(file),
+            },
+          ];
 
           const response = await fetch(`/api/projects/addAttachments`, {
             method: "POST",
@@ -68,14 +66,14 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
               attachments: attachmentDocumentStruct,
               documentContractAddress: props.documentContract.documentContractAddress,
               signerAddress: projectManagerAddress,
-            })
+            }),
           });
 
           if (response.ok) {
             setAlert({ title: "", message: `Priloga ${file.name} naložena`, type: "success" });
             router.push(router.asPath);
           } else {
-            throw new Error(await response.json())
+            throw new Error(await response.json());
           }
         }
         setIsAttachmentsPopupOpen(false);
