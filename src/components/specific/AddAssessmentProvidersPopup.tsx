@@ -66,10 +66,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
         }),
       });
 
-      console.log(response);
-
       if (!response.ok) {
-        console.log(response);
         throw new Error((await response.json()).message);
       } else {
         setIsLoading(false);

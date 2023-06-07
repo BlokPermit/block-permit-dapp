@@ -1,17 +1,23 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FaArrowUp, FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash } from "react-icons/fa";
 import { downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 import DocumentInput from "../input/DocumentInput";
 import IconButton from "../buttons/IconButton";
+import {ProjectModel} from "../../../models/ProjectModel";
+import {getConnectedAddress} from "../../../utils/MetamaskUtils";
+import {hashFileToBytes32} from "../../../utils/FileUtils";
+import {LoadingAnimation} from "../loading-animation/LoadingAnimation";
 
 interface DocumentDropdownProps {
   documentId: string;
   documentType: "dpp" | "dgd";
   isPresent: boolean;
   fileName?: string;
+  path: string;
   onDocumentChange: (file: File | null) => void;
+  projectAddress: string;
 }
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
@@ -36,10 +42,14 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
     }
   }
 
+  async function updateFile() {
+
+  }
+
   return (
     <div>
       <div className="inline-flex items-center overflow-hidde bg-main-200 hover:bg-white rounded-md border text-sm hover:cursor-pointer">
-        <span className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
+        <span onClick={downloadFile} className="inline-flex items-center border-e px-4 py-2 bg-main-200 hover:bg-white text-white hover:text-main-200">
           <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
@@ -84,13 +94,36 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
     setFile(file);
   };
 
-  const uploadDocument = () => {
+  const uploadDocument = async () => {
+
     try {
       if (file) {
-        saveDocument(file);
-        setIsActive(false);
-        setAlert({ title: "Success", message: "DPP is set", type: "success" });
-        props.onDocumentChange(file);
+        const documentUrl = await saveDocument(file, props.path);
+
+        const body = {
+          projectAddress: props.projectAddress,
+          signerAddress: await getConnectedAddress(window),
+          documentUrl: documentUrl,
+          documentHash: await hashFileToBytes32(file)
+        }
+
+        const uri = props.documentType == 'dpp' ? "setDPP" : "setDGD";
+
+        const response = await fetch(`/api/projects/${uri}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (response.ok) {
+          setIsActive(false);
+          setAlert({ title: "Success", message: "DPP is set", type: "success" });
+          props.onDocumentChange(file);
+        } else {
+          throw new Error((await response.json()).message);
+        }
       }
       setAlert({ title: "Warning", message: "No file selected", type: "warning" });
     } catch (e: any) {
@@ -131,7 +164,13 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
       {props.isPresent ? (
         <DocumentDownload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} fileName={props.fileName} onDocumentChange={props.onDocumentChange} />
       ) : (
-        <DocumentUpload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} onDocumentChange={props.onDocumentChange} />
+        <DocumentUpload documentId={props.documentId}
+                        documentType={props.documentType}
+                        isPresent={props.isPresent}
+                        onDocumentChange={props.onDocumentChange}
+                        path={props.path}
+                        projectAddress={props.projectAddress}
+        />
       )}
     </>
   );

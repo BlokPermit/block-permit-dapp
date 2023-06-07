@@ -1,10 +1,10 @@
 import {supabase} from "@/utils/SupabaseClient";
 
-export const saveDocument = async (file: File | null) => {
+export const saveDocument = async (file: File | null, path: string) => {
     if (file != null) {
         const {data, error} = await supabase.storage
             .from("blokcejn-bucket")
-            .upload(`public/${file.name}`, file, {
+            .upload(`public/${path}/${file.name}`, file, {
                 cacheControl: "3600",
                 upsert: false,
             });
@@ -12,7 +12,6 @@ export const saveDocument = async (file: File | null) => {
         if (error) {
             return false;
         }
-
         return data.path;
     } else return false;
 };

@@ -41,6 +41,7 @@ export const getErrorReason = (error: any) => {
         case "UNPREDICTABLE_GAS_LIMIT":
             return error.error.error.data.reason;
         default:
+            console.log(error);
             return `Other blockchain error: ${error.code}`;
     }
 }

@@ -9,8 +9,6 @@ function Root() {
     const router = useRouter();
 
     useEffect(() => {
-        /*const accounts = window.ethereum.request({method: 'eth_accounts'});*/
-        console.log(window.ethereum.selectedAddress);
         if (status === "authenticated" && session) {
             router.push("/dashboard");
         } else if (status === "unauthenticated") {

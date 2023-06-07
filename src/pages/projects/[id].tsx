@@ -21,6 +21,7 @@ import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
+import {LoadingAnimation} from "../../components/generic/loading-animation/LoadingAnimation";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -37,6 +38,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const router = useRouter();
 
   useEffect(() => {
+    console.log(project.DPPUrl);
     setRecentProject(project.baseProject.id);
   }, []);
 
@@ -116,8 +118,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       streetAddress: "Street 1",
       projectId: project.id,
     },
-  ];
-
+  ]
+  // projects/id/dpp
+  // project/id/dpp/assessmentProviderId/attachments
+  // project/id/dpp/assessmentProviderId/assessment
+  // project/id/dpp/assessmentProviderId/assessment/attachments
+  // projects/id/dgd
+  // project/id/dgd/assessmentProviderId/attachments
+  // project/id/dgd/assessmentProviderId/assessment
+  // project/id/dgd/assessmentProviderId/assessment/attachments
   return (
     <div className="px-40 mb-10">
       <BreadCrumbs />
@@ -126,7 +135,13 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.baseProject.id}</h1>
         <div className="flex items-center gap-2">
           <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => setIsAttachmentsPopupOpen(true)} />
-          <DocumentDropdown documentId={project.dppUrl ?? ""} documentType="dpp" isPresent={project.dppUrl !== undefined} fileName={project.dppUrl} onDocumentChange={onMainDocumentChange} />
+          <DocumentDropdown documentId={project.DPPUrl ?? ""}
+                            documentType="dpp"
+                            isPresent={project.DPPUrl != undefined}
+                            fileName={project.DPPUrl}
+                            path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
+                            onDocumentChange={onMainDocumentChange}
+                            projectAddress={project.baseProject.smartContractAddress}/>
         </div>
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">

@@ -10,6 +10,7 @@ import {findUserByAddress} from "./UserService";
 import {DocumentContractModel} from "../models/DocumentContractModel";
 import {AddressZero} from "@ethersproject/constants";
 import {getErrorReason} from "../utils/BlockchainUtils";
+import {hashFileToBytes32} from "../utils/FileUtils";
 
 /*const URL: string = process.env.BACKEND_URL;
 
@@ -224,6 +225,27 @@ export const addAssessmentProviders = async (projectAddress: string, signerAddre
         throw new Error(error.message);
     }
 }
+
+export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
+    console.log(projectAddress, signerAddress, dppUrl, dppHash);
+    try {
+        const projectContract = new Contract(
+            projectAddress,
+            getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi,
+            await provider.getSigner(signerAddress)
+        );
+
+        const dpp = {
+            id: dppUrl,
+            owner: signerAddress,
+            documentHash: dppHash
+        }
+
+        await projectContract.setDPP(dpp);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
+};
 
 const getProjectAddressesOfUser = async (walletAddress: string) => {
     try {
