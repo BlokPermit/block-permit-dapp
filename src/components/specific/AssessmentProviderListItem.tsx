@@ -8,25 +8,35 @@ import { dateFromTimestamp, formatDate } from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
 import { getAllFilesInDirectory, saveDocument } from "@/lib/DocumentService";
 import { useRouter } from "next/router";
+import {
+  downloadDocument,
+  getFileNamesFromDirectory,
+  getFileNamesWithHashesFromDirectory
+} from "../../lib/DocumentService";
+import {getConnectedAddress} from "../../utils/MetamaskUtils";
+import {hashFileToBytes32} from "../../utils/FileUtils";
+import useAlert from "../../hooks/AlertHook";
 
-interface OpinionProviderProps {
+interface AssessmentProviderListItemProps {
   assessmentProvider: User;
   projectId: string;
   projectState: ProjectState;
   documentContract: DocumentContractModel;
   isMainDocumentPresent: boolean;
   countSelected: (isSelected: boolean, id: string) => void;
+  projectManagerAddress?: string;
 }
 
-const AssessmentProviderListItem = (props: OpinionProviderProps) => {
+const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
   const router = useRouter();
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
   const [unsentAttachments, setUnsentAttachments] = useState<string[]>([]);
+  const { setAlert } = useAlert();
 
   const getUnsentAttachments = async () => {
-    const unsentAttachments = await getAllFilesInDirectory(
+    const unsentAttachments = await getFileNamesFromDirectory(
       `public/projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
     );
     if (typeof unsentAttachments !== "boolean") {
@@ -34,15 +44,43 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
     }
   };
 
-  const handleAdd = async (file: File | undefined) => {
+  const handleAddAttachment = async (file: File | undefined) => {
     if (file) {
       const path = `projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`;
       try {
         await saveDocument(file, path);
         setUnsentAttachments([...unsentAttachments, `${path}/${file.name}`]);
+        //TODO: store multiple to blockchain if we add multiinput
+        const projectManagerAddress: string = await getConnectedAddress(window);
+        if (props.documentContract) {
+          const attachmentDocumentStruct = [{
+            id: `${path}/${file.name}`,
+            owner: await getConnectedAddress(window),
+            documentHash: await hashFileToBytes32(file)
+          }]
+
+          const response = await fetch(`/api/projects/addAttachments`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              attachments: attachmentDocumentStruct,
+              documentContractAddress: props.documentContract.documentContractAddress,
+              signerAddress: projectManagerAddress,
+            })
+          });
+
+          if (response.ok) {
+            setAlert({ title: "", message: `Priloga ${file.name} naložena`, type: "success" });
+            router.push(router.asPath);
+          } else {
+            throw new Error(await response.json())
+          }
+        }
         setIsAttachmentsPopupOpen(false);
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        setAlert({ title: "", message: error, type: "error" });
       }
     }
   };
@@ -65,7 +103,7 @@ const AssessmentProviderListItem = (props: OpinionProviderProps) => {
       {isAttachmentsPopupOpen && (
         <AttachmentsPopup
           existingAttachments={props.documentContract ? props.documentContract.attachments ?? [] : unsentAttachments}
-          onAdd={handleAdd}
+          onAdd={handleAddAttachment}
           onClose={() => setIsAttachmentsPopupOpen(false)}
         />
       )}

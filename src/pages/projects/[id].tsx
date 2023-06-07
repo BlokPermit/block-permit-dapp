@@ -32,8 +32,15 @@ import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProv
 import {ProjectModel} from "@/models/ProjectModel";
 import {DocumentContractModel} from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import {getConnectedAddress} from "../../utils/MetamaskUtils";
+import {
+  getFileNamesFromDirectory,
+  getFileNamesWithHashesFromDirectory,
+  getFilesFromDirectory
+} from "../../lib/DocumentService";
+import {LoadingAnimation} from "../../components/generic/loading-animation/LoadingAnimation";
+import useAlert from "../../hooks/AlertHook";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -49,6 +56,7 @@ export const getServerSideProps: any = async (context: any) => {
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { setConformationPopup } = useConformationPopup();
+  const { setAlert } = useAlert();
   useEffect(() => {
     setRecentProject(project.baseProject.id);
   }, []);
@@ -105,19 +113,55 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     try {
       const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
 
+      let assessmentProvidersInfo: object[] = project.assessmentProviders.map((assessmentProvider: User) => {
+        const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
+        if (matchingAssessmentProvider) return {
+          assessmentProviderId: assessmentProvider.id,
+          assessmentProviderAddress: assessmentProvider.walletAddress
+        };
+      });
+
+      assessmentProvidersInfo = assessmentProvidersInfo.filter((info: object) => info !== undefined);
+
+      let documentContractStructs: object[] = [];
+      const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
+      const connectedAddress = await getConnectedAddress(window);
+      for (let info of assessmentProvidersInfo) {
+        let attachments: object[] = await getFileNamesWithHashesFromDirectory(`public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`);
+
+        for (let attachment of attachments) {
+          attachment.owner = connectedAddress;
+        }
+
+        documentContractStructs.push({
+          assessmentProvider: info.assessmentProviderAddress,
+          attachments: attachments
+        })
+      }
+
       const body = {
         projectAddress: project.baseProject.smartContractAddress,
-        signerAddress: getConnectedAddress(window),
-      };
+        signerAddress: connectedAddress,
+        documentContractStructs: documentContractStructs,
+      }
 
       const response = await fetch(`/api/projects/${path}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
-    } catch (e: any) {}
+
+      if (response.ok) {
+        setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
+        setIsLoading(false);
+        router.reload();
+      }
+    } catch (e: any) {
+      setAlert({ title: "", message: e.message, type: "error" });
+      setIsLoading(false);
+    }
   };
 
   const onMainDocumentChange = (file: File | null) => {
@@ -144,14 +188,14 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       projectId: project.id,
     },
   ];
-  // projects/id/dpp
-  // project/id/dpp/assessmentProviderId/attachments
-  // project/id/dpp/assessmentProviderId/assessment
-  // project/id/dpp/assessmentProviderId/assessment/attachments
-  // projects/id/dgd
-  // project/id/dgd/assessmentProviderId/attachments
-  // project/id/dgd/assessmentProviderId/assessment
-  // project/id/dgd/assessmentProviderId/assessment/attachments
+  // public/projects/:projectId/DPP
+  // public/project/:projectId/DPP/:assessmentProviderId/attachments
+  // public/project/:projectId/DPP/:assessmentProviderId/assessment
+  // public/project/:projectId/DPP/:assessmentProviderId/assessment/attachments
+  // public/projects/:projectId/DGD
+  // public/project/:projectId/DGD/:assessmentProviderId/attachments
+  // public/project/:projectId/DGD/:assessmentProviderId/assessment
+  // public/project/:projectId/DGD/:assessmentProviderId/assessment/attachments
   return (
     <div className="px-40 mb-10">
       <BreadCrumbs />

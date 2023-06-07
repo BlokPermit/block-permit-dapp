@@ -11,6 +11,7 @@ import {DocumentContractModel} from "../models/DocumentContractModel";
 import {AddressZero} from "@ethersproject/constants";
 import {getErrorReason} from "../utils/BlockchainUtils";
 import {hashFileToBytes32} from "../utils/FileUtils";
+import {getFileNamesWithHashesFromDirectory} from "./DocumentService";
 
 /*const URL: string = process.env.BACKEND_URL;
 
@@ -214,20 +215,12 @@ export const addAssessmentProviders = async (projectAddress: string, signerAddre
                 }
             });
         }
-        console.log(await prisma.user.findMany({
-            where: {
-                walletAddress: {
-                    in: assessmentProvidersAddresses,
-                },
-            },
-        }));
     } catch (error: any) {
         throw new Error(error.message);
     }
 }
 
 export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
-    console.log(projectAddress, signerAddress, dppUrl, dppHash);
     try {
         const projectContract = new Contract(
             projectAddress,
@@ -246,6 +239,34 @@ export const setDPP = async (projectAddress: string, signerAddress: string, dppU
         throw new Error(getErrorReason(error));
     }
 };
+
+export const sendDPP = async (projectAddress: string, signerAddress: string, documentContractStructs: object[]) => {
+    try {
+        const projectContract = new Contract(
+            projectAddress,
+            getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi,
+            await provider.getSigner(signerAddress)
+        );
+
+        await projectContract.sendDPP(documentContractStructs);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
+}
+
+export const addAttachments = async (documentContractAddress: string, signerAddress: string, attachments: object[]) => {
+    try {
+        const documentContract = new Contract(
+            documentContractAddress,
+            getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi,
+            await provider.getSigner(signerAddress)
+        );
+
+        await documentContract.addAttachments(attachments);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
+}
 
 const getProjectAddressesOfUser = async (walletAddress: string) => {
     try {
