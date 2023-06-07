@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { AiFillFileAdd } from "react-icons/ai";
-import { FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash } from "react-icons/fa";
+import { FaArrowUp, FaChevronDown, FaChevronUp, FaFileDownload, FaFileUpload, FaTrash } from "react-icons/fa";
 import { downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
+import DocumentInput from "../input/DocumentInput";
+import IconButton from "../buttons/IconButton";
 
 interface DocumentDropdownProps {
   documentId: string;
   documentType: "dpp" | "dgd";
   isPresent: boolean;
   fileName?: string;
+  onDocumentChange: (file: File | null) => void;
 }
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
@@ -74,10 +77,25 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
 
 const DocumentUpload = (props: DocumentDropdownProps) => {
   const [isActive, setIsActive] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const { setAlert } = useAlert();
 
-  const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    saveDocument(file);
+  const handleDocumentChange = (file: File | null) => {
+    setFile(file);
+  };
+
+  const uploadDocument = () => {
+    try {
+      if (file) {
+        saveDocument(file);
+        setIsActive(false);
+        setAlert({ title: "Success", message: "DPP is set", type: "success" });
+        props.onDocumentChange(file);
+      }
+      setAlert({ title: "Warning", message: "No file selected", type: "warning" });
+    } catch (e: any) {
+      setAlert({ title: "Error", message: e.message, type: "error" });
+    }
   };
 
   return (
@@ -96,21 +114,12 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
       </div>
 
       <div className={!isActive ? "hidden" : "absolute end-0 z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg"} role="menu">
-        <div className="p-5">
-          <div className="text-center">
-            <AiFillFileAdd className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-            <div className="mt-4 flex items-center justify-center text-sm leading-6 text-gray-600">
-              <label
-                htmlFor="file-upload"
-                className="relative cursor-pointer rounded-md  font-semibold text-main-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-main-200 focus-within:ring-offset-2 hover:text-main-500"
-              >
-                <span>Upload a file</span>
-                <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleDocumentChange} />
-              </label>
-            </div>
-            <p className="text-xs leading-5 text-gray-600">PDF, DOCX, PNG up to 10MB</p>
+        <DocumentInput onDocumentChange={handleDocumentChange} />
+        {file && (
+          <div className="p-3 flex justify-end">
+            <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Upload"} icon={<FaArrowUp />} onClick={uploadDocument} />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -120,9 +129,9 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
   return (
     <>
       {props.isPresent ? (
-        <DocumentDownload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} fileName={props.fileName} />
+        <DocumentDownload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} fileName={props.fileName} onDocumentChange={props.onDocumentChange} />
       ) : (
-        <DocumentUpload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} />
+        <DocumentUpload documentId={props.documentId} documentType={props.documentType} isPresent={props.isPresent} onDocumentChange={props.onDocumentChange} />
       )}
     </>
   );

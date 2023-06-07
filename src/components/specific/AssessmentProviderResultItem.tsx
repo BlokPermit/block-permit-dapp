@@ -23,7 +23,7 @@ const AssessmentProviderResultItem = (props: ResultItemProps) => {
     }
   };
   return (
-    <div className={`p-5 rounded-md hover:bg-gray-200 hover:cursor-pointer border-b border-gray-200 ${isAdded && "bg-gray-200"}`} key={props.user.id} onClick={handleSelect}>
+    <div className={`p-5 my-3 rounded-lg hover:bg-gray-200 hover:cursor-pointer ${isAdded && "bg-gray-200"}`} key={props.user.id} onClick={handleSelect}>
       <span className="text-lg inline-flex items-center gap-5 mb-3">
         <div>{props.user.name}</div>
         <span>{isAdded && <FaCheck color="green" />}</span>

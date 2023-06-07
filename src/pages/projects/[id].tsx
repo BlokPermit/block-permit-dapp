@@ -1,22 +1,9 @@
-import {findProjectById} from "@/lib/ProjectService";
-import {Investor, ProjectState, User} from "@prisma/client";
-import React, {useEffect, useState} from "react";
-import {InferGetServerSidePropsType} from "next";
-import {BreadCrumbs} from "@/components/generic/navigation/Breadcrumbs";
-import {
-  FaArrowUp,
-  FaCalendarPlus,
-  FaFileContract,
-  FaHeading,
-  FaHourglass,
-  FaPaperclip,
-  FaPlus,
-  FaQuestion,
-  FaTag,
-  FaTrash,
-  FaUpload,
-  FaUser
-} from "react-icons/all";
+import { findProjectById } from "@/lib/ProjectService";
+import { Investor, ProjectState, User } from "@prisma/client";
+import React, { useEffect, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
+import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
+import { FaArrowUp, FaCalendarPlus, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPlus, FaQuestion, FaTag, FaTrash, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -28,12 +15,12 @@ import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
 import InputField from "@/components/generic/input/InputField";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import {setRecentProject} from "@/utils/LocalStorageUtil";
+import { setRecentProject } from "@/utils/LocalStorageUtil";
 import AddAssessmentProvidersPopup from "@/components/specific/AddAssessmentProvidersPopup";
-import {ProjectModel} from "@/models/ProjectModel";
-import {DocumentContractModel} from "@/models/DocumentContractModel";
+import { ProjectModel } from "@/models/ProjectModel";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -57,15 +44,6 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
   const [isAddAssessmentProvidersOpen, setIsAddAssessmentProvidersOpen] = useState<boolean>(false);
-
-  const openAddAssessmentProviderPopup = () => {
-    setIsAddAssessmentProvidersOpen(!isAddAssessmentProvidersOpen);
-  };
-
-  const onAssessmentProvidersAdded = async () => {
-    await router.push(router.asPath);
-    setIsAddAssessmentProvidersOpen(false);
-  }
 
   const handleRemove = (id: string) => {
     setConformationPopup({
@@ -115,15 +93,19 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     console.log(selectedAddresses);
   };
 
+  const onMainDocumentChange = (file: File | null) => {
+    router.reload();
+  };
+
   const investors: Investor[] = [
     {
-        id: "1",
-        name: "Investor 1",
-        email: "investor@gmail.com",
-        phoneNumber: "123456789",
-        taxId: "SI12355",
+      id: "1",
+      name: "Investor 1",
+      email: "investor@gmail.com",
+      phoneNumber: "123456789",
+      taxId: "SI12355",
       streetAddress: "Street 1",
-      projectId: project.id
+      projectId: project.id,
     },
     {
       id: "1",
@@ -132,9 +114,9 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       phoneNumber: "123456789",
       taxId: "SI12355",
       streetAddress: "Street 1",
-      projectId: project.id
+      projectId: project.id,
     },
-  ]
+  ];
 
   return (
     <div className="px-40 mb-10">
@@ -144,7 +126,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <h1 className="text-3xl font-semibold text-neutral-900">Proj-{project.baseProject.id}</h1>
         <div className="flex items-center gap-2">
           <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => setIsAttachmentsPopupOpen(true)} />
-          <DocumentDropdown documentId={project.dppUrl ?? ""} documentType="dpp" isPresent={project.dppUrl !== undefined} fileName={project.dppUrl} />
+          <DocumentDropdown documentId={project.dppUrl ?? ""} documentType="dpp" isPresent={project.dppUrl !== undefined} fileName={project.dppUrl} onDocumentChange={onMainDocumentChange} />
         </div>
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
@@ -165,8 +147,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <div className="overflow-x-auto">
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
-          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={openAddAssessmentProviderPopup} />
-          {isAddAssessmentProvidersOpen && <AddAssessmentProvidersPopup onAdd={() => onAssessmentProvidersAdded} onClose={() => setIsAddAssessmentProvidersOpen(false)} projectAddress={project.baseProject.smartContractAddress} projectId={project.baseProject.id} existingAssessmentProviders={project.assessmentProviders}/>}
+          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={() => setIsAddAssessmentProvidersOpen(true)} />
+          {isAddAssessmentProvidersOpen && (
+            <AddAssessmentProvidersPopup
+              onClose={() => setIsAddAssessmentProvidersOpen(false)}
+              projectAddress={project.baseProject.smartContractAddress}
+              projectId={project.baseProject.id}
+              existingAssessmentProviders={project.assessmentProviders}
+            />
+          )}
         </span>
         {project.assessmentProviders.map((assessmentProvider: User) => (
           <AssessmentProviderListItem

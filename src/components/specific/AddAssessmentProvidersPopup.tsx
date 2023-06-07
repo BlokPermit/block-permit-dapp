@@ -12,7 +12,6 @@ interface AddAssessmentProvidersPopupProps {
   projectId: string;
   projectAddress: string;
   onClose: () => void;
-  onAdd: () => void;
   existingAssessmentProviders: User[];
 }
 
@@ -75,7 +74,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
       } else {
         setIsLoading(false);
         setAlert({ title: "", message: "Mnenjedajalci dodani.", type: "success" });
-        props.onAdd();
+        router.reload();
         props.onClose();
       }
     } catch (error: any) {

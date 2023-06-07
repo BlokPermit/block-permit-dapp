@@ -20,8 +20,8 @@ const DocumentInput = ({ label, title, description, onDocumentChange }: Document
 
   return (
     <div>
-      <h2 className="text-xl font-semibold leading-7 text-gray-900">{title}</h2>
-      <p className="mt-1 text-sm leading-6 text-gray-600">{description}</p>
+      {title && <h2 className="text-xl font-semibold leading-7 text-gray-900">{title}</h2>}
+      {description && <p className="mt-1 text-sm leading-6 text-gray-600">{description}</p>}
 
       <div className="space-y-10">
         <div className="col-span-full">
@@ -29,7 +29,7 @@ const DocumentInput = ({ label, title, description, onDocumentChange }: Document
             {label}
           </label>
           <div
-            className={`mt-2 flex justify-center rounded-lg bg-white ${
+            className={`m-3 flex justify-center rounded-lg bg-white ${
               fileName != undefined ? "bg-gradient-to-l from-main-100 to-main-400 border-none" : ""
             } border border-dashed border-gray-900/25 px-6 py-10`}
           >
