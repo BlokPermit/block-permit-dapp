@@ -223,6 +223,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             key={assessmentProvider.id}
             countSelected={countSelected}
             isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
+            projectAddress={project.baseProject.smartContractAddress}
           />
         ))}
         <div className="flex justify-end">

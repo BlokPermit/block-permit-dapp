@@ -1,7 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {addAssessmentProviders, addAttachments} from "../../../lib/ProjectService";
 
-//TODO: refactor
+//TODO: move to api/documentContracts
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {

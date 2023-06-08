@@ -1,12 +1,12 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {addAssessmentProviders, addAttachments, removeAttachments} from "../../../lib/ProjectService";
+import {findUsersByName} from "@/lib/UserService";
+import {User} from "@prisma/client";
+import {removeAssessmentProviders} from "../../../lib/ProjectService";
 
-//TODO: move to api/documentContracts
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
-            console.log(req.body);
-            await removeAttachments(req.body.documentContractAddress, req.body.signerAddress, req.body.attachmentIds);
+            await removeAssessmentProviders(req.body.projectAddress, req.body.signerAddress, req.body.assessmentProvidersAddresses);
             res.status(200).end();
         } catch (e: any) {
             console.log(e.message);

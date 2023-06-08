@@ -7,12 +7,12 @@ import {
   FaClock,
   FaEye,
   FaPaperclip,
-  FaTimes
+  FaTimes, FaXbox, FaXingSquare, HiXMark
 } from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, {useEffect, useState} from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import {User} from "@prisma/client";
+import {User, ProjectState} from "@prisma/client";
 import {DocumentContractModel} from "@/models/DocumentContractModel";
 import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
@@ -32,6 +32,7 @@ interface AssessmentProviderListItemProps {
   isMainDocumentPresent: boolean;
   countSelected: (isSelected: boolean, id: string) => void;
   projectManagerAddress?: string;
+  projectAddress: string;
 }
 
 const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
@@ -109,6 +110,27 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
 
     if (response.ok) {
       setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
+      router.push(router.asPath);
+    } else {
+      setAlert({ title: "", message: (await response.json()).message, type: "error" });
+    }
+  }
+
+  const handleRemoveAssessmentProvider = async () => {
+    const response = await fetch(`/api/projects/removeAssessmentProviders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        projectAddress: props.projectAddress,
+        signerAddress: await getConnectedAddress(window),
+        assessmentProvidersAddresses: [props.assessmentProvider.walletAddress]
+      }),
+    });
+
+    if (response.ok) {
+      setAlert({ title: "", message: `Mnenjedajalec ${props.assessmentProvider.name} odstranjen.`, type: "success" });
       router.push(router.asPath);
     } else {
       setAlert({ title: "", message: (await response.json()).message, type: "error" });
@@ -196,11 +218,14 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           )}
         </div>
         {/*TODO: move*/}
-        {props.documentContract.requestedAssessmentDueDate && (
+        {props.documentContract && props.documentContract.requestedAssessmentDueDate && (
         <div>
-          <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(true)} className="bg-green-800"/>
-          <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(false)} className="bg-red-800"/>
+          <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(true)}/>
+          <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(false)}/>
         </div>)}
+        {!props.documentContract && (
+            <IconButton text={"Odstrani"} icon={<HiXMark/>} onClick={() => handleRemoveAssessmentProvider()}/>
+        )}
       </div>
     </>
   );

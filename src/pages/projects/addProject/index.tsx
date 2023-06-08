@@ -143,7 +143,7 @@ const CreateProject = () => {
 
   return (
     <div>
-      <div className="px-40 mb-20">D
+      <div className="px-40 mb-20">
         <BreadCrumbs />
         <form onSubmit={handleSubmit}>
           <div className="space-y-12">

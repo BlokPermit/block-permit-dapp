@@ -228,6 +228,15 @@ export const addAssessmentProviders = async (projectAddress: string, signerAddre
   }
 };
 
+export const removeAssessmentProviders = async (projectAddress: string, signerAddress: string, assessmentProvidersAddresses: string[]) => {
+  try {
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await projectContract.removeAssessmentProviders(assessmentProvidersAddresses);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+}
+
 export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
   try {
     const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
@@ -254,6 +263,7 @@ export const sendDPP = async (projectAddress: string, signerAddress: string, doc
   }
 };
 
+//TODO: move to DocumentContractService
 export const addAttachments = async (documentContractAddress: string, signerAddress: string, attachments: object[]) => {
   try {
     const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
@@ -264,6 +274,7 @@ export const addAttachments = async (documentContractAddress: string, signerAddr
   }
 };
 
+//TODO: move to DocumentContractService
 export const removeAttachments = async (documentContractAddress: string, signerAddress: string, attachmentIds: string[]) => {
   try {
     const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
@@ -273,6 +284,7 @@ export const removeAttachments = async (documentContractAddress: string, signerA
   }
 };
 
+//TODO: move to DocumentContractService
 export const evaluateAssessmentDueDateExtension = async (documentContractAddress: string, signerAddress: string, confirmed: boolean) => {
   try {
     const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
@@ -294,7 +306,6 @@ const getProjectAddressesOfUser = async (walletAddress: string) => {
   }
 };
 
-//TODO: refactor
 const getDocumentContractModels = async (addresses: string[]) => {
   let sentDocumentContracts: DocumentContractModel[] = [];
   for (const address of addresses) {
