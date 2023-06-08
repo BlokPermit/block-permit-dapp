@@ -1,11 +1,10 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {addAssessmentProviders, addAttachments} from "../../../lib/ProjectService";
+import {sendMailToUser} from "../../../lib/MailingService";
 
-//TODO: move to api/documentContracts
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
-            await addAttachments(req.body.documentContractAddress, req.body.signerAddress, req.body.confirmed);
+            await sendMailToUser(req.body.to, req.body.subject, req.body.text, req.body.link);
             res.status(200).end();
         } catch (e: any) {
             console.log(e.message);
@@ -15,4 +14,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
 }
-

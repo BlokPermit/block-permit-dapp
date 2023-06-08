@@ -67,6 +67,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
         throw new Error((await response.json()).message);
       } else {
         setAlert({ title: "", message: "Mnenjedajalci dodani.", type: "success" });
+
         router.push(router.asPath);
         props.onClose();
       }

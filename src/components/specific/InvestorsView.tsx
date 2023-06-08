@@ -4,6 +4,8 @@ import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { FaPaperPlane } from "react-icons/all";
 import { FaInfo } from "react-icons/fa";
 import InvestorInfoPopup from "./InvestorInfoPopup";
+import {mailInvestor} from "../../utils/MailingUtils";
+import useAlert from "../../hooks/AlertHook";
 
 interface InvestorsViewProps {
   investors: Investor[];
@@ -12,11 +14,29 @@ interface InvestorsViewProps {
 const InvestorsView = (props: InvestorsViewProps) => {
   const [isInvestorInfoPopupOpen, setIsInvestorInfoPopupOpen] = useState<boolean>(false);
   const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
+  const { setAlert } = useAlert();
 
   const handleMoreInfoClick = (investor: Investor) => {
     if (!investor) return;
     setSelectedInvestor(investor);
     setIsInvestorInfoPopupOpen(true);
+  };
+
+  const handleSendUpdateClick = async (investor: Investor) => {
+    if (!investor) return;
+    const response: Response = await mailInvestor({
+      to: investor.email,
+      subject: "Poročilo o projektu",
+      text: "Poslano vam je bilo poročilo o projektu"
+    })
+
+    if (response.ok) {
+      setAlert({ title: "", message: `Poročilo poslano`, type: "success" });
+    } else {
+      setAlert({ title: "", message: (await response.json()).message, type: "error" });
+    }
+
+    //await sendEmailToInvestor([investor.email], "Poročilo za projekt", "Poslano vam je bilo sporočilo za projekt");
   };
 
   return (
@@ -25,7 +45,7 @@ const InvestorsView = (props: InvestorsViewProps) => {
       <div>
         {props.investors.map((investor: Investor) => (
           <div key={investor.id}>
-            <InvestorListItem investor={investor} moreInfoClick={(investor: Investor) => handleMoreInfoClick(investor)} sendUpdateClick={(investor: Investor) => console.log(investor.id)} />
+            <InvestorListItem investor={investor} moreInfoClick={(investor: Investor) => handleMoreInfoClick(investor)} sendUpdateClick={(investor: Investor) => handleSendUpdateClick(investor)} />
           </div>
         ))}
       </div>
