@@ -26,7 +26,7 @@ const InvestorInfoPopup = (props: InvestorInfoPopupProps) => {
           <IconCard title={"Street Address"} value={props.investor.streetAddress} icon={<FaMapMarker />} />
           <IconCard title={"Phone Number"} value={props.investor.phoneNumber} icon={<FaPhone />} />
           <IconCard title={"Email"} value={props.investor.email} icon={<FaEnvelope />} />
-          <IconCard title={"Tax Id"} value={props.investor.email} icon={<FaIdBadge />} />
+          <IconCard title={"Tax Id"} value={props.investor.taxId} icon={<FaIdBadge />} />
         </div>
       </div>
     </div>

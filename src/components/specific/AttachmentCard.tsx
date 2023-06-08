@@ -2,10 +2,12 @@ import useAlert from "@/hooks/AlertHook";
 import { deleteDocuments, downloadDocument } from "@/lib/DocumentService";
 import { useState } from "react";
 import { FaArrowDown, FaPaperclip, FaRegTrashAlt, FaTrash, FaTrashAlt, FaTrashRestore } from "react-icons/fa";
+import {getConnectedAddress} from "../../utils/MetamaskUtils";
 
 interface AttachmentCardProps {
   attachment: { attachmentTitle: string; attachmentPath: string };
   onRemove: (attachmentPath: string) => void;
+  documentContractAddress: string;
 }
 
 const AttachmentCard = (props: AttachmentCardProps) => {
@@ -32,10 +34,28 @@ const AttachmentCard = (props: AttachmentCardProps) => {
     try {
       if (props.attachment.attachmentPath != null) {
         await deleteDocuments([props.attachment.attachmentPath]);
-        props.onRemove(props.attachment.attachmentPath);
+        //TODO: make path dynamic for AP - should be calling api/project/assessment/removeAttachments
+        const response = await fetch(`/api/projects/removeAttachments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            attachmentIds: [props.attachment.attachmentPath],
+            documentContractAddress: props.documentContractAddress,
+            signerAddress: await getConnectedAddress(window),
+          }),
+        });
+
+        if (response.ok) {
+          setAlert({ title: "", message: `Priloga ${props.attachment.attachmentPath} izbrisana`, type: "success" });
+          props.onRemove(props.attachment.attachmentPath);
+        } else {
+          throw new Error(await response.json());
+        }
       }
     } catch (e: any) {
-      setAlert({ title: "Error", message: e.message, type: "error" });
+      setAlert({ title: "Napaka", message: e.message, type: "error" });
     }
   };
 

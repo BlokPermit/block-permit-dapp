@@ -135,7 +135,7 @@ const CreateProject = () => {
       let createdProject = await response.json();
       // @ts-ignore
       await router.push(`/projects/${createdProject.id}`);
-      setAlert({ title: "Project created!", message: "You can now view it in projects.", type: "success" });
+      setAlert({ title: "Projekt ustvarjen!", message: "", type: "success" });
     } catch (error: any) {
       setAlert({ title: "", message: error.message, type: "error" });
     }
@@ -143,7 +143,7 @@ const CreateProject = () => {
 
   return (
     <div>
-      <div className="px-40 mb-20">
+      <div className="px-40 mb-20">D
         <BreadCrumbs />
         <form onSubmit={handleSubmit}>
           <div className="space-y-12">

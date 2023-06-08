@@ -1,11 +1,12 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {addAssessmentProviders, addAttachments} from "../../../lib/ProjectService";
+import {addAssessmentProviders, addAttachments, removeAttachments} from "../../../lib/ProjectService";
 
 //TODO: refactor
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
-            await addAttachments(req.body.documentContractAddress, req.body.signerAddress, req.body.confirmed);
+            console.log(req.body);
+            await removeAttachments(req.body.documentContractAddress, req.body.signerAddress, req.body.attachmentIds);
             res.status(200).end();
         } catch (e: any) {
             console.log(e.message);

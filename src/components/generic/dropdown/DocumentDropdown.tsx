@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FaArrowUp, FaChevronDown, FaChevronUp, FaEdit, FaFileDownload, FaFileUpload, FaTimes, FaTrash } from "react-icons/fa";
 import { deleteDocuments, downloadDocument, saveDocument } from "@/lib/DocumentService";
@@ -10,6 +10,7 @@ import { getConnectedAddress } from "../../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../../utils/FileUtils";
 import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
 import { useRouter } from "next/router";
+import {changeDocument} from "../../../lib/DocumentService";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -51,15 +52,36 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   }
 
   const updateDocument = async () => {
-    //Current file
-    console.log(props.fileName);
+    const path = props.documentType == "dpp" ? "setDPP" : "setDGD";
 
-    //New file
-    console.log(fileForUpdate);
+    try {
+      let newDocumentPath = await changeDocument(fileForUpdate!, props.fileName!);
+      const response = await fetch(`/api/projects/${path}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectAddress: props.projectAddress,
+          signerAddress: await getConnectedAddress(window),
+          documentUrl: newDocumentPath,
+          documentHash: await hashFileToBytes32(fileForUpdate)
+        }),
+      });
+
+      if (response.ok) {
+        setAlert({ title: "", message: `${props.documentType.toUpperCase()} posodobljen.`, type: "success" });
+        router.push(router.asPath);
+      } else {
+        throw new Error(await response.json().message);
+      }
+    } catch (e: any) {
+      setAlert({ title: "", message: e, type: "error" });
+    }
   };
 
   //TODO: Add Conformation Popup and Blockchain deletion!
-  const deleteDocument = async () => {
+  const deleteDocument  = async () => {
     try {
       if (props.fileName != null) {
         await deleteDocuments([props.fileName]);
@@ -219,8 +241,8 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
           isPresent={props.isPresent}
           fileName={props.fileName}
           onDocumentChange={props.onDocumentChange}
-          path={""}
-          projectAddress={""}
+          path={props.path}
+          projectAddress={props.projectAddress}
         />
       ) : (
         <DocumentUpload

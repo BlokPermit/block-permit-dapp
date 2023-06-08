@@ -264,6 +264,24 @@ export const addAttachments = async (documentContractAddress: string, signerAddr
   }
 };
 
+export const removeAttachments = async (documentContractAddress: string, signerAddress: string, attachmentIds: string[]) => {
+  try {
+    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await documentContract.removeAttachments(attachmentIds);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+};
+
+export const evaluateAssessmentDueDateExtension = async (documentContractAddress: string, signerAddress: string, confirmed: boolean) => {
+  try {
+    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await documentContract.evaluateAssessmentDueDateExtension(confirmed);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+}
+
 const getProjectAddressesOfUser = async (walletAddress: string) => {
   try {
     return await prisma.user.findUnique({

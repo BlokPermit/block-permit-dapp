@@ -1,8 +1,18 @@
-import {FaArrowUp, FaCalendar, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes} from "react-icons/all";
+import {
+  FaArrowUp,
+  FaCalendar,
+  FaCalendarCheck,
+  FaCalendarMinus, FaCalendarPlus,
+  FaCheck,
+  FaClock,
+  FaEye,
+  FaPaperclip,
+  FaTimes
+} from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, {useEffect, useState} from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import {ProjectState, User} from "@prisma/client";
+import {User} from "@prisma/client";
 import {DocumentContractModel} from "@/models/DocumentContractModel";
 import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
@@ -12,6 +22,7 @@ import {getFileNamesFromDirectory} from "../../lib/DocumentService";
 import {getConnectedAddress} from "../../utils/MetamaskUtils";
 import {hashFileToBytes32} from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
+import IconButton from "../generic/buttons/IconButton";
 
 interface AssessmentProviderListItemProps {
   assessmentProvider: User;
@@ -83,6 +94,27 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     }
   };
 
+  const handleRequestedDueDateExtensionEvaluation = async (confirmed: boolean) => {
+    const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        documentContractAddress: props.documentContract.documentContractAddress,
+        signerAddress: await getConnectedAddress(window),
+        confirmed: confirmed
+      }),
+    });
+
+    if (response.ok) {
+      setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
+      router.push(router.asPath);
+    } else {
+      setAlert({ title: "", message: (await response.json()).message, type: "error" });
+    }
+  }
+
   useEffect(() => {
     if (props.documentContract) {
       setStatus("sent");
@@ -103,6 +135,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           existingAttachments={props.documentContract ? props.documentContract.attachments ?? [] : unsentAttachments}
           onAdd={handleAddAttachment}
           onClose={() => setIsAttachmentsPopupOpen(false)}
+          documentContractAddress={props.documentContract.documentContractAddress}
         />
       )}
       <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
@@ -162,6 +195,12 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             />
           )}
         </div>
+        {/*TODO: move*/}
+        {props.documentContract.requestedAssessmentDueDate && (
+        <div>
+          <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(true)} className="bg-green-800"/>
+          <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(false)} className="bg-red-800"/>
+        </div>)}
       </div>
     </>
   );

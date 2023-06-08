@@ -1,14 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import AttachmentCard from "./AttachmentCard";
 import DocumentInput from "../generic/input/DocumentInput";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import IconButton from "../generic/buttons/IconButton";
 import useAlert from "@/hooks/AlertHook";
 
+//TODO: pass prop to identify if user is PM or AP
 interface AttachmentsPopupProps {
   existingAttachments: string[];
   onAdd: (file: File | undefined) => void;
   onClose: () => void;
+  documentContractAddress: string;
 }
 
 const AttachmentsPopup = (props: AttachmentsPopupProps) => {
@@ -41,6 +43,7 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
                     attachmentTitle: attachment.split("/").pop() || "",
                     attachmentPath: attachment,
                   }}
+                  documentContractAddress={props.documentContractAddress}
                 />
               </div>
             ))}

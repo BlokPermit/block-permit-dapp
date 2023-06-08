@@ -87,3 +87,14 @@ export const getFileNamesWithHashesFromDirectory = async (path: string): Promise
     throw e;
   }
 };
+
+export const changeDocument = async (file: File, oldFilePath: string): Promise<string> => {
+  try {
+    await deleteDocuments([oldFilePath]);
+    const dirPath: string = oldFilePath.substring(oldFilePath.indexOf("/") + 1, oldFilePath.lastIndexOf("/"));
+    console.log(dirPath);
+    return saveDocument(file, dirPath);
+  } catch (e: any) {
+    throw e;
+  }
+}

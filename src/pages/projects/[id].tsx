@@ -40,12 +40,12 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const router = useRouter();
   const { setConformationPopup } = useConformationPopup();
   const { setAlert } = useAlert();
+  const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
+  const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
+
   useEffect(() => {
     setRecentProject(project.baseProject.id);
   }, []);
-  const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
-
-  const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
 
   //Count Selected Opinion Providers
   const [numOfSelected, setNumOfSelected] = useState<number>(0);
@@ -142,7 +142,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
-        router.reload();
+        router.push(router.asPath);
       }
     } catch (e: any) {
       setAlert({ title: "", message: e.message, type: "error" });
