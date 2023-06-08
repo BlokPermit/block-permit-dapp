@@ -80,18 +80,6 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
     }
   };
 
-  //TODO: Add Conformation Popup and Blockchain deletion!
-  const deleteDocument = async () => {
-    try {
-      if (props.fileName != null) {
-        await deleteDocuments([props.fileName]);
-        router.push(router.asPath);
-      }
-    } catch (e: any) {
-      setAlert({ title: "Error", message: e.message, type: "error" });
-    }
-  };
-
   return (
     <div>
       <div className="inline-flex items-center overflow-hidden bg-white rounded-md border border-main-200 text-sm hover:cursor-pointer">
@@ -141,15 +129,6 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
                 role="menuitem"
               >
                 Update
-              </button>
-            </div>
-
-            <div className="p-2">
-              <strong className="block p-2 text-xs font-medium uppercase text-gray-400">Danger Zone</strong>
-
-              <button onClick={deleteDocument} className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50" role="menuitem">
-                <FaTrash />
-                Delete
               </button>
             </div>
           </>

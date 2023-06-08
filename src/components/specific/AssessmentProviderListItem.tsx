@@ -1,26 +1,16 @@
-import {
-  FaArrowUp,
-  FaCalendar,
-  FaCalendarCheck,
-  FaCalendarMinus, FaCalendarPlus,
-  FaCheck,
-  FaClock,
-  FaEye,
-  FaPaperclip,
-  FaTimes, FaXbox, FaXingSquare, HiXMark
-} from "react-icons/all";
+import { FaArrowUp, FaCalendar, FaCalendarCheck, FaCalendarMinus, FaCalendarPlus, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes, FaXbox, FaXingSquare, HiXMark } from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import {User, ProjectState} from "@prisma/client";
-import {DocumentContractModel} from "@/models/DocumentContractModel";
-import {dateFromTimestamp, formatDate} from "../../utils/DateUtils";
+import { User, ProjectState } from "@prisma/client";
+import { DocumentContractModel } from "@/models/DocumentContractModel";
+import { dateFromTimestamp, formatDate } from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
-import {saveDocument} from "@/lib/DocumentService";
-import {useRouter} from "next/router";
-import {getFileNamesFromDirectory} from "../../lib/DocumentService";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
-import {hashFileToBytes32} from "../../utils/FileUtils";
+import { saveDocument } from "@/lib/DocumentService";
+import { useRouter } from "next/router";
+import { getFileNamesFromDirectory } from "../../lib/DocumentService";
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
+import { hashFileToBytes32 } from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
 import IconButton from "../generic/buttons/IconButton";
 
@@ -69,7 +59,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             },
           ];
 
-          const response = await fetch(`/api/projects/addAttachments`, {
+          const response = await fetch(`/api/documentContracts/addAttachments`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -104,7 +94,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
       body: JSON.stringify({
         documentContractAddress: props.documentContract.documentContractAddress,
         signerAddress: await getConnectedAddress(window),
-        confirmed: confirmed
+        confirmed: confirmed,
       }),
     });
 
@@ -114,7 +104,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     } else {
       setAlert({ title: "", message: (await response.json()).message, type: "error" });
     }
-  }
+  };
 
   const handleRemoveAssessmentProvider = async () => {
     const response = await fetch(`/api/projects/removeAssessmentProviders`, {
@@ -125,7 +115,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
       body: JSON.stringify({
         projectAddress: props.projectAddress,
         signerAddress: await getConnectedAddress(window),
-        assessmentProvidersAddresses: [props.assessmentProvider.walletAddress]
+        assessmentProvidersAddresses: [props.assessmentProvider.walletAddress],
       }),
     });
 
@@ -135,7 +125,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     } else {
       setAlert({ title: "", message: (await response.json()).message, type: "error" });
     }
-  }
+  };
 
   useEffect(() => {
     if (props.documentContract) {
@@ -157,7 +147,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           existingAttachments={props.documentContract ? props.documentContract.attachments ?? [] : unsentAttachments}
           onAdd={handleAddAttachment}
           onClose={() => setIsAttachmentsPopupOpen(false)}
-          documentContractAddress={props.documentContract.documentContractAddress}
+          documentContractAddress={props.documentContract ? props.documentContract.documentContractAddress! : ""}
         />
       )}
       <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
@@ -219,13 +209,12 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
         </div>
         {/*TODO: move*/}
         {props.documentContract && props.documentContract.requestedAssessmentDueDate && (
-        <div>
-          <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(true)}/>
-          <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus/>} onClick={() => handleRequestedDueDateExtensionEvaluation(false)}/>
-        </div>)}
-        {!props.documentContract && (
-            <IconButton text={"Odstrani"} icon={<HiXMark/>} onClick={() => handleRemoveAssessmentProvider()}/>
+          <div>
+            <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus />} onClick={() => handleRequestedDueDateExtensionEvaluation(true)} />
+            <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus />} onClick={() => handleRequestedDueDateExtensionEvaluation(false)} />
+          </div>
         )}
+        {!props.documentContract && <IconButton text={"Odstrani"} icon={<HiXMark />} onClick={() => handleRemoveAssessmentProvider()} />}
       </div>
     </>
   );

@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { addAssessmentProviders } from "../../../lib/ProjectService";
+import { addAttachments } from "../../../lib/DocumentContractService";
 
+//TODO: move to api/documentContracts
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
-      await addAssessmentProviders(req.body.projectAddress, req.body.signerAddress, req.body.assessmentProvidersAddresses);
+      await addAttachments(req.body.documentContractAddress, req.body.signerAddress, req.body.confirmed);
       res.status(200).end();
     } catch (e: any) {
       console.log(e.message);

@@ -2,7 +2,7 @@ import useAlert from "@/hooks/AlertHook";
 import { deleteDocuments, downloadDocument } from "@/lib/DocumentService";
 import { useState } from "react";
 import { FaArrowDown, FaPaperclip, FaRegTrashAlt, FaTrash, FaTrashAlt, FaTrashRestore } from "react-icons/fa";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
 
 interface AttachmentCardProps {
   attachment: { attachmentTitle: string; attachmentPath: string };
@@ -32,27 +32,31 @@ const AttachmentCard = (props: AttachmentCardProps) => {
   };
   const removeAttachment = async () => {
     try {
-      if (props.attachment.attachmentPath != null) {
-        await deleteDocuments([props.attachment.attachmentPath]);
-        //TODO: make path dynamic for AP - should be calling api/project/assessment/removeAttachments
-        const response = await fetch(`/api/projects/removeAttachments`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            attachmentIds: [props.attachment.attachmentPath],
-            documentContractAddress: props.documentContractAddress,
-            signerAddress: await getConnectedAddress(window),
-          }),
-        });
+      if (props.documentContractAddress) {
+        if (props.attachment.attachmentPath != null) {
+          await deleteDocuments([props.attachment.attachmentPath]);
+          //TODO: make path dynamic for AP - should be calling api/project/assessment/removeAttachments
+          const response = await fetch(`/api/documentContracts/removeAttachments`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              attachmentIds: [props.attachment.attachmentPath],
+              documentContractAddress: props.documentContractAddress,
+              signerAddress: await getConnectedAddress(window),
+            }),
+          });
 
-        if (response.ok) {
-          setAlert({ title: "", message: `Priloga ${props.attachment.attachmentPath} izbrisana`, type: "success" });
-          props.onRemove(props.attachment.attachmentPath);
-        } else {
-          throw new Error(await response.json());
+          if (response.ok) {
+            setAlert({ title: "", message: `Priloga ${props.attachment.attachmentPath} izbrisana`, type: "success" });
+            props.onRemove(props.attachment.attachmentPath);
+          } else {
+            throw new Error(await response.json());
+          }
         }
+      } else {
+        props.onRemove(props.attachment.attachmentPath);
       }
     } catch (e: any) {
       setAlert({ title: "Napaka", message: e.message, type: "error" });

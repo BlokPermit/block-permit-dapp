@@ -43,7 +43,7 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
                     attachmentTitle: attachment.split("/").pop() || "",
                     attachmentPath: attachment,
                   }}
-                  documentContractAddress={props.documentContractAddress}
+                  documentContractAddress={props.documentContractAddress ?? null}
                 />
               </div>
             ))}

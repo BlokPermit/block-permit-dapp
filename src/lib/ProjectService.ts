@@ -24,7 +24,7 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
     }
 }*/
 
-export const createProject = async (data: Project, walletAddress: string, dppHash: string | null, dppUrl: string | null) => {
+export const createProject = async (data: Project, walletAddress: string) => {
   try {
     const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
     // Deploys a new Project smart contract on a blockchain
@@ -235,7 +235,7 @@ export const removeAssessmentProviders = async (projectAddress: string, signerAd
   } catch (error: any) {
     throw new Error(getErrorReason(error));
   }
-}
+};
 
 export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
   try {
@@ -262,37 +262,6 @@ export const sendDPP = async (projectAddress: string, signerAddress: string, doc
     throw new Error(getErrorReason(error));
   }
 };
-
-//TODO: move to DocumentContractService
-export const addAttachments = async (documentContractAddress: string, signerAddress: string, attachments: object[]) => {
-  try {
-    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-
-    await documentContract.addAttachments(attachments);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
-};
-
-//TODO: move to DocumentContractService
-export const removeAttachments = async (documentContractAddress: string, signerAddress: string, attachmentIds: string[]) => {
-  try {
-    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await documentContract.removeAttachments(attachmentIds);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
-};
-
-//TODO: move to DocumentContractService
-export const evaluateAssessmentDueDateExtension = async (documentContractAddress: string, signerAddress: string, confirmed: boolean) => {
-  try {
-    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await documentContract.evaluateAssessmentDueDateExtension(confirmed);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
-}
 
 const getProjectAddressesOfUser = async (walletAddress: string) => {
   try {
