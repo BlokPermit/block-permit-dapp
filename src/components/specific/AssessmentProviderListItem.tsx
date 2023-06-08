@@ -1,10 +1,9 @@
-import { FaArrowUp, FaCalendar, FaCalendarCheck, FaCalendarMinus, FaCalendarPlus, FaCheck, FaClock, FaEye, FaPaperclip, FaTimes, FaXbox, FaXingSquare, HiXMark } from "react-icons/all";
+import { FaArrowUp, FaBell, FaCheck, FaClock, FaEye, FaInfo, FaPaperclip, FaTimes } from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
-import { User, ProjectState } from "@prisma/client";
+import { ProjectState, User } from "@prisma/client";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
-import { dateFromTimestamp, formatDate } from "../../utils/DateUtils";
 import AttachmentsPopup from "./AttachmentsPopup";
 import { saveDocument } from "@/lib/DocumentService";
 import { useRouter } from "next/router";
@@ -12,7 +11,7 @@ import { getFileNamesFromDirectory } from "../../lib/DocumentService";
 import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
-import IconButton from "../generic/buttons/IconButton";
+import AssessmentProviderInfoPopup from "@/components/specific/AssessmentProviderInfoPopup";
 
 interface AssessmentProviderListItemProps {
   assessmentProvider: User;
@@ -28,6 +27,7 @@ interface AssessmentProviderListItemProps {
 const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
   const router = useRouter();
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
+  const [isAssessmentProviderInfoPopupOpen, setIsAssessmentProviderInfoPopupOpen] = useState<boolean>(false);
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
   const [unsentAttachments, setUnsentAttachments] = useState<string[]>([]);
@@ -37,9 +37,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     const files = await getFileNamesFromDirectory(
       `public/projects/${props.projectId}/${props.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
     );
-    if (typeof files !== "boolean") {
-      setUnsentAttachments(files);
-    }
+    setUnsentAttachments(files);
   };
 
   const handleAddAttachment = async (file: File | undefined) => {
@@ -85,48 +83,6 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     }
   };
 
-  const handleRequestedDueDateExtensionEvaluation = async (confirmed: boolean) => {
-    const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        documentContractAddress: props.documentContract.documentContractAddress,
-        signerAddress: await getConnectedAddress(window),
-        confirmed: confirmed,
-      }),
-    });
-
-    if (response.ok) {
-      setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
-      router.push(router.asPath);
-    } else {
-      setAlert({ title: "", message: (await response.json()).message, type: "error" });
-    }
-  };
-
-  const handleRemoveAssessmentProvider = async () => {
-    const response = await fetch(`/api/projects/removeAssessmentProviders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        projectAddress: props.projectAddress,
-        signerAddress: await getConnectedAddress(window),
-        assessmentProvidersAddresses: [props.assessmentProvider.walletAddress],
-      }),
-    });
-
-    if (response.ok) {
-      setAlert({ title: "", message: `Mnenjedajalec ${props.assessmentProvider.name} odstranjen.`, type: "success" });
-      router.push(router.asPath);
-    } else {
-      setAlert({ title: "", message: (await response.json()).message, type: "error" });
-    }
-  };
-
   useEffect(() => {
     if (props.documentContract) {
       setStatus("sent");
@@ -150,7 +106,15 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           documentContractAddress={props.documentContract ? props.documentContract.documentContractAddress! : ""}
         />
       )}
-      <div key={props.assessmentProvider.id} className={isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}>
+      {isAssessmentProviderInfoPopupOpen && (
+        <AssessmentProviderInfoPopup
+          projectAddress={props.projectAddress}
+          assessmentProvider={props.assessmentProvider}
+          documentContract={props.documentContract}
+          onClose={() => setIsAssessmentProviderInfoPopupOpen(false)}
+        />
+      )}
+      <div key={props.assessmentProvider.id} className={`${isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}`}>
         <div className="flex justify-between">
           <div className="flex justify-between gap-5 items-center">
             <div className="text-lg">
@@ -162,59 +126,52 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
               <div className="text-lg font-bold">{props.assessmentProvider.name}</div>
             </span>
           </div>
-          {props.isMainDocumentPresent && (
+          {props.isMainDocumentPresent ? (
+            <span className="inline-flex items-center gap-3">
+              {props.documentContract && (props.documentContract.mainDocumentUpdateRequested || props.documentContract.requestedAssessmentDueDate) && <FaBell color="red" />}
+              <ButtonGroup
+                secondaryButtons={[
+                  {
+                    text: "More info",
+                    icon: <FaInfo />,
+                    onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+                  },
+                  {
+                    text: "Attachments",
+                    icon: <FaPaperclip />,
+                    onClick: () => setIsAttachmentsPopupOpen(true),
+                  },
+                ]}
+                primaryButton={
+                  status === "waiting to send"
+                    ? {
+                        text: isSelected ? "Deselect" : "Select",
+                        icon: isSelected ? <FaTimes /> : <FaCheck />,
+                        onClick: () => {
+                          setIsSelected(!isSelected);
+                          props.countSelected(!isSelected, props.assessmentProvider.id);
+                        },
+                      }
+                    : {
+                        text: status === "assessed" ? "Review" : "Sent",
+                        icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
+                        onClick: status === "assessed" ? () => {} : () => {},
+                        disabled: status === "assessed" ? false : true,
+                      }
+                }
+              />
+            </span>
+          ) : (
             <ButtonGroup
-              secondaryButtons={
-                status === "sent"
-                  ? [
-                      {
-                        text: formatDate(dateFromTimestamp(props.documentContract.assessmentDueDate!)),
-                        icon: <FaCalendar />,
-                        onClick: () => {},
-                        disabled: true,
-                      },
-                      {
-                        text: "Attachments",
-                        icon: <FaPaperclip />,
-                        onClick: () => setIsAttachmentsPopupOpen(true),
-                      },
-                    ]
-                  : [
-                      {
-                        text: "Attachments",
-                        icon: <FaPaperclip />,
-                        onClick: () => setIsAttachmentsPopupOpen(true),
-                      },
-                    ]
-              }
-              primaryButton={
-                status === "waiting to send"
-                  ? {
-                      text: isSelected ? "Deselect" : "Select",
-                      icon: isSelected ? <FaTimes /> : <FaCheck />,
-                      onClick: () => {
-                        setIsSelected(!isSelected);
-                        props.countSelected(!isSelected, props.assessmentProvider.id);
-                      },
-                    }
-                  : {
-                      text: status === "assessed" ? "Review" : "Sent",
-                      icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
-                      onClick: status === "assessed" ? () => {} : () => {},
-                      disabled: status === "assessed" ? false : true,
-                    }
-              }
+              secondaryButtons={[]}
+              primaryButton={{
+                text: "More info",
+                icon: <FaInfo />,
+                onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+              }}
             />
           )}
         </div>
-        {/*TODO: move*/}
-        {props.documentContract && props.documentContract.requestedAssessmentDueDate && (
-          <div>
-            <IconButton text={"Potrdi podaljšanje roka"} icon={<FaCalendarPlus />} onClick={() => handleRequestedDueDateExtensionEvaluation(true)} />
-            <IconButton text={"Zavrni podaljšanje roka"} icon={<FaCalendarMinus />} onClick={() => handleRequestedDueDateExtensionEvaluation(false)} />
-          </div>
-        )}
-        {!props.documentContract && <IconButton text={"Odstrani"} icon={<HiXMark />} onClick={() => handleRemoveAssessmentProvider()} />}
       </div>
     </>
   );

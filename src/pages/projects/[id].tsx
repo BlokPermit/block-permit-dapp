@@ -1,5 +1,5 @@
 import { findProjectById } from "@/lib/ProjectService";
-import { Investor, ProjectState, User } from "@prisma/client";
+import { ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
@@ -59,17 +59,17 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       setSelectedAssessmentProviders(selectedAssessmentProviders.filter((id) => id !== opinionProviderId));
     }
   };
-  const handleSend = () => {
-    setConformationPopup({
-      title: "Send to Opinion Providers",
-      message: "Are you sure you want to send this project to the selected opinion providers?",
-      icon: <FaArrowUp />,
-      popupType: "warning",
-      buttonPrimaryText: "Send",
-      onClickPrimary: sendToAssessmentProviders,
-      show: true,
-    });
-  };
+  // const handleSend = () => {
+  //     setConformationPopup({
+  //         title: "Send to Opinion Providers",
+  //         message: "Are you sure you want to send this project to the selected opinion providers?",
+  //         icon: <FaArrowUp/>,
+  //         popupType: "warning",
+  //         buttonPrimaryText: "Send",
+  //         onClickPrimary: sendToAssessmentProviders,
+  //         show: true,
+  //     });
+  // };
 
   const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
@@ -96,7 +96,10 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     try {
       const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
 
-      let assessmentProvidersInfo: { assessmentProviderId: string; assessmentProviderAddress: string }[] = project.assessmentProviders.map((assessmentProvider: User) => {
+      let assessmentProvidersInfo: {
+        assessmentProviderId: string;
+        assessmentProviderAddress: string;
+      }[] = project.assessmentProviders.map((assessmentProvider: User) => {
         const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
         if (matchingAssessmentProvider)
           return {
@@ -107,7 +110,6 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
       assessmentProvidersInfo = assessmentProvidersInfo.filter((info: object) => info !== undefined);
 
-      //TODO: Create a interface to avoid typescript errors.
       let documentContractStructs: object[] = [];
       const documentType = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
       const connectedAddress = await getConnectedAddress(window);
@@ -226,8 +228,13 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             projectAddress={project.baseProject.smartContractAddress}
           />
         ))}
-        <div className="flex justify-end">
-          <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={numOfSelected > 0 ? "Send Selected" : "Send All"} icon={<FaPaperPlane />} onClick={handleSend} />
+        <div className="flex justify-end mb-20">
+          <IconButton
+            className="bg-main-200 text-white hover:bg-white hover:text-main-200"
+            text={numOfSelected > 0 ? "Send Selected" : "Send All"}
+            icon={<FaPaperPlane />}
+            onClick={sendToAssessmentProviders}
+          />
         </div>
       </div>
       {/*} />*/}
