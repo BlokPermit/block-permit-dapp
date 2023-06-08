@@ -28,7 +28,7 @@ const DocumentInput = ({ label, title, description, onDocumentChange }: Document
           <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
             {label}
           </label>
-          <div className={`flex justify-center rounded-lg bg-white ${fileName != undefined ? "bg-main-500 border-none" : ""} border border-dashed border-gray-900/25 px-6 py-10`}>
+          <div className={`flex justify-center rounded-lg ${fileName != undefined ? "bg-main-400 border-none" : ""} border border-dashed border-gray-900/25 px-6 py-10`}>
             <div className="text-center ">
               {fileName == undefined ? <AiFillFileAdd className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" /> : <AiFillFile className="mx-auto h-12 w-12 text-white"></AiFillFile>}
               <div className="mt-4 flex items-center justify-center text-sm leading-6  text-gray-600">
