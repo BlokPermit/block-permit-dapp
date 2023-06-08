@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillFileAdd } from "react-icons/ai";
 import { FaArrowUp, FaChevronDown, FaChevronUp, FaEdit, FaFileDownload, FaFileUpload, FaTimes, FaTrash } from "react-icons/fa";
 import { deleteDocuments, downloadDocument, saveDocument } from "@/lib/DocumentService";
@@ -10,7 +10,7 @@ import { getConnectedAddress } from "../../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../../utils/FileUtils";
 import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
 import { useRouter } from "next/router";
-import {changeDocument} from "../../../lib/DocumentService";
+import { changeDocument } from "../../../lib/DocumentService";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -65,7 +65,7 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
           projectAddress: props.projectAddress,
           signerAddress: await getConnectedAddress(window),
           documentUrl: newDocumentPath,
-          documentHash: await hashFileToBytes32(fileForUpdate)
+          documentHash: await hashFileToBytes32(fileForUpdate),
         }),
       });
 
@@ -73,7 +73,7 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
         setAlert({ title: "", message: `${props.documentType.toUpperCase()} posodobljen.`, type: "success" });
         router.push(router.asPath);
       } else {
-        throw new Error(await response.json().message);
+        throw new Error(await response.json());
       }
     } catch (e: any) {
       setAlert({ title: "", message: e, type: "error" });
@@ -81,7 +81,7 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   };
 
   //TODO: Add Conformation Popup and Blockchain deletion!
-  const deleteDocument  = async () => {
+  const deleteDocument = async () => {
     try {
       if (props.fileName != null) {
         await deleteDocuments([props.fileName]);
