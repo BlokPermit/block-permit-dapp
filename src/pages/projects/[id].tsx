@@ -229,12 +229,14 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           />
         ))}
         <div className="flex justify-end mb-20">
-          <IconButton
-            className="bg-main-200 text-white hover:bg-white hover:text-main-200"
-            text={numOfSelected > 0 ? "Send Selected" : "Send All"}
-            icon={<FaPaperPlane />}
-            onClick={sendToAssessmentProviders}
-          />
+          {project.assessmentProviders.length > 0 && (project.sentDPPs.length !== project.assessmentProviders.length || project.sentDGDs.length !== project.assessmentProviders.length) && (
+            <IconButton
+              className="bg-main-200 text-white hover:bg-white hover:text-main-200"
+              text={numOfSelected > 0 ? "Send Selected" : "Send All"}
+              icon={<FaPaperPlane />}
+              onClick={sendToAssessmentProviders}
+            />
+          )}
         </div>
       </div>
       {/*} />*/}
