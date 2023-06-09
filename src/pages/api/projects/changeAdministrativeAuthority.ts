@@ -1,12 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { findAssessmentProvidersByName } from "@/lib/UserService";
-import { User } from "@prisma/client";
-import { addAssessmentProviders, sendDPP, setDPP } from "../../../lib/ProjectService";
+import { changeAdministrativeAuthority } from "../../../lib/ProjectService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
+  if (req.method === "PUT") {
     try {
-      await sendDPP(req.body.projectAddress, req.body.signerAddress, req.body.documentContractStructs);
+      await changeAdministrativeAuthority(req.body.projectAddress, req.body.signerAddress, req.body.administrativeAuthorityAddress);
       res.status(200).end();
     } catch (e: any) {
       console.log(e.message);

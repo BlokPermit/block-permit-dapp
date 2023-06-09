@@ -263,6 +263,15 @@ export const sendDPP = async (projectAddress: string, signerAddress: string, doc
   }
 };
 
+export const changeAdministrativeAuthority = async (projectAddress: string, signerAddress: string, administrativeAuthorityAddress: string) => {
+  try {
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await projectContract.changeAdministrativeAuthority(administrativeAuthorityAddress);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+};
+
 const getProjectAddressesOfUser = async (walletAddress: string) => {
   try {
     return await prisma.user.findUnique({

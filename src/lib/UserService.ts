@@ -1,5 +1,5 @@
 import { prisma } from "@/utils/PrismaClient";
-import { User } from "@prisma/client";
+import { User, UserType } from "@prisma/client";
 import { Contract } from "ethers";
 import { getOwnerContract } from "@/utils/BlockchainUtils";
 import { provider } from "@/utils/EthereumClient";
@@ -25,38 +25,38 @@ export const findUserByAddress = async (address: string) => {
   return user;
 };
 
-export const findUsersByName = async (name: string) => {
+export const searchUsers = async (searchQuery: string, userType: UserType) => {
   return prisma.user.findMany({
     where: {
       OR: [
         {
           name: {
-            contains: name,
+            contains: searchQuery,
             mode: "insensitive",
           },
         },
         {
           email: {
-            contains: name,
+            contains: searchQuery,
             mode: "insensitive",
           },
         },
         {
           phone: {
-            contains: name,
+            contains: searchQuery,
             mode: "insensitive",
           },
         },
         {
           streetAddress: {
-            contains: name,
+            contains: searchQuery,
             mode: "insensitive",
           },
         },
       ],
       AND: [
         {
-          userType: "ASSESSMENT_PROVIDER",
+          userType: userType,
         },
       ],
     },

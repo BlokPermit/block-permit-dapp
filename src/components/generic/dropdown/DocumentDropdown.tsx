@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AiFillFileAdd } from "react-icons/ai";
-import { FaArrowUp, FaChevronDown, FaChevronUp, FaEdit, FaFileDownload, FaFileUpload, FaTimes, FaTrash } from "react-icons/fa";
+import { FaArrowUp, FaChevronDown, FaChevronUp, FaEdit, FaFileDownload, FaFileUpload, FaTimes, FaTrash, FaUpload } from "react-icons/fa";
 import { deleteDocuments, downloadDocument, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 import DocumentInput from "../input/DocumentInput";
@@ -82,7 +82,7 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
 
   return (
     <div>
-      <div className="inline-flex items-center overflow-hidden bg-white rounded-md border border-main-200 text-sm hover:cursor-pointer">
+      <div className="inline-flex items-center overflow-hidden bg-white rounded-md border-2 border-main-200 text-sm hover:cursor-pointer">
         <span onClick={downloadFile} className="inline-flex items-center border-e border-main-200 px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
           <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
@@ -187,10 +187,10 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
     <div className="relative">
       <div
         onClick={() => setIsActive(!isActive)}
-        className="inline-flex items-center overflow-hidden rounded-md border bg-main-200 hover:cursor-pointer hover:bg-gray-50 text-white hover:text-main-200"
+        className="inline-flex items-center overflow-hidden rounded-md border-2 border-main-200 bg-main-200 hover:cursor-pointer hover:bg-gray-50 text-white hover:text-main-200"
       >
         <span className="flex justify-between items-center px-2 py-2 text-sm text-inherit">
-          <FaFileUpload className="mr-2" size={19} />
+          <FaFileUpload className="mr-2" />
           {props.documentType === "dpp" && <p>Upload DPP</p>}
           {props.documentType === "dgd" && <p>Upload DGD</p>}
         </span>

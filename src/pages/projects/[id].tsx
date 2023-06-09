@@ -3,7 +3,7 @@ import { ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaEdit, FaFileContract, FaHeading, FaHourglass, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
+import { FaArrowUp, FaCalendarPlus, FaEdit, FaFileContract, FaHeading, FaHourglass, FaLandmark, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -24,7 +24,8 @@ import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
-import {getSentMainDocumentText, mailUser} from "../../utils/MailingUtils";
+import { getSentMainDocumentText, mailUser } from "../../utils/MailingUtils";
+import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -42,6 +43,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const { setConformationPopup } = useConformationPopup();
   const { setAlert } = useAlert();
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
+  const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
   const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
 
   useEffect(() => {
@@ -145,10 +147,10 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
         const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
         const response2 = await mailUser({
-          to: assessmentProvidersInfo.map(ap => ap.email),
+          to: assessmentProvidersInfo.map((ap) => ap.email),
           subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,
           text: getSentMainDocumentText(project.baseProject.name, project.baseProject.projectState),
-          link: router.asPath
+          link: router.asPath,
         });
         if (!response2.ok) throw new Error((await response2.json()).message);
         router.push(router.asPath);
@@ -161,6 +163,11 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const onMainDocumentChange = (file: File | null) => {
     router.push(router.asPath);
   };
+
+  function handleAdministrativeAuthorityChange(): void {
+    setIsAdministrativeAuthorityPopupOpen(false);
+    router.push(router.asPath);
+  }
 
   // public/projects/:projectId/DPP
   // public/project/:projectId/DPP/:assessmentProviderId/attachments
@@ -175,11 +182,33 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <BreadCrumbs />
       <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
       <div className="flex justify-between mb-10">
-        <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
-        <div className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-3">
+          <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
+          {/* <RoleBasedComponent
+            projectManagerComponent={ */}
           <Link href={`/projects/editProject/${project.baseProject.id}`}>
-            <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaEdit />} text={"Edit Project"} onClick={() => {}} />
+            <IconButton className="text-main-200 border-gray-50 rounded-none hover:border-b-main-200" icon={<FaEdit />} text={"Edit Project"} onClick={() => {}} />
           </Link>
+        </span>
+        <div className="flex items-center gap-5">
+          {/* <RoleBasedComponent
+            assessmentProviderComponent={ */}
+          <>
+            <IconButton
+              className="text-main-200 border-gray-50 bg-inherit rounded-none hover:border-b-main-200"
+              icon={project.administrativeAuthority ? <FaLandmark /> : <FaPlus />}
+              text={project.administrativeAuthority ? project.administrativeAuthority.name : "Dodaj upravni organ"}
+              onClick={() => setIsAdministrativeAuthorityPopupOpen(true)}
+            />
+            {isAdministrativeAuthorityPopupOpen && (
+              <AdministrativeAuthorityPopup
+                administrativeAuthority={project.administrativeAuthority ? project.administrativeAuthority : null}
+                projectAddress={project.baseProject.smartContractAddress}
+                onClose={() => setIsAdministrativeAuthorityPopupOpen(false)}
+                onSubmit={() => handleAdministrativeAuthorityChange()}
+              />
+            )}
+          </>
           <RoleBasedComponent
             assessmentProviderComponent={<IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />}
           />
@@ -215,7 +244,12 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <div className="overflow-x-auto">
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Assessment Providers</h2>
-          <IconButton className="text-main-200 hover:text-gray-500 shadow-none" text={"Add Assessment Provider"} icon={<FaPlus />} onClick={() => setIsAddAssessmentProvidersPopupOpen(true)} />
+          <IconButton
+            className="text-main-200 border-gray-50 rounded-none hover:border-b-main-200"
+            text={"Add Assessment Provider"}
+            icon={<FaPlus />}
+            onClick={() => setIsAddAssessmentProvidersPopupOpen(true)}
+          />
           {isAddAssessmentProvidersPopupOpen && (
             <AddAssessmentProvidersPopup
               onClose={() => setIsAddAssessmentProvidersPopupOpen(false)}

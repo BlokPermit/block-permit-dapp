@@ -1,5 +1,5 @@
 import { className } from "postcss-selector-parser";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface AltButtonProps {
   onClick?: () => void;
@@ -16,7 +16,7 @@ const IconButton = (props: AltButtonProps) => {
   }, [props.disabled]);
 
   return (
-    <button disabled={isButtonDisabled} className={`${props.className} inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm shadow-sm focus:relative`} onClick={props.onClick}>
+    <button disabled={isButtonDisabled} className={`${props.className} border-2 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm focus:relative`} onClick={props.onClick}>
       {props.icon}
       {props.text}
     </button>

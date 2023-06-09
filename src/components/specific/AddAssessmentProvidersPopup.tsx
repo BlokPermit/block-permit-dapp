@@ -33,7 +33,7 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
 
   const handleSearch = async () => {
     const encodedSearchQuery = encodeURIComponent(searchQuery);
-    const data = await fetchUsers(`/api/users/search?q=${encodedSearchQuery}`);
+    const data = await fetchUsers(`/api/users/searchAssessmentProviders?q=${encodedSearchQuery}`);
     setResults(data.users.filter((assessmentProvider: User) => !props.existingAssessmentProviders.some((existingAssessmentProvider: User) => assessmentProvider.id === existingAssessmentProvider.id)));
     setResultsVisible(data.users.length > 0);
   };
