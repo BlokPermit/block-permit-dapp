@@ -272,6 +272,15 @@ export const changeAdministrativeAuthority = async (projectAddress: string, sign
   }
 };
 
+export const finalizeProject = async (projectAddress: string, signerAddress: string) => {
+  try {
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await projectContract.finalizeProject();
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+};
+
 const getProjectAddressesOfUser = async (walletAddress: string) => {
   try {
     return await prisma.user.findUnique({

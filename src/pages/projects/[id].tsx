@@ -3,7 +3,24 @@ import { ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaArrowUp, FaCalendarPlus, FaEdit, FaFileContract, FaHeading, FaHourglass, FaLandmark, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
+import {
+  FaArrowUp,
+  FaCalendarPlus,
+  FaCheck,
+  FaCheckCircle,
+  FaEdit,
+  FaFileContract,
+  FaHeading,
+  FaHourglass,
+  FaLandmark,
+  FaPaperclip,
+  FaPaperPlane,
+  FaPlus,
+  FaQuestion,
+  FaTag,
+  FaUpload,
+  FaUser,
+} from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -164,10 +181,27 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     router.push(router.asPath);
   };
 
-  function handleAdministrativeAuthorityChange(): void {
+  const handleAdministrativeAuthorityChange = (): void => {
     setIsAdministrativeAuthorityPopupOpen(false);
     router.push(router.asPath);
-  }
+  };
+
+  const finalizeProject = async () => {
+    const response = await fetch(`/api/projects/finalizeProject/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ projectAddress: project.baseProject.smartContractAddress, signerAddress: await getConnectedAddress(window) }),
+    });
+
+    if (response.ok) {
+      setAlert({ title: "Uspeh", message: "Projekt zaključen", type: "success" });
+      router.push(router.asPath);
+    } else {
+      setAlert({ title: "Napaka", message: "Napaka pri zaključevanju projekta", type: "error" });
+    }
+  };
 
   // public/projects/:projectId/DPP
   // public/project/:projectId/DPP/:assessmentProviderId/attachments
@@ -272,13 +306,18 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           />
         ))}
         <div className="flex justify-end mb-20">
-          {project.assessmentProviders.length > 0 && (project.sentDPPs.length !== project.assessmentProviders.length || project.sentDGDs.length !== project.assessmentProviders.length) && (
-            <IconButton
-              className="bg-main-200 text-white hover:bg-white hover:text-main-200"
-              text={numOfSelected > 0 ? "Send Selected" : "Send All"}
-              icon={<FaPaperPlane />}
-              onClick={sendToAssessmentProviders}
-            />
+          {project.assessmentProviders.length > 0 &&
+            (project.DPPUrl || project.DGDUrl) &&
+            (project.sentDPPs.length !== project.assessmentProviders.length || project.sentDGDs.length !== project.assessmentProviders.length) && (
+              <IconButton
+                className="bg-main-200 text-white hover:bg-white hover:text-main-200"
+                text={numOfSelected > 0 ? "Send Selected" : "Send All"}
+                icon={<FaPaperPlane />}
+                onClick={sendToAssessmentProviders}
+              />
+            )}
+          {project.sentDGDs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
+            <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi projekt"} icon={<FaCheckCircle />} onClick={finalizeProject} />
           )}
         </div>
       </div>
