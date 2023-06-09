@@ -213,8 +213,8 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     router.push(router.asPath);
   };
 
-  const finalizeProject = async () => {
-    const response = await fetch(`/api/projects/finalizeProject/`, {
+  const finalizeDPPPhase = async () => {
+    const response = await fetch(`/api/projects/finalizeDPPPhase/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -348,7 +348,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
               />
             )}
           {project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
-            <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi projekt"} icon={<FaCheckCircle />} onClick={finalizeProject} />
+            <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
           )}
         </div>
       </div>

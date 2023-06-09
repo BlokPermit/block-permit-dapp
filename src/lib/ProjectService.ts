@@ -272,10 +272,10 @@ export const changeAdministrativeAuthority = async (projectAddress: string, sign
   }
 };
 
-export const finalizeProject = async (projectAddress: string, signerAddress: string) => {
+export const finalizeDPPPhase = async (projectAddress: string, signerAddress: string) => {
   try {
     const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await projectContract.finalizeProject();
+    await projectContract.finalizeDPPPhase();
   } catch (error: any) {
     throw new Error(getErrorReason(error));
   }
