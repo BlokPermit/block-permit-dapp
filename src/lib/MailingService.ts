@@ -1,9 +1,9 @@
 import {Mailgun} from "mailgun-js";
 import mailgun from 'mailgun-js';
 
-export const sendMailToUser = async (to: string[], subject: string, text: string, link: string) : Promise<string> => {
-    link = `http://localhost:3000/projects/${link}`;
-
+export const sendMailToUser = async (to: string[], subject: string, text: string, link?: string) : Promise<string> => {
+    link = link ?? `http://localhost:3000${link}`;
+    console.log(getUserHtmlTemplate(link, text));
     try {
         await sendMail(to, subject, text, getUserHtmlTemplate(link, text))
     } catch (e: any) {
@@ -39,9 +39,9 @@ const sendMail = async (to: string[], subject: string, text: string, html: strin
     }
 }
 
-const getUserHtmlTemplate = (link: string, text: string) => {
-    return `
-    <!DOCTYPE html>
+const getUserHtmlTemplate = (link?: string, text: string) => {
+    return link
+    ? `<!DOCTYPE html>
     <html>
         <head>
           <meta charset="UTF-8">
@@ -51,6 +51,18 @@ const getUserHtmlTemplate = (link: string, text: string) => {
           <h3>${text}</h3>
           <p>Podrobnosti:</p>
           <a href="${link}">${link}</a>
+          <p>To je avtomatsko generirano sporočilo aplikacije Docu-Verification dApp</p>
+        </body>
+    </html>
+    ` :
+        `<!DOCTYPE html>
+    <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Docu-Verification</title>
+        </head>
+        <body>
+          <h3>${text}</h3>
           <p>To je avtomatsko generirano sporočilo aplikacije Docu-Verification dApp</p>
         </body>
     </html>

@@ -3,7 +3,6 @@ import IconCard from "../generic/data-view/IconCard";
 import { FaHeading, FaMapMarker, FaPhone, FaEnvelope, FaSearch, FaEdit, FaTimes } from "react-icons/fa";
 import IconButton from "../generic/buttons/IconButton";
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import useAlert from "@/hooks/AlertHook";
 
@@ -80,7 +79,7 @@ const AdministrativeAuthorityPopup = (props: AdministrativeAuthorityPopupProps) 
           </div>
         )}
         {(!props.administrativeAuthority || showSearch) && (
-          <div>
+          <div className="mt-7">
             <div className="grid grid-cols-8 gap-3">
               <input className="col-span-7 border-none rounded-lg bg-gray-200 p-3" type="text" placeholder="Išči upravne organe" onChange={(e) => setSearchQuery(e.target.value)} />
               <IconButton className="border-gray-200 bg-gray-200" text="Išči" icon={<FaSearch />} onClick={handleSearch} />

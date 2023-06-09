@@ -18,7 +18,7 @@ interface DocumentDropdownProps {
   isPresent: boolean;
   fileName?: string;
   path: string;
-  onDocumentChange: (file: File | null) => void;
+  onDocumentChange: () => void;
   projectAddress: string;
 }
 
@@ -71,12 +71,14 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
 
       if (response.ok) {
         setAlert({ title: "", message: `${props.documentType.toUpperCase()} posodobljen.`, type: "success" });
-        router.push(router.asPath);
+        setIsActive(false);
+        setFileForUpdate(null);
+        props.onDocumentChange();
       } else {
         throw new Error(await response.json());
       }
     } catch (e: any) {
-      setAlert({ title: "", message: e, type: "error" });
+      setAlert({ title: "", message: e.message, type: "error" });
     }
   };
 
@@ -172,7 +174,7 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
         if (response.ok) {
           setIsActive(false);
           setAlert({ title: "Success", message: "DPP is set", type: "success" });
-          props.onDocumentChange(file);
+          props.onDocumentChange();
         } else {
           throw new Error((await response.json()).message);
         }

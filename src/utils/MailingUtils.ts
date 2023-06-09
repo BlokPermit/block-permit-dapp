@@ -10,7 +10,7 @@ export const mailInvestor = async (body: {to: string[]; subject: string, text: s
     });
 }
 
-export const mailUser = async (body: {to: string[]; subject: string, text: string, link: string}) => {
+export const mailUser = async (body: {to: string[]; subject: string, text: string, link?: string}) => {
     return await fetch(`/api/mailing/sendMailToUser`, {
         method: "POST",
         headers: {
@@ -21,21 +21,21 @@ export const mailUser = async (body: {to: string[]; subject: string, text: strin
 }
 
 // PM -> AP
-export const getSetMainDocumentText = (projectName: string, projectState: ProjectState) => {
+export const getSetMainDocumentText = (projectName: string, projectState: ProjectState) => { // DONE for DPP
     const mainDocumentName = projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
     return `${mainDocumentName} na projektu ${projectName} je bil posodobljen.`;
 }
 
-export const getSentMainDocumentText = (projectName: string, projectState: ProjectState) => {
+export const getSentMainDocumentText = (projectName: string, projectState: ProjectState) => { // DONE for DPP
     const phaseText = projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
     return `Poslana vam je bila zahteva za pridobitev ${phaseText} na projektu ${projectName}`;
 }
 
-export const getEvaluateDueDateExtensionText = (projectName: string, confirmed: boolean) => {
+export const getEvaluateDueDateExtensionText = (projectName: string, confirmed: boolean) => { // DONE
     return `Vaša zahteva za podaljšanje roka ocenitve na projektu ${projectName} je bila ${confirmed ? "sprejeta" : "zavrnjena"}`;
 }
 
-export const getRemoveAssessmentProvidersText = (projectName: string) => {
+export const getRemoveAssessmentProvidersText = (projectName: string) => { // DONE
     return `Odstranjeni ste bili iz projekta ${projectName}.`;
 }
 
@@ -59,4 +59,8 @@ export const getProvideAssessmentText = (projectName: string, projectState: Proj
 export const getDeadlineExceededText = (projectName: string, projectState: ProjectState) => {
     const mainDocumentName = projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
     return `${mainDocumentName} na projektu ${projectName} je bil posodobljen.`;
+}
+
+export const getBuildingPermitContractSentText = (projectName: string) => {
+    return `Dobili ste zahtevo za izdajo gradbenega dovoljenja na projektu ${projectName}.`
 }

@@ -314,8 +314,10 @@ const getDocumentContractModels = async (addresses: string[]) => {
       requestedAssessmentDueDate: requestedAssessmentDueDate,
       attachments: getAttachmentsUrls(await documentContract.getAttachments()),
       assessmentAttachments: getAttachmentsUrls(await documentContract.getAssessmentAttachments()),
+      assessmentMainDocument: (await documentContract.assessment()).assessmentMainDocument.id
     });
   }
+
   return sentDocumentContracts;
 };
 

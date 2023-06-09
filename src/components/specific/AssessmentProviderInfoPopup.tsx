@@ -1,6 +1,16 @@
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import React from "react";
-import { FaCalendarMinus, FaCalendarPlus, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes } from "react-icons/fa";
+import {
+  FaCalendarMinus,
+  FaCalendarPlus,
+  FaDownload,
+  FaEnvelope,
+  FaExclamation,
+  FaHeading,
+  FaMapMarker,
+  FaPhone,
+  FaTimes
+} from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { dateFromTimestamp, formatDate } from "@/utils/DateUtils";
 import IconButton from "../generic/buttons/IconButton";
@@ -8,11 +18,18 @@ import useAlert from "@/hooks/AlertHook";
 import { useRouter } from "next/router";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import { User } from "@prisma/client";
+import {
+  getEvaluateDueDateExtensionText,
+  getRemoveAssessmentProvidersText,
+  getSentMainDocumentText,
+  mailUser
+} from "../../utils/MailingUtils";
 
 interface AssessmentProviderInfoPopupProps {
   documentContract?: DocumentContractModel;
   assessmentProvider: User;
   projectAddress: string;
+  projectName: string;
   onClose: () => void;
 }
 
@@ -34,6 +51,14 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
     });
 
     if (response.ok) {
+      if (props.documentContract) {
+        const responseMail = await mailUser({
+          to: [props.assessmentProvider.email],
+          subject: `${props.projectName} - Odstranitev iz projekta ${props.projectName}`,
+          text: getRemoveAssessmentProvidersText(props.projectName),
+        });
+        if (!responseMail.ok) setAlert({title: "", message: (await responseMail.json()).message, type: "error"});
+      }
       setAlert({ title: "", message: `Mnenjedajalec ${props.assessmentProvider.name} odstranjen.`, type: "success" });
       router.push(router.asPath);
     } else {
@@ -43,23 +68,34 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
   };
 
   const handleRequestedDueDateExtensionEvaluation = async (confirmed: boolean) => {
-    const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        documentContractAddress: props.documentContract!.documentContractAddress,
-        signerAddress: await getConnectedAddress(window),
-        confirmed: confirmed,
-      }),
-    });
+    try {
+      const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          documentContractAddress: props.documentContract!.documentContractAddress,
+          signerAddress: await getConnectedAddress(window),
+          confirmed: confirmed,
+        }),
+      });
 
-    if (response.ok) {
-      setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
-      router.push(router.asPath);
-    } else {
-      setAlert({ title: "", message: (await response.json()).message, type: "error" });
+      if (response.ok) {
+        const responseMail = await mailUser({
+          to: [props.assessmentProvider.email],
+          subject: `${props.projectName} - zahteva za podaljšanje roka ${confirmed ? "sprejeta" : "zavrnjena"}`,
+          text: getEvaluateDueDateExtensionText(props.projectName, confirmed),
+          link: router.asPath
+        });
+        if (!responseMail.ok) throw new Error(await responseMail.json())
+        setAlert({title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success"});
+        router.push(router.asPath);
+      } else {
+        throw new Error(await response.json())
+      }
+    } catch (e: any) {
+      setAlert({ title: "", message: (e.message).message, type: "error" });
     }
   };
 
@@ -70,7 +106,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
         <div className="absolute top-5 right-5">
           <FaTimes className="hover:text-gray-500 hover:cursor-pointer" size={20} onClick={props.onClose} />
         </div>
-        {props.documentContract && (
+        {props.documentContract && !props.documentContract.isClosed && (
           <>
             <div className="flex justify-between gap-3 mt-10 bg-white px-5 py-3 rounded-lg">
               <h1 className="flex items-center">
@@ -112,7 +148,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
           <IconCard title={"E-pošta"} value={props.assessmentProvider.email} icon={<FaEnvelope />} />
         </div>
         <div className="flex justify-end">
-          {props.documentContract && !props.documentContract.isClosed && (
+          {(!props.documentContract || (props.documentContract && !props.documentContract.isClosed)) && (
             <IconButton className="bg-red-500 text-white hover:bg-white hover:text-red-600" text={"Odstrani"} icon={<FaTimes />} onClick={() => handleRemoveAssessmentProvider()} />
           )}
         </div>

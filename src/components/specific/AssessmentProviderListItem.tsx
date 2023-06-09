@@ -1,4 +1,4 @@
-import { FaArrowUp, FaBell, FaCheck, FaClock, FaEye, FaInfo, FaPaperclip, FaTimes } from "react-icons/all";
+import {FaArrowUp, FaBell, FaCheck, FaClock, FaEye, FaInfo, FaPaperclip, FaSpinner, FaTimes} from "react-icons/all";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import React, { useEffect, useState } from "react";
 import IconBadge from "../generic/data-view/IconBadge";
@@ -12,6 +12,7 @@ import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
 import AssessmentProviderInfoPopup from "@/components/specific/AssessmentProviderInfoPopup";
+import {FaDownload, FaFileDownload} from "react-icons/fa";
 
 interface AssessmentProviderListItemProps {
   assessmentProvider: User;
@@ -22,6 +23,8 @@ interface AssessmentProviderListItemProps {
   countSelected: (isSelected: boolean, id: string) => void;
   projectManagerAddress?: string;
   projectAddress: string;
+  projectName: string;
+  downloadAssessment: (paths: string[], zipName: string) => boolean;
 }
 
 const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
@@ -31,6 +34,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [status, setStatus] = useState<"waiting to send" | "sent" | "assessed">("assessed");
   const [unsentAttachments, setUnsentAttachments] = useState<string[]>([]);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const { setAlert } = useAlert();
 
   const getUnsentAttachments = async () => {
@@ -96,6 +100,15 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     getUnsentAttachments();
   }, []);
 
+  const downloadAssessment = async () => {
+    setIsDownloading(true);
+    let paths: string[] = props.documentContract.assessmentAttachments;
+    const zipName = `${props.projectName}_${props.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS 
+        ? "projektni-pogoji" : "projektno-mnenje"}_${props.assessmentProvider.name}`;
+    paths.push(props.documentContract.assessmentMainDocument);
+    setIsDownloading(await props.downloadAssessment(paths, zipName));
+  }
+
   return (
     <>
       {isAttachmentsPopupOpen && (
@@ -112,6 +125,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           assessmentProvider={props.assessmentProvider}
           documentContract={props.documentContract}
           onClose={() => setIsAssessmentProviderInfoPopupOpen(false)}
+          projectName={props.projectName}
         />
       )}
       <div key={props.assessmentProvider.id} className={`${isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}`}>
@@ -130,7 +144,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             <span className="inline-flex items-center gap-3">
               {props.documentContract && (props.documentContract.mainDocumentUpdateRequested || props.documentContract.requestedAssessmentDueDate) && <FaBell color="red" />}
               <ButtonGroup
-                secondaryButtons={[
+                secondaryButtons={!props.documentContract || !props.documentContract.isClosed ? [
                   {
                     text: "More info",
                     icon: <FaInfo />,
@@ -141,7 +155,15 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
                     icon: <FaPaperclip />,
                     onClick: () => setIsAttachmentsPopupOpen(true),
                   },
-                ]}
+                ] :
+                  [
+                {
+                  text: "More info",
+                  icon: <FaInfo />,
+                  onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+                }
+                  ]
+                }
                 primaryButton={
                   status === "waiting to send"
                     ? {
@@ -153,9 +175,11 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
                         },
                       }
                     : {
-                        text: status === "assessed" ? "Review" : "Sent",
-                        icon: status === "assessed" ? <FaEye /> : <FaArrowUp />,
-                        onClick: status === "assessed" ? () => {} : () => {},
+                        text: status === "assessed" ? `Prenesi ${props.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? 'projektne pogoje' : 'projektno mnenje'}` : "Sent",
+                        icon: status === "assessed" ?
+                            !isDownloading ? <FaFileDownload/> : <FaSpinner className="animate-spin"/>
+                            : <FaArrowUp />,
+                        onClick: status === "assessed" ? downloadAssessment : () => {},
                         disabled: status === "assessed" ? false : true,
                       }
                 }

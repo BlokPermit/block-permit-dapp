@@ -25,7 +25,7 @@ import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
 import AssessmentProviderListItem from "@/components/specific/AssessmentProviderListItem";
-import useConformationPopup from "@/hooks/ConformationPopupHook";
+//import useConformationPopup from "@/hooks/ConformationPopupHook";
 import ProgressBar from "@/components/specific/ProgressBar";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
@@ -38,10 +38,10 @@ import { DocumentContractModel } from "@/models/DocumentContractModel";
 import InvestorsView from "@/components/specific/InvestorsView";
 import { useRouter } from "next/router";
 import { getConnectedAddress } from "../../utils/MetamaskUtils";
-import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
+import {getFileNamesWithHashesFromDirectory, zipAndDownload} from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
-import { getSentMainDocumentText, mailUser } from "../../utils/MailingUtils";
+import {getSentMainDocumentText, getSetMainDocumentText, mailUser} from "../../utils/MailingUtils";
 import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
 
 export const getServerSideProps: any = async (context: any) => {
@@ -57,7 +57,7 @@ export const getServerSideProps: any = async (context: any) => {
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const { setConformationPopup } = useConformationPopup();
+  //const { setConformationPopup } = useConformationPopup();
   const { setAlert } = useAlert();
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
   const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
@@ -79,7 +79,8 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       setSelectedAssessmentProviders(selectedAssessmentProviders.filter((id) => id !== opinionProviderId));
     }
   };
-  const handleSend = () => {
+
+  /*const handleSend = () => {
     setConformationPopup({
       title: "Send to Opinion Providers",
       message: "Are you sure you want to send this project to the selected opinion providers?",
@@ -89,7 +90,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       onClickPrimary: sendToAssessmentProviders,
       show: true,
     });
-  };
+  };*/
 
   const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
@@ -163,13 +164,13 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
         const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
-        const response2 = await mailUser({
-          to: assessmentProvidersInfo.map((ap) => ap.email),
+        const responseMail = await mailUser({
+          to: assessmentProvidersInfo.map(ap => ap.email),
           subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,
           text: getSentMainDocumentText(project.baseProject.name, project.baseProject.projectState),
-          link: router.asPath,
+          link: router.asPath
         });
-        if (!response2.ok) throw new Error((await response2.json()).message);
+        if (!responseMail.ok) throw new Error((await responseMail.json()).message);
         router.push(router.asPath);
       }
     } catch (e: any) {
@@ -177,8 +178,33 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     }
   };
 
-  const onMainDocumentChange = (file: File | null) => {
-    router.push(router.asPath);
+  const downloadZip = async (paths: string[], zipName: string) => {
+    try {
+      await zipAndDownload(paths, zipName);
+    } catch (e: any) {
+      console.log(e);
+      setAlert({ title: "", message: e.message, type: "error" });
+    }
+    return false;
+  }
+
+  const onMainDocumentChange = async () => {
+    const relevantEmails: string[] = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS
+        ? project.sentDPPs.map((documentContract) => documentContract.assessmentProvider.email)
+        : project.sentDGDs.map((documentContract) => documentContract.assessmentProvider.email);
+    try {
+      const responseMail = await mailUser({
+        to: relevantEmails,
+        subject: `${project.baseProject.name} - Posodobljen ${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`,
+        text: getSetMainDocumentText(project.baseProject.name, project.baseProject.projectState),
+        link: router.asPath
+      });
+      if (!responseMail.ok) throw new Error((await responseMail.json()).message);
+    } catch (e: any) {
+      setAlert({ title: "", message: "Napaka pri pošiljanju e-pošte", type: "error" });
+    } finally {
+      router.push(router.asPath);
+    }
   };
 
   const handleAdministrativeAuthorityChange = (): void => {
@@ -230,7 +256,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <>
             <IconButton
               className="text-main-200 border-gray-50 bg-inherit rounded-none hover:border-b-main-200"
-              icon={project.administrativeAuthority ? <FaLandmark /> : <FaPlus />}
+              icon={project.administrativeAuthority ? <FaLandmark/> : <FaPlus />}
               text={project.administrativeAuthority ? project.administrativeAuthority.name : "Dodaj upravni organ"}
               onClick={() => setIsAdministrativeAuthorityPopupOpen(true)}
             />
@@ -303,6 +329,8 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
             countSelected={countSelected}
             isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
             projectAddress={project.baseProject.smartContractAddress}
+            projectName={project.baseProject.name}
+            downloadAssessment={downloadZip}
           />
         ))}
         <div className="flex justify-end mb-20">
