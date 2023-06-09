@@ -50,7 +50,7 @@ const InvestorsView = (props: InvestorsViewProps) => {
           <div className="text-left text-gray-500">
             Na projekt niste dodali nobenega investitorja. To lahko storite{" "}
             <span
-              className="text-main-200 underline hover:text-gray-200 hover:cursor-pointer"
+              className="text-main-200 underline hover:text-gray-500 hover:cursor-pointer"
               onClick={() => {
                 router.push(`/projects/editProject/${props.projectId}`);
               }}
