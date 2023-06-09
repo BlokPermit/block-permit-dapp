@@ -4,10 +4,11 @@ import {sendMailToInvestor} from "../../../lib/MailingService";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
-            await sendMailToInvestor(req.body.to, req.body.subject, req.body.text);
+            console.log(req.body);
+            await sendMailToInvestor(req.body.to, req.body.subject, req.body.info);
             res.status(200).end();
         } catch (e: any) {
-            console.log(e.message);
+            console.log(e);
             res.status(500).json({message: e.message})
         }
     } else {

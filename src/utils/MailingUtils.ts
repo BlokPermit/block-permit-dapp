@@ -1,6 +1,14 @@
-import { ProjectState, Project } from "@prisma/client";
+import {ProjectState, Project, User} from "@prisma/client";
 
-export const mailInvestor = async (body: {to: string[]; subject: string, text: string}) => {
+export const mailInvestor = async (body: {to: string[]; subject: string, info: {
+    projectName: string;
+    projectManagerInfo: User;
+    numOfAssessmentProviders: number;
+    numOfSentDPPs: number;
+    numOfAssessedDPPs: number;
+    numOfSentDGDs: number;
+    numOfAssessedDGDs: number;
+}}) => {
     return await fetch(`/api/mailing/sendMailToInvestor`, {
         method: "POST",
         headers: {

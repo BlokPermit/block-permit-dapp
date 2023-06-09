@@ -109,16 +109,14 @@ export const findProjectById = async (id: string) => {
 
     const DPP = await projectContract.DPP();
     const DPPUrl: string | null = DPP.id != "" ? DPP.id : null;
-
     const sentDPPs: DocumentContractModel[] = await getDocumentContractModels(await projectContract.getSentDPPsAddresses());
-
+    const numOfSentDPPs: number = parseInt(await projectContract.getSentDPPsLength());
     const numOfAssessedDPPs: number = parseInt(await projectContract.numOfAssessedDPPs());
 
     const DGD = await projectContract.DGD();
     const DGDUrl: string | null = DGD.id != "" ? DGD.id : null;
-
     const sentDGDs: DocumentContractModel[] | null = await getDocumentContractModels(await projectContract.getSentDGDsAddresses());
-
+    const numOfSentDGDs: number = parseInt(await projectContract.getSentDGDsLength());
     const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
 
     return {
@@ -129,9 +127,11 @@ export const findProjectById = async (id: string) => {
       administrativeAuthority: administrativeAuthority,
       DPPUrl: DPPUrl,
       sentDPPs: sentDPPs,
+      numOfSentDPPs: numOfSentDPPs,
       numOfAssessedDPPs: numOfAssessedDPPs,
       DGDUrl: DGDUrl,
       sentDGDs: sentDGDs,
+      numOfSentDGDs: numOfSentDGDs,
       numOfAssessedDGDs: numOfAssessedDGDs,
     };
   } catch (error: any) {
@@ -276,6 +276,15 @@ export const finalizeDPPPhase = async (projectAddress: string, signerAddress: st
   try {
     const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
     await projectContract.finalizeDPPPhase();
+
+    await prisma.project.update({
+      where: {
+        smartContractAddress: projectAddress
+      },
+      data: {
+        projectState: ProjectState.AQUIRING_PROJECT_OPINIONS
+      }
+    })
   } catch (error: any) {
     throw new Error(getErrorReason(error));
   }

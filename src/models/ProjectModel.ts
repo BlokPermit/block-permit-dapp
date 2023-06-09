@@ -9,9 +9,11 @@ export interface ProjectModel {
   administrativeAuthority: User | null;
   DPPUrl: string | null;
   sentDPPs: DocumentContractModel[];
+  numOfSentDPPs: number,
   numOfAssessedDPPs: number;
   DGDUrl: string | null;
   sentDGDs: DocumentContractModel[];
+  numOfSentDGDs: number,
   numOfAssessedDGDs: number;
 }
 

@@ -1,4 +1,4 @@
-import { Investor } from "@prisma/client";
+import { Investor, User } from "@prisma/client";
 import React, { useState } from "react";
 import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { FaPaperPlane } from "react-icons/all";
@@ -11,6 +11,15 @@ import { useRouter } from "next/router";
 interface InvestorsViewProps {
   investors: Investor[];
   projectId: string;
+  projectUpdateInfo: {
+    projectName: string;
+    projectManagerInfo: User;
+    numOfAssessmentProviders: number;
+    numOfSentDPPs: number;
+    numOfAssessedDPPs: number;
+    numOfSentDGDs: number;
+    numOfAssessedDGDs: number;
+  };
 }
 
 const InvestorsView = (props: InvestorsViewProps) => {
@@ -25,12 +34,13 @@ const InvestorsView = (props: InvestorsViewProps) => {
     setIsInvestorInfoPopupOpen(true);
   };
 
+  console.log(props.projectUpdateInfo);
   const handleSendUpdateClick = async (investor: Investor) => {
     if (!investor) return;
     const response: Response = await mailInvestor({
       to: [investor.email],
-      subject: "Poročilo o projektu",
-      text: "Poslano vam je bilo poročilo o projektu",
+      subject: `Poročilo o projektu ${props.projectUpdateInfo.projectName}` ,
+      info: props.projectUpdateInfo,
     });
 
     if (response.ok) {

@@ -194,13 +194,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         ? project.sentDPPs.map((documentContract: DocumentContractModel) => documentContract.assessmentProvider.email)
         : project.sentDGDs.map((documentContract: DocumentContractModel) => documentContract.assessmentProvider.email);
     try {
-      const responseMail = await mailUser({
-        to: relevantEmails,
-        subject: `${project.baseProject.name} - Posodobljen ${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`,
-        text: getSetMainDocumentText(project.baseProject.name, project.baseProject.projectState),
-        link: router.asPath,
-      });
-      if (!responseMail.ok) throw new Error((await responseMail.json()).message);
+      if (relevantEmails.length != 0) {
+        const responseMail = await mailUser({
+          to: relevantEmails,
+          subject: `${project.baseProject.name} - Posodobljen ${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`,
+          text: getSetMainDocumentText(project.baseProject.name, project.baseProject.projectState),
+          link: router.asPath,
+        });
+        if (!responseMail.ok) throw new Error((await responseMail.json()).message);
+      }
     } catch (e: any) {
       setAlert({ title: "", message: "Napaka pri pošiljanju e-pošte", type: "error" });
     } finally {
@@ -230,6 +232,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     }
   };
 
+  /*const investorRelevantInfo = {
+    projectName: project.baseProject.name,
+    projectManagerInfo: project.baseProject.projectManager,
+    numOfAssessmentProviders: project.baseProject.numOfAssessmentProviders,
+    numOfSentDPPs: project.baseProject.numOfSentDPPs,
+    numOfAssessedDPPs: project.baseProject.numOfAssessedDPPs,
+    numOfSentDGDs: project.baseProject.numOfSentDGDs,
+    numOfAssessedDGDs: project.baseProject.numOfAssessedDGDs
+  };*/
   // public/projects/:projectId/DPP
   // public/project/:projectId/DPP/:assessmentProviderId/attachments
   // public/project/:projectId/DPP/:assessmentProviderId/assessment
@@ -297,7 +308,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
         <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-          <InvestorsView investors={project.baseProject.investors} projectId={project.baseProject.id} />
+          <InvestorsView investors={project.baseProject.investors} projectId={project.baseProject.id} projectUpdateInfo={{
+            projectName: project.baseProject.name,
+            projectManagerInfo: project.projectManager,
+            numOfAssessmentProviders: project.numOfAssessmentProviders,
+            numOfSentDPPs: project.numOfSentDPPs,
+            numOfAssessedDPPs: project.numOfAssessedDPPs,
+            numOfSentDGDs: project.numOfSentDGDs,
+            numOfAssessedDGDs: project.numOfAssessedDGDs
+          }}/>
         </div>
       </div>
       {/*<RoleBasedComponent*/}
@@ -347,7 +366,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
                 onClick={sendToAssessmentProviders}
               />
             )}
-          {project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
+          {project.numOfSentDPPs != 0 && project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
             <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
           )}
         </div>
