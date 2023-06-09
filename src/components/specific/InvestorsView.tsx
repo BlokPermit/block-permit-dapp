@@ -4,14 +4,17 @@ import ButtonGroup from "@/components/generic/buttons/ButtonGroup";
 import { FaPaperPlane } from "react-icons/all";
 import { FaInfo } from "react-icons/fa";
 import InvestorInfoPopup from "./InvestorInfoPopup";
-import {mailInvestor} from "../../utils/MailingUtils";
+import { mailInvestor } from "../../utils/MailingUtils";
 import useAlert from "../../hooks/AlertHook";
+import { useRouter } from "next/router";
 
 interface InvestorsViewProps {
   investors: Investor[];
+  projectId: string;
 }
 
 const InvestorsView = (props: InvestorsViewProps) => {
+  const router = useRouter();
   const [isInvestorInfoPopupOpen, setIsInvestorInfoPopupOpen] = useState<boolean>(false);
   const [selectedInvestor, setSelectedInvestor] = useState<Investor | null>(null);
   const { setAlert } = useAlert();
@@ -25,10 +28,10 @@ const InvestorsView = (props: InvestorsViewProps) => {
   const handleSendUpdateClick = async (investor: Investor) => {
     if (!investor) return;
     const response: Response = await mailInvestor({
-      to: investor.email,
+      to: [investor.email],
       subject: "Poročilo o projektu",
-      text: "Poslano vam je bilo poročilo o projektu"
-    })
+      text: "Poslano vam je bilo poročilo o projektu",
+    });
 
     if (response.ok) {
       setAlert({ title: "", message: `Poročilo poslano`, type: "success" });
@@ -43,8 +46,22 @@ const InvestorsView = (props: InvestorsViewProps) => {
     <>
       {isInvestorInfoPopupOpen && <InvestorInfoPopup investor={selectedInvestor!} onClose={() => setIsInvestorInfoPopupOpen(false)} />}
       <div>
+        {props.investors.length === 0 && (
+          <div className="text-left text-gray-500">
+            Na projekt niste dodali nobenega investitorja. To lahko storite{" "}
+            <span
+              className="text-main-200 underline hover:text-gray-200 hover:cursor-pointer"
+              onClick={() => {
+                router.push(`/projects/editProject/${props.projectId}`);
+              }}
+            >
+              tukaj
+            </span>
+            .
+          </div>
+        )}
         {props.investors.map((investor: Investor) => (
-          <div key={investor.id}>
+          <div key={investor.taxId}>
             <InvestorListItem investor={investor} moreInfoClick={(investor: Investor) => handleMoreInfoClick(investor)} sendUpdateClick={(investor: Investor) => handleSendUpdateClick(investor)} />
           </div>
         ))}

@@ -236,7 +236,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
         <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-          <InvestorsView investors={project.baseProject.investors} />
+          <InvestorsView investors={project.baseProject.investors} projectId={project.baseProject.id} />
         </div>
       </div>
       {/*<RoleBasedComponent*/}
