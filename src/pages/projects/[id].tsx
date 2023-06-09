@@ -180,7 +180,9 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <Link href={`/projects/editProject/${project.baseProject.id}`}>
             <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaEdit />} text={"Edit Project"} onClick={() => {}} />
           </Link>
-          <IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />
+          <RoleBasedComponent
+            assessmentProviderComponent={<IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />}
+          />
           <DocumentDropdown
             documentId={project.DPPUrl ?? ""}
             documentType="dpp"
