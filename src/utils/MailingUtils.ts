@@ -1,6 +1,6 @@
 import { ProjectState, Project } from "@prisma/client";
 
-export const mailInvestor = async (body) => {
+export const mailInvestor = async (body: {to: string[]; subject: string, text: string}) => {
     return await fetch(`/api/mailing/sendMailToInvestor`, {
         method: "POST",
         headers: {
@@ -10,7 +10,7 @@ export const mailInvestor = async (body) => {
     });
 }
 
-export const mailUser = async (body) => {
+export const mailUser = async (body: {to: string[]; subject: string, text: string, link: string}) => {
     return await fetch(`/api/mailing/sendMailToUser`, {
         method: "POST",
         headers: {
@@ -33,6 +33,10 @@ export const getSentMainDocumentText = (projectName: string, projectState: Proje
 
 export const getEvaluateDueDateExtensionText = (projectName: string, confirmed: boolean) => {
     return `Vaša zahteva za podaljšanje roka ocenitve na projektu ${projectName} je bila ${confirmed ? "sprejeta" : "zavrnjena"}`;
+}
+
+export const getRemoveAssessmentProvidersText = (projectName: string) => {
+    return `Odstranjeni ste bili iz projekta ${projectName}.`;
 }
 
 // AP -> PM

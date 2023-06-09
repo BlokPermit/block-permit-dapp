@@ -24,6 +24,7 @@ import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
+import {getSentMainDocumentText, mailUser} from "../../utils/MailingUtils";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -59,17 +60,17 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       setSelectedAssessmentProviders(selectedAssessmentProviders.filter((id) => id !== opinionProviderId));
     }
   };
-  // const handleSend = () => {
-  //     setConformationPopup({
-  //         title: "Send to Opinion Providers",
-  //         message: "Are you sure you want to send this project to the selected opinion providers?",
-  //         icon: <FaArrowUp/>,
-  //         popupType: "warning",
-  //         buttonPrimaryText: "Send",
-  //         onClickPrimary: sendToAssessmentProviders,
-  //         show: true,
-  //     });
-  // };
+  const handleSend = () => {
+    setConformationPopup({
+      title: "Send to Opinion Providers",
+      message: "Are you sure you want to send this project to the selected opinion providers?",
+      icon: <FaArrowUp />,
+      popupType: "warning",
+      buttonPrimaryText: "Send",
+      onClickPrimary: sendToAssessmentProviders,
+      show: true,
+    });
+  };
 
   const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
@@ -96,15 +97,13 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     try {
       const path = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "sendDPP" : "sendDGD";
 
-      let assessmentProvidersInfo: {
-        assessmentProviderId: string;
-        assessmentProviderAddress: string;
-      }[] = project.assessmentProviders.map((assessmentProvider: User) => {
+      let assessmentProvidersInfo: { id: string; walletAddress: string; email: string }[] = project.assessmentProviders.map((assessmentProvider: User) => {
         const matchingAssessmentProvider = selectedAddresses.find((address: string) => address === assessmentProvider.walletAddress);
         if (matchingAssessmentProvider)
           return {
-            assessmentProviderId: assessmentProvider.id,
-            assessmentProviderAddress: assessmentProvider.walletAddress,
+            id: assessmentProvider.id,
+            walletAddress: assessmentProvider.walletAddress,
+            email: assessmentProvider.email,
           };
       });
 
@@ -115,7 +114,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       const connectedAddress = await getConnectedAddress(window);
       for (let info of assessmentProvidersInfo) {
         let attachments: { id: string; documentHash: string; owner?: string }[] = await getFileNamesWithHashesFromDirectory(
-          `public/projects/${project.baseProject.id}/${documentType}/${info.assessmentProviderId}/attachments`
+          `public/projects/${project.baseProject.id}/${documentType}/${info.id}/attachments`
         );
 
         for (let attachment of attachments) {
@@ -123,7 +122,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         }
 
         documentContractStructs.push({
-          assessmentProvider: info.assessmentProviderAddress,
+          assessmentProvider: info.walletAddress,
           attachments: attachments,
         });
       }
@@ -144,6 +143,14 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
+        const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
+        const response2 = await mailUser({
+          to: assessmentProvidersInfo.map(ap => ap.email),
+          subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,
+          text: getSentMainDocumentText(project.baseProject.name, project.baseProject.projectState),
+          link: router.asPath
+        });
+        if (!response2.ok) throw new Error((await response2.json()).message);
         router.push(router.asPath);
       }
     } catch (e: any) {
