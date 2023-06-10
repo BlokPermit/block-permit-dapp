@@ -13,7 +13,7 @@ export const getServerSideProps: any = async (context: any) => {
     const id = context.params ? context.params.id : "";
 
     try {
-        let user: User = await findUserById(id?.toString() ?? "");
+        let user: User | null = await findUserById(id?.toString() ?? "");
         return { props: { user } };
     } catch (error) {
         return { notFound: true };

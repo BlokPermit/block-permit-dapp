@@ -2,30 +2,35 @@ import React from "react";
 import ProtectedRoute from "@/components/generic/navigation/ProtectedRoute";
 import { AiOutlineAppstoreAdd } from "react-icons/all";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
-import SearchInput from "@/components/generic/input/SearchInput";
-import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
-import { getAllProjectsFromDatabase } from "@/lib/ProjectService";
+import { getProjectsOfUserFromDatabase} from "@/lib/ProjectService";
 import { InferGetServerSidePropsType } from "next/types";
-import { Project, ProjectState } from "@prisma/client";
+import {Project, ProjectState, User} from "@prisma/client";
 import { useRouter } from "next/router";
 import InputField from "@/components/generic/input/InputField";
 import Radio from "@/components/generic/input/Radio";
 import ProgressBar from "@/components/specific/ProgressBar";
 import {getProjectStateName} from "@/utils/EnumUtils";
+import {getSession} from "next-auth/react";
 
-export const getServerSideProps: any = async () => {
+export const getServerSideProps: any = async (context: any) => {
   try {
-    const projects: Project[] = await getAllProjectsFromDatabase("1");
-    return {
-      props: {
-        projects: projects,
-      },
-    };
-  } catch (e: any) {
-    console.log(e);
-    return {
-      notFound: true,
-    };
+    const session = await getSession(context);
+
+    if(!session){
+      return {
+        redirect: {
+          destination: '/auth',
+          permanent: false,
+        },
+      }
+    } else {
+      let projects: Project[] = await getProjectsOfUserFromDatabase(session.user.id?.toString() ?? "");
+      return {
+        props: {projects}
+      }
+    }
+  } catch (error) {
+    return { notFound: true };
   }
 };
 

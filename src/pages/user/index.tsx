@@ -23,7 +23,7 @@ export const getServerSideProps: any = async (context: any) => {
                 },
             }
         } else {
-            let user: User = await findUserById(session.user.id?.toString() ?? "");
+            let user: User | null = await findUserById(session.user.id?.toString() ?? "");
             return {
                 props: {user}
             }

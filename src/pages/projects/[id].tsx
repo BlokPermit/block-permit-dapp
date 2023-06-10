@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import {
-  FaArrowUp,
   FaCalendarPlus,
-  FaCheck,
   FaCheckCircle,
   FaEdit,
   FaFileContract,
@@ -41,8 +39,9 @@ import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { getFileNamesWithHashesFromDirectory, zipAndDownload } from "../../lib/DocumentService";
 import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
-import { getSentMainDocumentText, getSetMainDocumentText, mailUser } from "../../utils/MailingUtils";
+import { getSetMainDocumentText, mailUser } from "../../utils/MailingUtils";
 import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
+import useConformationPopup from "@/hooks/ConformationPopupHook";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
