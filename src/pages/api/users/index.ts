@@ -1,8 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Investor, User } from "@prisma/client";
-import { createUsers } from "@/lib/UserService";
-import { createInvestors, getAllInvestors } from "@/lib/InvestorService";
-import { prisma } from "@/utils/PrismaClient";
+import {createUsers, updateUser} from "@/lib/UserService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {method} = req;
@@ -17,7 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             break;
 
         case "PUT":
-
+            const response = await updateUser(req.body.user);
+            res.status(201).json(response);
             break;
 
         case "DELETE":

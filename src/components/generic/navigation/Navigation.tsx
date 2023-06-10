@@ -15,22 +15,22 @@ const Navigation: FC = () => {
     adminOnly?: boolean;
   }[] = [
     {
-      label: "Dashboard",
+      label: "Nadzorna plošča",
       href: "/dashboard",
       icon: <RiDashboardLine size={26} />,
     },
     {
-      label: "Projects",
+      label: "Projekti",
       href: "/projects",
       icon: <AiOutlineFundProjectionScreen size={26} />,
     },
     {
-      label: "Documents",
+      label: "Dokumenti",
       href: "/documents",
       icon: <HiOutlineDocumentSearch size={26} />,
     },
     {
-      label: "Add Users",
+      label: "Dodaj uporabnike",
       href: "/addUser",
       icon: <AiOutlineUserAdd size={26} />,
       adminOnly: true,

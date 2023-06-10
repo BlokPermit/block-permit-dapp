@@ -94,7 +94,7 @@ const InvestorListItem = (props: InvestorListItemProps) => {
           <ButtonGroup
             secondaryButtons={[
               {
-                text: "More Info",
+                text: "Več informacij",
                 icon: <FaInfo />,
                 onClick: () => {
                   props.moreInfoClick(props.investor);
@@ -102,7 +102,7 @@ const InvestorListItem = (props: InvestorListItemProps) => {
               },
             ]}
             primaryButton={{
-              text: "Send Update",
+              text: "Pošlji spremembo",
               icon: <FaPaperPlane />,
               onClick: () => {
                 props.sendUpdateClick(props.investor);

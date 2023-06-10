@@ -13,10 +13,34 @@ export const createUsers = async (users: User[]) => {
   });
 };
 
+export const updateUser = async (user: User) => {
+  console.log(user)
+  let id = user.id;
+  delete user.id;
+  return prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: user,
+  });
+};
+
 export const findUserByAddress = async (address: string) => {
   const user = prisma.user.findUnique({
     where: {
       walletAddress: address.toLowerCase(),
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+};
+
+export const findUserById = async (id: string) => {
+  const user = prisma.user.findUnique({
+    where: {
+      id: id,
     },
   });
 

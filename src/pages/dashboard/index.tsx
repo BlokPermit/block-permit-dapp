@@ -12,7 +12,7 @@ export const getServerSideProps: any = async () => {
     try {
         const acquiringConditionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_CONDITIONS);
         const acquiringOpinionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_OPINIONS);
-        const acquiringBuildingPermitsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_BUILDING_PERMIT);
+        const acquiringBuildingPermitsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_BUILDING_PERMIT) ;
 
         return {
             props: {

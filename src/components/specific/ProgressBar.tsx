@@ -1,5 +1,6 @@
 import { ProjectState } from "@prisma/client";
 import { FaCheckCircle, FaClock } from "react-icons/fa";
+import {getProjectStateName} from "@/utils/EnumUtils";
 
 interface ProgressBarProps {
   actualState: ProjectState;
@@ -32,8 +33,8 @@ const ProgressBar = (props: ProgressBarProps) => {
                 )}
 
                 <p className="leading-none">
-                  <strong className="block font-medium text-black"> Phase {index + 1} </strong>
-                  <small className="mt-1"> {state} </small>
+                  <strong className="block font-medium text-black"> Faza {index + 1} </strong>
+                  <small className="mt-1"> {getProjectStateName(state)} </small>
                 </p>
                 <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rotate-45 rounded-tr-sm bg-inherit"></span>
               </li>

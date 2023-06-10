@@ -142,30 +142,30 @@ const AddUser = () => {
     return (
         <form onSubmit={handleSubmit} className="px-5 py-5 ">
             <div className="flex justify-end px-5 py-3 pb-0">
-                {!isFormComplete ? <div className="mr-5 text-neutral-400">*Fill all fields to add user</div> : null}
+                {!isFormComplete ? <div className="mr-5 text-neutral-400">*Zapolni vsa polja, da lahko dodaš uporabnika</div> : null}
                 <div className="mr-5">
-                    <OutlineButton text={"Add User"} onClick={handleAddUser} disabled={!isFormComplete}/>
+                    <OutlineButton text={"Dodaj uporabnika"} onClick={handleAddUser} disabled={!isFormComplete}/>
                 </div>
                 <div>
-                    <AnimatedIconButton icon={<AiOutlineUserAdd/>} text={"Create users"} type={"submit"}/>
+                    <AnimatedIconButton icon={<AiOutlineUserAdd/>} text={"Ustvari uporabnike"} type={"submit"}/>
                 </div>
             </div>
             <div className="border-b border-gray-900/10 py-10  ">
                 <div className="flex w-full ">
                     <div className="w-1/2 px-5 space-y-2 ">
-                        <InputField id={"name"} name={"name"} label={"Name"} placeholder={"Enter display name..."}
+                        <InputField id={"name"} name={"name"} label={"Ime"} placeholder={"Vnesi ime..."}
                                     type={"text"} onChange={handleInputChange} value={userForm.name}/>
-                        <InputField id={"email"} name={"email"} label={"Email"} placeholder={"Enter email address..."}
+                        <InputField id={"email"} name={"email"} label={"Elektronski naslov"} placeholder={"Vnesi elektronski naslov..."}
                                     type={"text"} onChange={handleInputChange} value={userForm.email}/>
-                        <InputField id={"phone"} name={"phone"} label={"Phone"} placeholder={"Enter phone number..."}
+                        <InputField id={"phone"} name={"phone"} label={"Telefon"} placeholder={"Vnesi telefon..."}
                                     type={"text"} onChange={handleInputChange} value={userForm.phone}/>
                     </div>
                     <div className="w-1/2 px-5 space-y-2">
                         <InputField
                             id={"streetAddress"}
                             name={"streetAddress"}
-                            label={"Street address"}
-                            placeholder={"Enter street address..."}
+                            label={"Naslov"}
+                            placeholder={"Vnesi naslov..."}
                             onChange={handleInputChange}
                             type={"text"}
                             value={userForm.streetAddress}
@@ -173,13 +173,13 @@ const AddUser = () => {
                         <InputField
                             id={"walletAddress"}
                             name={"walletAddress"}
-                            label={"Wallet address"}
+                            label={"Naslov denarnice"}
                             placeholder={"0xBB39C4ac246cF3e10828..."}
                             onChange={handleInputChange}
                             type={"text"}
                             value={userForm.walletAddress}
                         />
-                        <Dropdown label={"Role"} options={options} onChange={handleDropdownChange}/>
+                        <Dropdown label={"Tip uporabnika"} options={options} onChange={handleDropdownChange}/>
                     </div>
                 </div>
             </div>
@@ -187,31 +187,31 @@ const AddUser = () => {
                 <div key={i} className={`border-b ${i == 0 ? "border-t" : null} border-gray-900/10 py-5`}>
                     <div className="grid grid-cols-7 w-full items-center justify-between">
                         <div className="col-span-1">
-                            <div className="text-neutral-400">Name</div>
+                            <div className="text-neutral-400">Ime</div>
                             <div style={{wordWrap: "break-word"}}>{user.name}</div>
                         </div>
                         <div className="col-span-1">
-                            <div className="text-neutral-400">Email</div>
+                            <div className="text-neutral-400">Elektronski naslov</div>
                             <div style={{wordWrap: "break-word"}}>{user.email}</div>
                         </div>
                         <div className="col-span-1">
-                            <div className="text-neutral-400">Phone</div>
+                            <div className="text-neutral-400">Telefon</div>
                             <div style={{wordWrap: "break-word"}}>{user.phone}</div>
                         </div>
                         <div className="col-span-1">
-                            <div className="text-neutral-400">Street Address</div>
+                            <div className="text-neutral-400">Naslov</div>
                             <div style={{wordWrap: "break-word"}}>{user.streetAddress}</div>
                         </div>
                         <div className="col-span-1">
-                            <div className="text-neutral-400">Wallet Address</div>
+                            <div className="text-neutral-400">Naslov denarnice</div>
                             <div style={{wordWrap: "break-word"}}>{user.walletAddress}</div>
                         </div>
                         <div className="col-span-1">
-                            <div className="text-neutral-400">User Type</div>
+                            <div className="text-neutral-400">Tip uporabnika</div>
                             <div style={{wordWrap: "break-word"}}>{UserTypeDisplay[user.userType]}</div>
                         </div>
                         <div className="col-span-1 text-right pr-5">
-                            <Button text={"Remove User"} onClick={() => handleRemoveUser(i)}/>
+                            <Button text={"Odstrani"} onClick={() => handleRemoveUser(i)}/>
                         </div>
                     </div>
                 </div>

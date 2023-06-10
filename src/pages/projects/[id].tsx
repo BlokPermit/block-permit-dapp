@@ -297,18 +297,18 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
       </div>
       <div className="my-10 py-5 border-y border-gray-200">
-        <p className="text-gray-500 text-sm">Description</p>
+        <p className="text-gray-500 text-sm">Opis</p>
         <p className="text-black mt-2">{project.baseProject.description}</p>
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
         <div className="col-span-3 pb-12">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Construction details</h2>
-          <IconCard icon={<FaHeading />} title="Construction Title" value={project.baseProject.constructionTitle} />
-          <IconCard icon={<FaTag />} title="Construction Type" value={project.baseProject.constructionType} />
-          <IconCard icon={<FaFileContract />} title="Impact on Environment?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
+          <IconCard icon={<FaHeading />} title="Naziv zgradbe" value={project.baseProject.constructionTitle} />
+          <IconCard icon={<FaTag />} title="Tip konstrukcije" value={project.baseProject.constructionType} />
+          <IconCard icon={<FaFileContract />} title="Vpliv na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
         </div>
         <div className="col-span-5">
-          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
+          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investitorji</h2>
           <InvestorsView
             investors={project.baseProject.investors}
             projectId={project.baseProject.id}
