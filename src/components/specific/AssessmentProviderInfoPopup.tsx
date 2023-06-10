@@ -1,16 +1,6 @@
 import { DocumentContractModel } from "@/models/DocumentContractModel";
 import React from "react";
-import {
-  FaCalendarMinus,
-  FaCalendarPlus,
-  FaDownload,
-  FaEnvelope,
-  FaExclamation,
-  FaHeading,
-  FaMapMarker,
-  FaPhone,
-  FaTimes
-} from "react-icons/fa";
+import { FaCalendarMinus, FaCalendarPlus, FaDownload, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes } from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { dateFromTimestamp, formatDate } from "@/utils/DateUtils";
 import IconButton from "../generic/buttons/IconButton";
@@ -18,12 +8,7 @@ import useAlert from "@/hooks/AlertHook";
 import { useRouter } from "next/router";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import { User } from "@prisma/client";
-import {
-  getEvaluateDueDateExtensionText,
-  getRemoveAssessmentProvidersText,
-  getSentMainDocumentText,
-  mailUser
-} from "../../utils/MailingUtils";
+import { getEvaluateDueDateExtensionText, getRemoveAssessmentProvidersText, getSentMainDocumentText, mailUser } from "../../utils/MailingUtils";
 
 interface AssessmentProviderInfoPopupProps {
   documentContract?: DocumentContractModel;
@@ -57,7 +42,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
           subject: `${props.projectName} - Odstranitev iz projekta ${props.projectName}`,
           text: getRemoveAssessmentProvidersText(props.projectName),
         });
-        if (!responseMail.ok) setAlert({title: "", message: (await responseMail.json()).message, type: "error"});
+        if (!responseMail.ok) setAlert({ title: "", message: (await responseMail.json()).message, type: "error" });
       }
       setAlert({ title: "", message: `Mnenjedajalec ${props.assessmentProvider.name} odstranjen.`, type: "success" });
       router.push(router.asPath);
@@ -86,16 +71,16 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
           to: [props.assessmentProvider.email],
           subject: `${props.projectName} - zahteva za podaljšanje roka ${confirmed ? "sprejeta" : "zavrnjena"}`,
           text: getEvaluateDueDateExtensionText(props.projectName, confirmed),
-          link: router.asPath
+          link: router.asPath,
         });
-        if (!responseMail.ok) throw new Error(await responseMail.json())
-        setAlert({title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success"});
+        if (!responseMail.ok) throw new Error(await responseMail.json());
+        setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
         router.push(router.asPath);
       } else {
-        throw new Error(await response.json())
+        throw new Error(await response.json());
       }
     } catch (e: any) {
-      setAlert({ title: "", message: (e.message).message, type: "error" });
+      setAlert({ title: "Napaka", message: e.message.message, type: "error" });
     }
   };
 
@@ -115,7 +100,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
               <div>
                 {props.documentContract.requestedAssessmentDueDate && (
                   <div className="inline-flex items-center gap-3">
-                    <p className="me-1 text-lg text-gray-500 font-semibold">{props.documentContract.requestedAssessmentDueDate}</p>
+                    <p className="me-1 text-lg text-gray-500 font-semibold">{formatDate(dateFromTimestamp(props.documentContract.requestedAssessmentDueDate))}</p>
                     <IconButton
                       className="text-white bg-green-700 hover:text-green-700 hover:bg-white"
                       text={"Potrdi podaljšanje roka"}

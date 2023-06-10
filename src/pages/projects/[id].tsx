@@ -61,7 +61,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   const { setAlert } = useAlert();
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
   const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
-  const [selectedState, setSelectedState] = useState<ProjectState>(project.ProjectState);
+  const [selectedState, setSelectedState] = useState<ProjectState>(project.baseProject.projectState);
 
   useEffect(() => {
     setRecentProject(project.baseProject.id);
@@ -163,18 +163,19 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
-        const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
-        const responseMail = await mailUser({
-          to: assessmentProvidersInfo.map((ap) => ap.email),
-          subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,
-          text: getSentMainDocumentText(project.baseProject.name, project.baseProject.projectState),
-          link: router.asPath,
-        });
-        if (!responseMail.ok) throw new Error((await responseMail.json()).message);
-        router.push(router.asPath);
+        // const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
+        // const responseMail = await mailUser({
+        //   to: assessmentProvidersInfo.map((ap) => ap.email),
+        //   subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,
+        //   text: getSentMainDocumentText(project.baseProject.name, project.baseProject.projectState),
+        //   link: router.asPath,
+        // });
+        // if (!responseMail.ok) throw new Error((await responseMail.json()).message);
+        router.reload();
       }
     } catch (e: any) {
       setAlert({ title: "", message: e.message, type: "error" });
+      router.reload();
     }
   };
 
@@ -259,7 +260,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           {/* <RoleBasedComponent
             projectManagerComponent={ */}
           <Link href={`/projects/editProject/${project.baseProject.id}`}>
-            <IconButton className="text-main-200 border-gray-50 rounded-none hover:border-b-main-200" icon={<FaEdit />} text={"Edit Project"} onClick={() => {}} />
+            <IconButton className="text-main-200 border-gray-50 rounded-none hover:border-b-main-200" icon={<FaEdit />} text={"Uredi Projekt"} onClick={() => {}} />
           </Link>
         </span>
         <div className="flex items-center gap-5">
@@ -277,7 +278,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
                 administrativeAuthority={project.administrativeAuthority ? project.administrativeAuthority : null}
                 projectAddress={project.baseProject.smartContractAddress}
                 onClose={() => setIsAdministrativeAuthorityPopupOpen(false)}
-                onSubmit={() => handleAdministrativeAuthorityChange()}
+                onSubmit={handleAdministrativeAuthorityChange}
               />
             )}
           </>
@@ -308,15 +309,19 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
         <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investors</h2>
-          <InvestorsView investors={project.baseProject.investors} projectId={project.baseProject.id} projectUpdateInfo={{
-            projectName: project.baseProject.name,
-            projectManagerInfo: project.projectManager,
-            numOfAssessmentProviders: project.numOfAssessmentProviders,
-            numOfSentDPPs: project.numOfSentDPPs,
-            numOfAssessedDPPs: project.numOfAssessedDPPs,
-            numOfSentDGDs: project.numOfSentDGDs,
-            numOfAssessedDGDs: project.numOfAssessedDGDs
-          }}/>
+          <InvestorsView
+            investors={project.baseProject.investors}
+            projectId={project.baseProject.id}
+            projectUpdateInfo={{
+              projectName: project.baseProject.name,
+              projectManagerInfo: project.projectManager,
+              numOfAssessmentProviders: project.numOfAssessmentProviders,
+              numOfSentDPPs: project.numOfSentDPPs,
+              numOfAssessedDPPs: project.numOfAssessedDPPs,
+              numOfSentDGDs: project.numOfSentDGDs,
+              numOfAssessedDGDs: project.numOfAssessedDGDs,
+            }}
+          />
         </div>
       </div>
       {/*<RoleBasedComponent*/}
@@ -358,7 +363,8 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         <div className="flex justify-end mb-20">
           {project.assessmentProviders.length > 0 &&
             (project.DPPUrl || project.DGDUrl) &&
-            (project.sentDPPs.length !== project.assessmentProviders.length || project.sentDGDs.length !== project.assessmentProviders.length) && (
+            ((project.sentDPPs.length !== project.assessmentProviders.length && project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) ||
+              (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_OPINIONS && project.sentDGDs.length !== project.assessmentProviders.length)) && (
               <IconButton
                 className="bg-main-200 text-white hover:bg-white hover:text-main-200"
                 text={numOfSelected > 0 ? "Pošlji izbranim" : "Pošlji vsem"}
@@ -366,9 +372,11 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
                 onClick={sendToAssessmentProviders}
               />
             )}
-          {project.numOfSentDPPs != 0 && project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
-            <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
-          )}
+          {project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS &&
+            project.numOfSentDPPs != 0 &&
+            project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
+              <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
+            )}
         </div>
       </div>
       {/*} />*/}

@@ -81,8 +81,8 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           }
         }
         setIsAttachmentsPopupOpen(false);
-      } catch (error: any) {
-        setAlert({ title: "", message: error, type: "error" });
+      } catch (e: any) {
+        setAlert({ title: "Napaka", message: e.message, type: "error" });
       }
     }
   };

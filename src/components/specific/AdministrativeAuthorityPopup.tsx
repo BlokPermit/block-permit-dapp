@@ -31,7 +31,7 @@ const AdministrativeAuthorityPopup = (props: AdministrativeAuthorityPopupProps) 
   const handleSearch = async () => {
     const encodedSearchQuery = encodeURIComponent(searchQuery);
     const data = await fetchUsers(`/api/users/searchAdministrativeAuthorities?q=${encodedSearchQuery}`);
-    setResults(data.users.filter((user: User) => props.administrativeAuthority && user.walletAddress !== props.administrativeAuthority.walletAddress));
+    setResults(data.users.filter((user: User) => !props.administrativeAuthority || user.walletAddress !== props.administrativeAuthority.walletAddress));
   };
 
   const handleSelect = async (walletAddress: string) => {
