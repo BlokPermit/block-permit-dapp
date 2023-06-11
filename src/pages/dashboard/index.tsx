@@ -35,11 +35,11 @@ const Dashboard = ({
 
     useEffect(() => {
         fetchProjects();
-        console.log(recentProjects)
     }, []);
 
     const fetchProjects = async () => {
         const recentProjects = await getRecentProjects();
+        console.log("recent", recentProjects);
         setRecentProjects(recentProjects);
     };
 

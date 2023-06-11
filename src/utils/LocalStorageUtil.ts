@@ -1,3 +1,5 @@
+import {Project} from "@prisma/client";
+
 export const getRecentProjects = async () => {
     const projectIds = localStorage.getItem('recentProjects');
     if (projectIds) {
@@ -17,8 +19,13 @@ export const getRecentProjects = async () => {
 
         let projects = await response.json();
 
+        let sortedProjects = parsedProjectIds.map((projectId: string) => projects.find((project: any) => project.id === projectId));
+
+        sortedProjects = sortedProjects.filter(function(element: Project) {
+            return element !== undefined;
+        });
         // Sort by opened
-        return parsedProjectIds.map((projectId: string) => projects.find((project: any) => project.id === projectId));
+        return sortedProjects;
     }
     return [];
 }
