@@ -19,7 +19,7 @@ interface AssessmentProviderListItemProps {
   projectId: string;
   actualProjectState: ProjectState;
   selectedProjectState: ProjectState;
-  documentContract: DocumentContractModel;
+  documentContract: DocumentContractModel | undefined;
   isMainDocumentPresent: boolean;
   countSelected: (isSelected: boolean, id: string) => void;
   projectManagerAddress?: string;
@@ -93,9 +93,9 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
 
   const downloadAssessment = async () => {
     setIsDownloading(true);
-    let paths: string[] = props.documentContract.assessmentAttachments ?? [];
+    let paths: string[] = props.documentContract!.assessmentAttachments ?? [];
     const zipName = `${props.projectName}_${props.actualProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektni-pogoji" : "projektno-mnenje"}_${props.assessmentProvider.name}`;
-    paths.push(props.documentContract.assessmentMainDocument!);
+    paths.push(props.documentContract!.assessmentMainDocument!);
     setIsDownloading(await props.downloadAssessment(paths, zipName));
   };
 

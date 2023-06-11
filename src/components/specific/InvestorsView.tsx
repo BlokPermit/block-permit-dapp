@@ -7,6 +7,7 @@ import InvestorInfoPopup from "./InvestorInfoPopup";
 import { mailInvestor } from "../../utils/MailingUtils";
 import useAlert from "../../hooks/AlertHook";
 import { useRouter } from "next/router";
+import RoleBasedComponent from "../generic/RoleBasedComponent";
 
 interface InvestorsViewProps {
   investors: Investor[];
@@ -39,7 +40,7 @@ const InvestorsView = (props: InvestorsViewProps) => {
     if (!investor) return;
     const response: Response = await mailInvestor({
       to: [investor.email],
-      subject: `Poročilo o projektu ${props.projectUpdateInfo.projectName}` ,
+      subject: `Poročilo o projektu ${props.projectUpdateInfo.projectName}`,
       info: props.projectUpdateInfo,
     });
 
@@ -91,23 +92,41 @@ const InvestorListItem = (props: InvestorListItemProps) => {
       <div className="flex justify-between items-center">
         <div className="text-lg">{props.investor.name}</div>
         <div>
-          <ButtonGroup
-            secondaryButtons={[
-              {
-                text: "Več informacij",
-                icon: <FaInfo />,
-                onClick: () => {
-                  props.moreInfoClick(props.investor);
-                },
-              },
-            ]}
-            primaryButton={{
-              text: "Pošlji spremembo",
-              icon: <FaPaperPlane />,
-              onClick: () => {
-                props.sendUpdateClick(props.investor);
-              },
-            }}
+          <RoleBasedComponent
+            projectManagerComponent={
+              <ButtonGroup
+                secondaryButtons={[
+                  {
+                    text: "Več informacij",
+                    icon: <FaInfo />,
+                    onClick: () => {
+                      props.moreInfoClick(props.investor);
+                    },
+                  },
+                ]}
+                primaryButton={{
+                  text: "Pošlji spremembo",
+                  icon: <FaPaperPlane />,
+                  onClick: () => {
+                    props.sendUpdateClick(props.investor);
+                  },
+                }}
+              />
+            }
+          />
+          <RoleBasedComponent
+            assessmentProviderComponent={
+              <ButtonGroup
+                secondaryButtons={[]}
+                primaryButton={{
+                  text: "Več informacij",
+                  icon: <FaInfo />,
+                  onClick: () => {
+                    props.moreInfoClick(props.investor);
+                  },
+                }}
+              />
+            }
           />
         </div>
       </div>

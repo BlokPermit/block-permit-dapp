@@ -11,6 +11,7 @@ import { hashFileToBytes32 } from "../../../utils/FileUtils";
 import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
 import { useRouter } from "next/router";
 import { changeDocument } from "../../../lib/DocumentService";
+import RoleBasedComponent from "../RoleBasedComponent";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -26,7 +27,6 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [fileForUpdate, setFileForUpdate] = useState<File | null>(null);
   const { setAlert } = useAlert();
-  const router = useRouter();
 
   const handleDocumentChange = (file: File | null) => {
     setFileForUpdate(file);
@@ -84,57 +84,64 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   return (
     <div>
       <div className="inline-flex items-center overflow-hidden bg-white rounded-md border-2 border-main-200 text-sm hover:cursor-pointer">
-        <span onClick={downloadFile} className="inline-flex items-center border-e border-main-200 px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
+        <span onClick={downloadFile} className="inline-flex items-center px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
           <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
-
-        <div onClick={() => setIsActive(!isActive)} className="p-2 bg-white text-main-200">
-          <div>{isActive ? <FaChevronUp /> : <FaChevronDown />}</div>
-        </div>
-      </div>
-      <div className={!isActive ? "hidden" : "absolute z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border bg-white border-gray-100 shadow-lg"} role="menu">
-        {isUpdate ? (
-          <span>
-            <div
-              className="absolute top-2 right-2 hover:cursor-pointer hover:text-gray-500"
-              onClick={() => {
-                setIsUpdate(false);
-                setFileForUpdate(null);
-              }}
-            >
-              <FaTimes />
+        <RoleBasedComponent
+          projectManagerComponent={
+            <div onClick={() => setIsActive(!isActive)} className="p-2 bg-white text-main-200">
+              <div>{isActive ? <FaChevronUp /> : <FaChevronDown />}</div>
             </div>
-            <DocumentInput onDocumentChange={handleDocumentChange} />
-            {fileForUpdate && (
-              <div className="p-3 flex justify-end">
-                <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Update"} icon={<FaEdit />} onClick={updateDocument} />
-              </div>
+          }
+        />
+      </div>
+      <RoleBasedComponent
+        projectManagerComponent={
+          <div className={!isActive ? "hidden" : "absolute z-10 mt-2 w-56 divide-y divide-gray-100 rounded-md border bg-white border-gray-100 shadow-lg"} role="menu">
+            {isUpdate ? (
+              <span>
+                <div
+                  className="absolute top-2 right-2 hover:cursor-pointer hover:text-gray-500"
+                  onClick={() => {
+                    setIsUpdate(false);
+                    setFileForUpdate(null);
+                  }}
+                >
+                  <FaTimes />
+                </div>
+                <DocumentInput onDocumentChange={handleDocumentChange} />
+                {fileForUpdate && (
+                  <div className="p-3 flex justify-end">
+                    <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Update"} icon={<FaEdit />} onClick={updateDocument} />
+                  </div>
+                )}
+              </span>
+            ) : (
+              <>
+                <div className="p-2">
+                  <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
+
+                  <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
+                    Download
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsUpdate(true);
+                    }}
+                    className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    role="menuitem"
+                  >
+                    Update
+                  </button>
+                </div>
+              </>
             )}
-          </span>
-        ) : (
-          <>
-            <div className="p-2">
-              <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
-
-              <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
-                Download
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsUpdate(true);
-                }}
-                className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                role="menuitem"
-              >
-                Update
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        }
+      />
     </div>
   );
 };
@@ -224,7 +231,13 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
           projectAddress={props.projectAddress}
         />
       ) : (
-        <DocumentUpload documentId={props.documentId} documentType={props.documentType} onDocumentChange={props.onDocumentChange} path={props.path} projectAddress={props.projectAddress} />
+        <>
+          <RoleBasedComponent
+            projectManagerComponent={
+              <DocumentUpload documentId={props.documentId} documentType={props.documentType} onDocumentChange={props.onDocumentChange} path={props.path} projectAddress={props.projectAddress} />
+            }
+          />
+        </>
       )}
     </>
   );
