@@ -33,7 +33,7 @@ function SignIn() {
             connector: new MetaMaskConnector(),
         });
 
-        const response = await fetch("/api/auth/blockchainAuthorization", {
+       /* const response = await fetch("/api/auth/blockchainAuthorization", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -46,7 +46,7 @@ function SignIn() {
         if (!response.ok) {
             setAlert({title: '', message: 'You are not registered on this platform.', type: 'error'});
             return;
-        }
+        }*/
         // @ts-ignore
         const {message} = await requestChallengeAsync({
             address: account,

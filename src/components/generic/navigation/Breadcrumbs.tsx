@@ -1,58 +1,47 @@
-import Link from "next/link";
 import {useRouter} from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Link from 'next/link';
 
 const Route2LabelMap = {
-    "/projects/addProject": "Create Project",
-    "/addProject": "Create Project",
-    "/projects": "Projects",
-    "/projects/[id]": "Project",
-    "/barrels/[barrel_id]/settings": "Settings",
+    "projects": "Projects",
+    "addProject": "Create Project",
+    "editProject": "Edit Project",
 };
+
+interface Crumb {
+    link: string;
+    label: string;
+}
 
 export function BreadCrumbs() {
     const router = useRouter();
 
-    const [crumbs, setCrumbs] = React.useState([]);
+    const [crumbs, setCrumbs] = useState<Crumb[]>([]);
 
-    React.useEffect(() => {
-        const segmentsPath = router.asPath.split("/");
-        const segmentsRoute = router.route.split("/");
+    useEffect(() => {
+        const pathSegments = router.asPath.split("/").filter(segment => segment);
 
-        const crumbLinks = CombineAccumulatively(segmentsPath);
-        const crumbLabels = CombineAccumulatively(segmentsRoute);
+        const crumbs: Crumb[] = pathSegments.map((segment, index, array) => {
+            const link = '/' + array.slice(0, index + 1).join('/');
+            const label = Route2LabelMap[segment] || segment;
 
-        const crumbs = crumbLinks.map((link: any, index: any) => {
-            const route = crumbLabels[index];
-            return {
-                link: link,
-                route: route,
-                // @ts-ignore
-                label: Route2LabelMap[route] || route,
-            };
+            return { link, label };
         });
-        if (crumbs.length > 3) {
-            crumbs.splice(0, 1);
-        }
+
         setCrumbs(crumbs);
-    }, [router.route]);
+    }, [router.asPath]);
 
     return (
         <div className="w-full flex justify-center items-center gap-1 py-5 ">
-            <div className=" bg-neutral-100 items-center flex px-5 rounded-xl py-2">
-                {crumbs.map((crumb: any, index) => {
-                    return (
-                        <div className="flex items-center " key={index}>
-                            {(index > 0) ? <div className="text-neutral-400 px-4 text-xs">{'>'}</div> : null}
-
-                            <Link href={crumb.link}
-                                  className={`hover:text-neutral-600 align-bottom pt-0.5  ${router.pathname == crumb.link ? 'text-main-200' : ''}`}>
+            <div className="bg-neutral-100 items-center flex px-5 rounded-xl py-2">
+                {crumbs.map((crumb, index) => (
+                    <div className="flex items-center" key={index}>
+                        {index > 0 && <div className="text-neutral-400 px-4 text-xs">{'>'}</div>}
+                        <Link href={crumb.link} className={`hover:text-neutral-600 align-bottom pt-0.5  ${router.asPath === crumb.link ? 'text-main-200' : ''}`}>
                                 {crumb.label}
-                            </Link>
-
-                        </div>
-                    );
-                })}
+                        </Link>
+                    </div>
+                ))}
             </div>
         </div>
     );

@@ -39,6 +39,8 @@
     "next": "13.4.2",
     "next-auth": "^4.22.1",
     "next-transpile-modules": "^10.0.0",
+    "nextjs-antd-breadcrumbs": "^1.2.2",
+    "nextjs-breadcrumbs": "^1.1.9",
     "nextjs-progressbar": "^0.0.16",
     "path": "^0.12.7",
     "postcss": "8.4.23",
