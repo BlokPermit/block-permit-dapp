@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { setDPP } from "../../../lib/ProjectService";
+import { setDGD } from "../../../lib/ProjectService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "PUT") {
     try {
-      await setDPP(req.body.projectAddress, req.body.signerAddress, req.body.documentUrl, req.body.documentHash);
+      await setDGD(req.body.projectAddress, req.body.signerAddress, req.body.documentUrl, req.body.documentHash);
       res.status(200).end();
     } catch (e: any) {
       console.log(e.message);

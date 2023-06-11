@@ -3,22 +3,7 @@ import { ProjectState, User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import {
-  FaCalendarPlus,
-  FaCheckCircle,
-  FaEdit,
-  FaFileContract,
-  FaHeading,
-  FaHourglass,
-  FaLandmark,
-  FaPaperclip,
-  FaPaperPlane,
-  FaPlus,
-  FaQuestion,
-  FaTag,
-  FaUpload,
-  FaUser,
-} from "react-icons/all";
+import { FaCalendarPlus, FaCheckCircle, FaEdit, FaFileContract, FaHeading, FaHourglass, FaLandmark, FaPaperclip, FaPaperPlane, FaPlus, FaQuestion, FaTag, FaUpload, FaUser } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -41,7 +26,7 @@ import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
 import { getSetMainDocumentText, mailUser } from "../../utils/MailingUtils";
 import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
-import {FaArrowUp} from "react-icons/fa";
+import { FaArrowUp } from "react-icons/fa";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -81,19 +66,15 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
   const handleSend = () => {
     setConformationPopup({
-      title: "Send to Opinion Providers",
-      message: "Are you sure you want to send this project to the selected opinion providers?",
+      title: "Pošlji mnenjedajalcem",
+      message: "Ali ste prepričani, da želite poslati mnenjedajalcem?",
       icon: <FaArrowUp />,
       popupType: "warning",
-      buttonPrimaryText: "Send",
-      onClickPrimary: testConfirmation,
+      buttonPrimaryText: "Pošlji",
+      onClickPrimary: sendToAssessmentProviders,
       show: true,
     });
   };
-
-   function testConfirmation() {
-      console.log("Test confirmation");
-   }
 
   const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
@@ -255,7 +236,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
   // public/project/:projectId/DGD/:assessmentProviderId/assessment/attachments
   return (
     <div className="px-40 mb-10">
-     <BreadCrumbs projectName={project.name}/>
+      <BreadCrumbs />
       <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
       <div className="flex justify-between mb-10">
         <span className="inline-flex items-center gap-3">
@@ -285,15 +266,11 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
               />
             )}
           </>
-          <RoleBasedComponent
-            assessmentProviderComponent={<IconButton className="text-white bg-main-200 hover:text-main-200 hover:bg-white" icon={<FaPaperclip />} text={"Attachments"} onClick={() => {}} />}
-          />
           <DocumentDropdown
-            documentId={project.DPPUrl ?? ""}
-            documentType="dpp"
-            isPresent={project.DPPUrl != undefined}
-            fileName={project.DPPUrl}
-            path={`projects/${project.baseProject.id}/${project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
+            documentId={selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.DPPUrl ?? "" : project.DGDUrl ?? ""}
+            documentType={selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "dpp" : "dgd"}
+            fileName={selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.DPPUrl : project.DGDUrl}
+            path={`projects/${project.baseProject.id}/${selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
             onDocumentChange={onMainDocumentChange}
             projectAddress={project.baseProject.smartContractAddress}
           />
@@ -305,7 +282,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       </div>
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
         <div className="col-span-3 pb-12">
-          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Construction details</h2>
+          <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Podatki o gradnji</h2>
           <IconCard icon={<FaHeading />} title="Naziv zgradbe" value={project.baseProject.constructionTitle} />
           <IconCard icon={<FaTag />} title="Tip konstrukcije" value={project.baseProject.constructionType} />
           <IconCard icon={<FaFileContract />} title="Vpliv na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
@@ -332,7 +309,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
       <div className="overflow-x-auto">
         <span className="inline-flex items-center gap-5 mb-5">
           <h2 className="text-2xl font-semibold text-neutral-900">Mnenjedajalci</h2>
-          {project.projectState != ProjectState.AQUIRING_PROJECT_CONDITIONS && (
+          {project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS && (
             <IconButton
               className="text-main-200 border-gray-50 rounded-none hover:border-b-main-200"
               text={"Dodaj mnenjedajalca"}
@@ -353,11 +330,16 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
           <AssessmentProviderListItem
             assessmentProvider={assessmentProvider}
             projectId={project.baseProject.id}
-            projectState={project.baseProject.projectState}
-            documentContract={project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)}
+            actualProjectState={project.baseProject.projectState}
+            selectedProjectState={selectedState}
+            documentContract={
+              selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)
+                : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === assessmentProvider.id)
+            }
             key={assessmentProvider.id}
             countSelected={countSelected}
-            isMainDocumentPresent={project.DPPUrl != undefined || project.DGDUrl != undefined}
+            isMainDocumentPresent={project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.DPPUrl != undefined : project.DGDUrl != undefined}
             projectAddress={project.baseProject.smartContractAddress}
             projectName={project.baseProject.name}
             downloadAssessment={downloadZip}

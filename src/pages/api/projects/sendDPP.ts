@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { findAssessmentProvidersByName } from "@/lib/UserService";
-import { User } from "@prisma/client";
-import { addAssessmentProviders, sendDPP, setDPP } from "../../../lib/ProjectService";
+import { sendDPP } from "../../../lib/ProjectService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {

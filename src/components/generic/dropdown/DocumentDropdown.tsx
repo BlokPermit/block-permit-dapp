@@ -15,7 +15,6 @@ import { changeDocument } from "../../../lib/DocumentService";
 interface DocumentDropdownProps {
   documentId: string;
   documentType: "dpp" | "dgd";
-  isPresent: boolean;
   fileName?: string;
   path: string;
   onDocumentChange: () => void;
@@ -215,25 +214,17 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
 const DocumentDropdown = (props: DocumentDropdownProps) => {
   return (
     <>
-      {props.isPresent ? (
+      {props.fileName !== null ? (
         <DocumentDownload
           documentId={props.documentId}
           documentType={props.documentType}
-          isPresent={props.isPresent}
           fileName={props.fileName}
           onDocumentChange={props.onDocumentChange}
           path={props.path}
           projectAddress={props.projectAddress}
         />
       ) : (
-        <DocumentUpload
-          documentId={props.documentId}
-          documentType={props.documentType}
-          isPresent={props.isPresent}
-          onDocumentChange={props.onDocumentChange}
-          path={props.path}
-          projectAddress={props.projectAddress}
-        />
+        <DocumentUpload documentId={props.documentId} documentType={props.documentType} onDocumentChange={props.onDocumentChange} path={props.path} projectAddress={props.projectAddress} />
       )}
     </>
   );
