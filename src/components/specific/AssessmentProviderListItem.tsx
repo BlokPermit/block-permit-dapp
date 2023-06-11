@@ -107,6 +107,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           onAdd={handleAddAttachment}
           onClose={() => setIsAttachmentsPopupOpen(false)}
           documentContractAddress={props.documentContract ? props.documentContract.documentContractAddress! : ""}
+          addDisabeld={props.documentContract ? props.documentContract.isClosed : false}
         />
       )}
       {isAssessmentProviderInfoPopupOpen && (
@@ -134,28 +135,18 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             <span className="inline-flex items-center gap-3">
               {props.documentContract && (props.documentContract.mainDocumentUpdateRequested || props.documentContract.requestedAssessmentDueDate) && <FaBell color="red" />}
               <ButtonGroup
-                secondaryButtons={
-                  !props.documentContract || !props.documentContract.isClosed
-                    ? [
-                        {
-                          text: "More info",
-                          icon: <FaInfo />,
-                          onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
-                        },
-                        {
-                          text: "Attachments",
-                          icon: <FaPaperclip />,
-                          onClick: () => setIsAttachmentsPopupOpen(true),
-                        },
-                      ]
-                    : [
-                        {
-                          text: "More info",
-                          icon: <FaInfo />,
-                          onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
-                        },
-                      ]
-                }
+                secondaryButtons={[
+                  {
+                    text: "More info",
+                    icon: <FaInfo />,
+                    onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+                  },
+                  {
+                    text: "Attachments",
+                    icon: <FaPaperclip />,
+                    onClick: () => setIsAttachmentsPopupOpen(true),
+                  },
+                ]}
                 primaryButton={
                   !props.documentContract
                     ? {

@@ -8,6 +8,7 @@ interface AttachmentCardProps {
   attachment: { attachmentTitle: string; attachmentPath: string };
   onRemove: (attachmentPath: string) => void;
   documentContractAddress: string;
+  removeDisabled?: boolean;
 }
 
 const AttachmentCard = (props: AttachmentCardProps) => {
@@ -74,9 +75,11 @@ const AttachmentCard = (props: AttachmentCardProps) => {
         {isDownloadHovered ? <FaArrowDown /> : <FaPaperclip />}
         <p>{props.attachment.attachmentTitle}</p>
       </div>
-      <div className="border-s p-3 hover:cursor-pointer hover:text-red-500" onClick={removeAttachment}>
-        <FaTrash />
-      </div>
+      {!props.removeDisabled && (
+        <div className="border-s p-3 hover:cursor-pointer hover:text-red-500" onClick={removeAttachment}>
+          <FaTrash />
+        </div>
+      )}
     </div>
   );
 };

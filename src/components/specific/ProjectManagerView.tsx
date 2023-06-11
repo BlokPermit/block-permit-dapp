@@ -191,7 +191,7 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
           }
           key={assessmentProvider.id}
           countSelected={countSelected}
-          isMainDocumentPresent={project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.DPPUrl != undefined : project.DGDUrl != undefined}
+          isMainDocumentPresent={selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.DPPUrl != undefined : project.DGDUrl != undefined}
           projectAddress={project.baseProject.smartContractAddress}
           projectName={project.baseProject.name}
           downloadAssessment={downloadZip}
@@ -199,9 +199,9 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
       ))}
       <div className="flex justify-end mb-20">
         {project.assessmentProviders.length > 0 &&
-          (project.DPPUrl || project.DGDUrl) &&
-          ((project.sentDPPs.length !== project.assessmentProviders.length && project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) ||
-            (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_OPINIONS && project.sentDGDs.length !== project.assessmentProviders.length)) && (
+          ((selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS && project.DPPUrl) || (selectedState === ProjectState.AQUIRING_PROJECT_OPINIONS && project.DGDUrl)) &&
+          ((selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS && project.sentDPPs.length !== project.assessmentProviders.length) ||
+            (selectedState === ProjectState.AQUIRING_PROJECT_OPINIONS && project.sentDGDs.length !== project.assessmentProviders.length)) && (
             <IconButton
               className="bg-main-200 text-white hover:bg-white hover:text-main-200"
               text={numOfSelected > 0 ? "Pošlji izbranim" : "Pošlji vsem"}

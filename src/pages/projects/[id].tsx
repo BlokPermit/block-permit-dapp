@@ -1,4 +1,4 @@
-import { findProjectById } from "@/lib/ProjectService";
+import { findProjectById, getProjectsOfUserFromDatabase } from "@/lib/ProjectService";
 import { ProjectState } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
@@ -21,19 +21,32 @@ import { getSetMainDocumentText, mailUser } from "../../utils/MailingUtils";
 import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
 import ProjectManagerView from "@/components/specific/ProjectManagerView";
 import AssessmentProviderView from "@/components/specific/AssessmentProviderView";
+import { getSession } from "next-auth/react";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
 
   try {
-    let project: ProjectModel = await findProjectById(id?.toString() ?? "");
-    return { props: { project } };
+    const session = await getSession(context);
+
+    if (!session) {
+      return {
+        redirect: {
+          destination: "/auth",
+          permanent: false,
+        },
+      };
+    } else {
+      let loggedInUser = session.user;
+      let project: ProjectModel = await findProjectById(id?.toString() ?? "");
+      return { props: { project, loggedInUser } };
+    }
   } catch (error) {
     return { notFound: true };
   }
 };
 
-const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { setAlert } = useAlert();
   const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
@@ -97,7 +110,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </span>
         <div className="flex items-center gap-5">
           <RoleBasedComponent
-            assessmentProviderComponent={
+            projectManagerComponent={
               <>
                 <IconButton
                   className="text-main-200 border-gray-50 bg-inherit rounded-none hover:border-b-main-200"
@@ -155,11 +168,22 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
         </div>
       </div>
       <RoleBasedComponent projectManagerComponent={<ProjectManagerView project={project} selectedState={selectedState} downloadZip={downloadZip} />} />
-      {/* <RoleBasedComponent
-        assessmentProviderComponent={ */}
-      <AssessmentProviderView project={project} />
-      {/* }
-      /> */}
+      <RoleBasedComponent
+        assessmentProviderComponent={
+          <div className="pb-10">
+            <AssessmentProviderView
+              project={project}
+              selectedState={selectedState}
+              loggedInAssessmentProvider={loggedInUser}
+              documentContract={
+                selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                  ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+                  : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+              }
+            />
+          </div>
+        }
+      />
     </div>
   );
 };

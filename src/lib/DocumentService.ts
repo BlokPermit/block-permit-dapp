@@ -1,12 +1,12 @@
 import { supabase } from "@/utils/SupabaseClient";
 import { hashFileToBytes32 } from "../utils/FileUtils";
 import JSZip from "jszip";
-import {saveAs} from 'file-saver';
-
+import { saveAs } from "file-saver";
 
 export const saveDocument = async (file: File | null, path: string): Promise<string> => {
   if (file != null) {
     try {
+      console.log(file);
       const { data, error } = await supabase.storage.from("blokcejn-bucket").upload(`public/${path}/${file.name}`, file, {
         cacheControl: "3600",
         upsert: true,
@@ -100,28 +100,28 @@ export const changeDocument = async (file: File, oldFilePath: string): Promise<s
   } catch (e: any) {
     throw e;
   }
-}
+};
 
-export const zipAndDownload = async (paths: string[], zipName: string): Promise<Blob> => {
+export const zipAndDownload = async (paths: string[], zipName: string) => {
   let files: File[] = [];
   try {
     for (let path of paths) {
-      files.push(new File([await downloadDocument(path)], path.split('/').pop()!))
+      files.push(new File([await downloadDocument(path)], path.split("/").pop()!));
     }
 
     const zip = new JSZip();
     await Promise.all(
-        files.map(async (file) => {
-          const fileContent = await file.arrayBuffer();
-          const fileName = file.name;
-          zip.file(fileName, fileContent);
-        })
+      files.map(async (file) => {
+        const fileContent = await file.arrayBuffer();
+        const fileName = file.name;
+        zip.file(fileName, fileContent);
+      })
     );
 
-    zip.generateAsync({type: 'blob'}).then((content) => {
+    zip.generateAsync({ type: "blob" }).then((content) => {
       saveAs(content, `${zipName}.zip`);
     });
   } catch (e: any) {
     throw e;
   }
-}
+};

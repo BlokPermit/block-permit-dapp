@@ -29,3 +29,13 @@ export const evaluateAssessmentDueDateExtension = async (documentContractAddress
     throw new Error(getErrorReason(error));
   }
 };
+
+//TODO: Fix this
+export const provideAssessment = async (documentContractAddress: string, signerAddress: string, assessment: { assessment: string; attachments: string[] }) => {
+  try {
+    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await documentContract.provideAssessment(assessment);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+};
