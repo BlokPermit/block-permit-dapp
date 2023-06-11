@@ -2,12 +2,18 @@ import useConformationPopup from "@/hooks/ConformationPopupHook";
 import {useEffect, useState} from "react";
 
 const ConformationPopup = () => {
-  const props = useConformationPopup();
+  const {clearConfirmationPopupState ,...props} = useConformationPopup();
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
+
     setShow(props.show);
-  }, [props]);
+  }, [props.show]);
+
+  const closeAndClearPopup = () => {
+    setShow(false);
+    clearConfirmationPopupState();
+  };
 
   return (
     <>
@@ -35,8 +41,8 @@ const ConformationPopup = () => {
                 ${props.popupType == "warning" && "bg-main-200"} 
                 ${props.popupType == "info" && "bg-gray-200"}`}
                 onClick={() => {
-                  props.onClickPrimary
-                  setShow(false);
+                    props.onClickPrimary();
+                  closeAndClearPopup()
                 }}
               >
                 {props.buttonPrimaryText}

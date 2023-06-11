@@ -16,6 +16,7 @@ export const createUsers = async (users: User[]) => {
 export const updateUser = async (user: User) => {
   console.log(user)
   let id = user.id;
+  // @ts-ignore
   delete user.id;
   return prisma.user.update({
     where: {

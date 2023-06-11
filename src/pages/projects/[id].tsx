@@ -23,7 +23,7 @@ import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
 import AssessmentProviderListItem from "@/components/specific/AssessmentProviderListItem";
-//import useConformationPopup from "@/hooks/ConformationPopupHook";
+import useConformationPopup from "@/hooks/ConformationPopupHook";
 import ProgressBar from "@/components/specific/ProgressBar";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
 import DocumentInput from "@/components/generic/input/DocumentInput";
@@ -41,7 +41,7 @@ import useAlert from "../../hooks/AlertHook";
 import Link from "next/link";
 import { getSetMainDocumentText, mailUser } from "../../utils/MailingUtils";
 import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAuthorityPopup";
-import useConformationPopup from "@/hooks/ConformationPopupHook";
+import {FaArrowUp} from "react-icons/fa";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -56,7 +56,7 @@ export const getServerSideProps: any = async (context: any) => {
 
 const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  //const { setConformationPopup } = useConformationPopup();
+  const { setConformationPopup } = useConformationPopup();
   const { setAlert } = useAlert();
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
   const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
@@ -79,17 +79,21 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
     }
   };
 
-  /*const handleSend = () => {
+  const handleSend = () => {
     setConformationPopup({
       title: "Send to Opinion Providers",
       message: "Are you sure you want to send this project to the selected opinion providers?",
       icon: <FaArrowUp />,
       popupType: "warning",
       buttonPrimaryText: "Send",
-      onClickPrimary: sendToAssessmentProviders,
+      onClickPrimary: testConfirmation,
       show: true,
     });
-  };*/
+  };
+
+   function testConfirmation() {
+      console.log("Test confirmation");
+   }
 
   const sendToAssessmentProviders = async () => {
     let selectedAddresses: string[] = [];
@@ -368,7 +372,7 @@ const ProjectPage = ({ project }: InferGetServerSidePropsType<typeof getServerSi
                 className="bg-main-200 text-white hover:bg-white hover:text-main-200"
                 text={numOfSelected > 0 ? "Pošlji izbranim" : "Pošlji vsem"}
                 icon={<FaPaperPlane />}
-                onClick={sendToAssessmentProviders}
+                onClick={handleSend}
               />
             )}
           {project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS &&
