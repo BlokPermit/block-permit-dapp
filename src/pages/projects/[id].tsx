@@ -95,7 +95,7 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
 
   return (
     <div className="px-40 mb-10">
-      <BreadCrumbs />
+      <BreadCrumbs  projectName={project.baseProject.name}/>
       <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
       <div className="flex justify-between mb-10">
         <span className="inline-flex items-center gap-3">

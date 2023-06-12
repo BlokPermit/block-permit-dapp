@@ -82,7 +82,7 @@ const EditUser = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
     return (
         <div>
             <div className="px-40 mb-20">
-                <BreadCrumbs />
+                <BreadCrumbs projectName={user.name}/>
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-12 mt-5">
                         <div className="border-b border-gray-900/10 pb-12">

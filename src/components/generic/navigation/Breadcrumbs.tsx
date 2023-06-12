@@ -6,6 +6,8 @@ const Route2LabelMap = {
     "projects": "Projects",
     "addProject": "Create Project",
     "editProject": "Edit Project",
+    "user": "User",
+    "editUser": "Edit User"
 };
 
 interface Crumb {
@@ -13,7 +15,11 @@ interface Crumb {
     label: string;
 }
 
-export function BreadCrumbs() {
+interface BreadcrumbsProps {
+    projectName?: string;
+}
+
+export function BreadCrumbs({projectName}: BreadcrumbsProps) {
     const router = useRouter();
 
     const [crumbs, setCrumbs] = useState<Crumb[]>([]);
@@ -23,13 +29,23 @@ export function BreadCrumbs() {
 
         const crumbs: Crumb[] = pathSegments.map((segment, index, array) => {
             const link = '/' + array.slice(0, index + 1).join('/');
-            const label = Route2LabelMap[segment] || segment;
-
+            // Determine the label
+            let label;
+            console.log(segment);
+            console.log(projectName);
+            if (segment != 'projects' && segment != 'editProject' && segment != 'addProject' && segment != 'editUser' && segment != 'user' && projectName) {
+                // Use the provided project name
+                label = projectName;
+            } else {
+                console.log(segment);
+                // Otherwise, fallback to your existing map or the segment name
+                label = Route2LabelMap[segment] || segment;
+            }
             return { link, label };
         });
 
         setCrumbs(crumbs);
-    }, [router.asPath]);
+    }, [router.asPath, projectName]);
 
     return (
         <div className="w-full flex justify-center items-center gap-1 py-5 ">
