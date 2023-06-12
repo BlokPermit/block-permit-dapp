@@ -1,21 +1,23 @@
 import { ProjectState } from "@prisma/client";
 import { FaCheckCircle, FaClock } from "react-icons/fa";
-import {getProjectStateName} from "@/utils/EnumUtils";
+import { getProjectStateName } from "@/utils/EnumUtils";
+import { useEffect, useState } from "react";
 
 interface ProgressBarProps {
   actualState: ProjectState;
   selectedState: ProjectState;
   handleStateChange: (state: ProjectState) => void;
   className?: string;
+  hideLastPhase?: boolean;
 }
 
 const ProgressBar = (props: ProgressBarProps) => {
-  const projectStateArray = Object.values(ProjectState);
+  let projectStateArray = !props.hideLastPhase ? Object.values(ProjectState) : Object.values(ProjectState).slice(0, Object.values(ProjectState).length - 1);
 
   return (
     <div className={`${props.className}`}>
       <div>
-        <ol className="grid grid-cols-1 divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white sm:grid-cols-3">
+        <ol className={`grid ${props.hideLastPhase ? "grid-cols-2" : "grid-cols-3"} divide-x divide-gray-200 overflow-hidden rounded-lg border border-gray-200 text-sm text-gray-500 bg-white`}>
           {projectStateArray.map((state, index) => (
             <div key={index}>
               <li

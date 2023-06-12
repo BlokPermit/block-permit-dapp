@@ -109,7 +109,13 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
       <div className="mt-6">
         <BreadCrumbs projectName={project.baseProject.name} />
       </div>
-      <ProgressBar className="my-6" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
+      <ProgressBar
+        hideLastPhase={true}
+        className="my-6"
+        actualState={project.baseProject.projectState}
+        selectedState={selectedState}
+        handleStateChange={(state: ProjectState) => setSelectedState(state)}
+      />
       <div className="flex justify-between mb-10">
         <span className="inline-flex items-center gap-3">
           <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
@@ -141,12 +147,16 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
                   />
                 )}
                 {assessmentProviderRelevantDocumentContract && !assessmentProviderRelevantDocumentContract.isClosed && !assessmentProviderRelevantDocumentContract.mainDocumentUpdateRequested && (
-                  <IconButton
-                    className="border-gray-50 rounded-none text-main-200 hover:border-b-main-200"
-                    text={"Zahtevaj posodobitev"}
-                    icon={<FaSyncAlt />}
-                    onClick={() => setIsRequestMainDocumentUpdatePopupOpen(true)}
-                  />
+                  <>
+                    {(selectedState != ProjectState.AQUIRING_PROJECT_CONDITIONS || (selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS && !project.isDPPPhaseFinalized)) && (
+                      <IconButton
+                        className="border-gray-50 rounded-none text-main-200 hover:border-b-main-200"
+                        text={"Zahtevaj posodobitev"}
+                        icon={<FaSyncAlt />}
+                        onClick={() => setIsRequestMainDocumentUpdatePopupOpen(true)}
+                      />
+                    )}
+                  </>
                 )}
               </>
             }
@@ -182,13 +192,11 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
             userId={loggedInUser.id}
             projectName={project.baseProject.name}
             assessmentProviderRelevantDocumentContract={
-                (selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
-                    ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
-                    : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)) ?? undefined}
-            updateDisabled={project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS
-                ? project.isDPPPhaseFinalized
-                : project.numOfSentDGDs == project.numOfAssessedDGDs
+              (selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+                : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)) ?? undefined
             }
+            updateDisabled={project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? project.isDPPPhaseFinalized : project.numOfSentDGDs == project.numOfAssessedDGDs}
           />
         </div>
       </div>
@@ -229,9 +237,10 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
               selectedState={selectedState}
               loggedInAssessmentProvider={loggedInUser}
               documentContract={
-                  selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
-                      ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
-                      : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)}
+                selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                  ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+                  : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+              }
               downloadZip={downloadZip}
             />
           </div>

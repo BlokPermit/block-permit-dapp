@@ -6,11 +6,11 @@ import { DocumentContractModel } from "@/models/DocumentContractModel";
 import { useRouter } from "next/router";
 import useAlert from "@/hooks/AlertHook";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
-import { FaArrowUp, FaCheckCircle, FaPaperPlane, FaPlus } from "react-icons/fa";
+import { FaArrowUp, FaBuilding, FaCheckCircle, FaPaperPlane, FaPlus } from "react-icons/fa";
 import { useState } from "react";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
-import { getSentMainDocumentText, mailUser } from "@/utils/MailingUtils";
+import { getBuildingPermitContractSentText, getSentMainDocumentText, mailUser } from "@/utils/MailingUtils";
 import IconButton from "../generic/buttons/IconButton";
 
 interface ProjectManagerViewProps {
@@ -157,6 +157,29 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
     }
   };
 
+  const handleConstructionPermitRequest = () => {
+    setConformationPopup({
+      title: "Zahtevek za izdajo gradbenega dovoljenja",
+      message: "Ali ste prepričani, da želite upravnemu organu poslati zahtevek za izdajo gradbenega dovoljenja?",
+      icon: <FaArrowUp />,
+      popupType: "warning",
+      buttonPrimaryText: "Pošlji",
+      onClickPrimary: requestConstructionPermit,
+      show: true,
+    });
+  };
+
+  const requestConstructionPermit = async () => {
+    const response = await mailUser({
+      to: [project.administrativeAuthority!.email],
+      subject: `${project.baseProject.name} - Zahteva za izdajo gradbenega dovoljenja`,
+      text: getBuildingPermitContractSentText(project.baseProject.name),
+      link: router.asPath,
+    });
+    if (!response.ok) throw new Error((await response.json()).message);
+    setAlert({ title: "Uspeh", message: "Zahtevek za izdajo gradbenega dovoljenja poslan", type: "success" });
+  };
+
   return (
     <div className="overflow-x-auto">
       <span className="inline-flex items-center gap-5 mb-5">
@@ -195,6 +218,7 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
           projectAddress={project.baseProject.smartContractAddress}
           projectName={project.baseProject.name}
           downloadAssessment={downloadZip}
+          isDPPPhaseFinalized={project.isDPPPhaseFinalized}
         />
       ))}
       <div className="flex justify-end mb-20">
@@ -214,6 +238,9 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
           project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
             <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
           )}
+        {project.baseProject.projectState == ProjectState.AQUIRING_BUILDING_PERMIT && project.administrativeAuthority && (
+          <IconButton className="bg-green-500 text-white hover:text-green-500 hover:bg-white" text={"Zahtevaj gradbeno dovoljenje"} icon={<FaBuilding />} onClick={handleConstructionPermitRequest} />
+        )}
       </div>
     </div>
   );

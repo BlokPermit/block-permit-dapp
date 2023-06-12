@@ -1,7 +1,8 @@
 import { ArtifactType, getContractArtifact, getErrorReason } from "@/utils/BlockchainUtils";
 import { provider } from "@/utils/EthereumClient";
 import { Contract } from "ethers";
-import {prisma, ProjectState} from "../utils/PrismaClient";
+import { prisma } from "../utils/PrismaClient";
+import { ProjectState } from "@prisma/client";
 
 export const addAttachments = async (documentContractAddress: string, signerAddress: string, attachments: object[]) => {
   try {
@@ -31,10 +32,15 @@ export const evaluateAssessmentDueDateExtension = async (documentContractAddress
   }
 };
 
-export const provideAssessment = async (documentContractAddress: string, signerAddress: string, assessment: {
-  assessmentMainDocument: { id: number; owner: string; documentHash: string };
-  assessmentAttachments: { id: number; owner: string; documentHash: string }[],
-  dateProvided: number }) => {
+export const provideAssessment = async (
+  documentContractAddress: string,
+  signerAddress: string,
+  assessment: {
+    assessmentMainDocument: { id: number; owner: string; documentHash: string };
+    assessmentAttachments: { id: number; owner: string; documentHash: string }[];
+    dateProvided: number;
+  }
+) => {
   let projectAddress: string = "";
   let numOfAssessedDGDs: number = 0;
   let numOfAssessmentProviders: number = 0;
@@ -46,7 +52,7 @@ export const provideAssessment = async (documentContractAddress: string, signerA
     await documentContract.provideAssessment(assessment, true);
 
     projectAddress = await documentContract.project();
-    projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
     numOfAssessedDGDs = parseInt(await projectContract.numOfAssessedDGDs());
     numOfAssessmentProviders = parseInt(await projectContract.numOfAssessmentProviders());
   } catch (error: any) {
@@ -55,11 +61,11 @@ export const provideAssessment = async (documentContractAddress: string, signerA
   try {
     if (numOfAssessedDGDs == numOfAssessmentProviders) {
       await prisma.project.update({
-        where: projectAddress,
+        where: { smartContractAddress: projectAddress },
         data: {
-          projectState: ProjectState.AQUIRING_BUILDING_PERMIT
-        }
-      })
+          projectState: ProjectState.AQUIRING_BUILDING_PERMIT,
+        },
+      });
     }
   } catch (e: any) {
     throw e;
@@ -73,7 +79,7 @@ export const requestAssessmentDueDateExtension = async (documentContractAddress:
   } catch (error: any) {
     throw new Error(getErrorReason(error));
   }
-}
+};
 
 export const requestMainDocumentUpdate = async (documentContractAddress: string, signerAddress: string) => {
   try {

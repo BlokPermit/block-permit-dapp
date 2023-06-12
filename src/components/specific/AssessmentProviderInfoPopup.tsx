@@ -16,6 +16,7 @@ interface AssessmentProviderInfoPopupProps {
   projectAddress: string;
   projectName: string;
   onClose: () => void;
+  isDPPPhaseFinalized: boolean;
 }
 
 const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) => {
@@ -133,7 +134,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
           <IconCard title={"E-pošta"} value={props.assessmentProvider.email} icon={<FaEnvelope />} />
         </div>
         <div className="flex justify-end">
-          {(!props.documentContract || (props.documentContract && !props.documentContract.isClosed)) && (
+          {(!props.documentContract || (props.documentContract && !props.documentContract.isClosed)) && !props.isDPPPhaseFinalized && (
             <IconButton className="bg-red-500 text-white hover:bg-white hover:text-red-600" text={"Odstrani"} icon={<FaTimes />} onClick={() => handleRemoveAssessmentProvider()} />
           )}
         </div>

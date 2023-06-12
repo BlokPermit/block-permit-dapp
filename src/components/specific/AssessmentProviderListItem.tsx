@@ -25,6 +25,7 @@ interface AssessmentProviderListItemProps {
   projectManagerAddress?: string;
   projectAddress: string;
   projectName: string;
+  isDPPPhaseFinalized: boolean;
   downloadAssessment: (paths: string[], zipName: string) => Promise<boolean>;
 }
 
@@ -117,6 +118,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           documentContract={props.documentContract}
           onClose={() => setIsAssessmentProviderInfoPopupOpen(false)}
           projectName={props.projectName}
+          isDPPPhaseFinalized={props.isDPPPhaseFinalized}
         />
       )}
       <div key={props.assessmentProvider.id} className={`${isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}`}>
