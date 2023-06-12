@@ -15,7 +15,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
   if (showSidebar) {
     return (
       <div className="flex flex-col h-screen bg-neutral-50 bg-blend-lighten">
-          <Sidebar></Sidebar>
+        <div className=""><Sidebar/></div>
           <main className={"w-full h-full"}>{children}</main>
       </div>
     );

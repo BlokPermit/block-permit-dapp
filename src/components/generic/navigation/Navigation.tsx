@@ -42,8 +42,7 @@ const Navigation: FC = () => {
 
   return (
     <nav aria-label="Main Nav" className=" flex ">
-      <span
-          className=" w-32 flex justify-center items-center rounded-lg bg-grey-100 text-xs text-gray-600">   <img src="/images/logo1.png" alt="Metamask Logo" className="w-500 h-200 "/></span>
+
       {adminRoutes.map((item, index) => (
         <Link
           key={index}
