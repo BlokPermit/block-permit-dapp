@@ -1,14 +1,15 @@
-import { prisma } from "@/utils/PrismaClient";
-import { Project, User } from "@prisma/client";
-import { Contract, ContractFactory } from "ethers";
-import { ArtifactType, getContractArtifact } from "@/utils/BlockchainUtils";
-import { provider } from "@/utils/EthereumClient";
-import { ProjectState } from ".prisma/client";
+import {prisma} from "@/utils/PrismaClient";
+import {Project, User} from "@prisma/client";
+import {Contract, ContractFactory} from "ethers";
+import {ArtifactType, getContractArtifact} from "@/utils/BlockchainUtils";
+import {provider} from "@/utils/EthereumClient";
+import {ProjectState} from ".prisma/client";
 
-import { findUserByAddress, findUserById } from "./UserService";
-import { DocumentContractModel } from "../models/DocumentContractModel";
-import { AddressZero } from "@ethersproject/constants";
-import { getErrorReason } from "../utils/BlockchainUtils";
+import {findUserByAddress, findUserById} from "./UserService";
+import {DocumentContractModel, MainDocumentType} from "../models/DocumentContractModel";
+import {AddressZero} from "@ethersproject/constants";
+import {getErrorReason} from "../utils/BlockchainUtils";
+import {dateFromTimestamp} from "../utils/DateUtils";
 
 /*const URL: string = process.env.BACKEND_URL;
 
@@ -119,6 +120,8 @@ export const findProjectById = async (id: string) => {
     const numOfSentDGDs: number = parseInt(await projectContract.getSentDGDsLength());
     const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
 
+    const isDPPPhaseFinalized = await projectContract.isDPPPhaseFinalized();
+
     return {
       baseProject: baseProject,
       projectManager: projectManager!,
@@ -133,6 +136,7 @@ export const findProjectById = async (id: string) => {
       sentDGDs: sentDGDs,
       numOfSentDGDs: numOfSentDGDs,
       numOfAssessedDGDs: numOfAssessedDGDs,
+      isDPPPhaseFinalized: isDPPPhaseFinalized
     };
   } catch (error: any) {
     throw new Error(error.message);
@@ -339,6 +343,12 @@ const getDocumentContractModels = async (addresses: string[]) => {
     let requestedAssessmentDueDate: number | null = parseInt(await documentContract.requestedAssessmentDueDate());
     if (requestedAssessmentDueDate == 0) requestedAssessmentDueDate = null;
 
+    let mainDocumentType: MainDocumentType = parseInt(await documentContract.mainDocumentType()) == 0
+        ? MainDocumentType.DPP : MainDocumentType.DGD;
+
+    let assessmentDateProvided: number | null = parseInt((await documentContract.assessment()).dateProvided);
+    if (assessmentDateProvided == 0) assessmentDateProvided = null;
+
     sentDocumentContracts.push({
       documentContractAddress: address,
       assessmentProvider: assessmentProvider,
@@ -349,6 +359,9 @@ const getDocumentContractModels = async (addresses: string[]) => {
       attachments: getAttachmentsUrls(await documentContract.getAttachments()),
       assessmentAttachments: getAttachmentsUrls(await documentContract.getAssessmentAttachments()),
       assessmentMainDocument: (await documentContract.assessment()).assessmentMainDocument.id,
+      mainDocumentType: mainDocumentType,
+      assessmentDateProvided: assessmentDateProvided,
+      dateCreated: parseInt(await documentContract.dateCreated())
     });
   }
 

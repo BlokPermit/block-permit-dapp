@@ -5,7 +5,7 @@ import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
 import { FaEdit, FaFileContract, FaHeading, FaLandmark, FaPlus, FaSyncAlt, FaTag } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
-import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
+import dDocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
 import ProgressBar from "@/components/specific/ProgressBar";
 import RoleBasedComponent from "@/components/generic/RoleBasedComponent";
@@ -23,6 +23,7 @@ import ProjectManagerView from "@/components/specific/ProjectManagerView";
 import AssessmentProviderView from "@/components/specific/AssessmentProviderView";
 import { getSession } from "next-auth/react";
 import RequestMainDocumentUpdatePopup from "@/components/specific/RequestMainDocumentUpdatePopup";
+import DocumentDropdown from "../../components/generic/dropdown/DocumentDropdown";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -177,6 +178,17 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
             path={`projects/${project.baseProject.id}/${selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}`}
             onDocumentChange={onMainDocumentChange}
             projectAddress={project.baseProject.smartContractAddress}
+            userType={loggedInUser.userType}
+            userId={loggedInUser.id}
+            projectName={project.baseProject.name}
+            assessmentProviderRelevantDocumentContract={
+                (selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                    ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+                    : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)) ?? undefined}
+            updateDisabled={project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS
+                ? project.isDPPPhaseFinalized
+                : project.numOfSentDGDs == project.numOfAssessedDGDs
+            }
           />
         </div>
       </div>
@@ -217,10 +229,10 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
               selectedState={selectedState}
               loggedInAssessmentProvider={loggedInUser}
               documentContract={
-                selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
-                  ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
-                  : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
-              }
+                  selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS
+                      ? project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)
+                      : project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id)}
+              downloadZip={downloadZip}
             />
           </div>
         }

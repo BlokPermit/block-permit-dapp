@@ -10,8 +10,11 @@ import { getConnectedAddress } from "../../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../../utils/FileUtils";
 import { LoadingAnimation } from "../loading-animation/LoadingAnimation";
 import { useRouter } from "next/router";
-import { changeDocument } from "../../../lib/DocumentService";
+import {changeDocument, getFileNamesFromDirectory, zipAndDownload} from "../../../lib/DocumentService";
 import RoleBasedComponent from "../RoleBasedComponent";
+import { UserType } from "@prisma/client";
+import {a} from "@wagmi/core/dist/index-fc9ab085";
+import {DocumentContractModel} from "../../../models/DocumentContractModel";
 
 interface DocumentDropdownProps {
   documentId: string;
@@ -20,6 +23,11 @@ interface DocumentDropdownProps {
   path: string;
   onDocumentChange: () => void;
   projectAddress: string;
+  userType?: UserType;
+  userId?: string;
+  projectName?: string;
+  assessmentProviderRelevantDocumentContract?: DocumentContractModel;
+  updateDisabled: boolean;
 }
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
@@ -47,6 +55,17 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
       }
     } catch (error: Error | any) {
       setAlert({ title: "", message: error.message, type: "error" });
+    }
+  }
+
+  const downloadZip = async () => {
+    try {
+      const paths = props.assessmentProviderRelevantDocumentContract!.attachments ?? [];
+      if (props.fileName) paths.push(props.fileName);
+      await zipAndDownload(paths, `${props.projectName}_${props.documentType.toUpperCase()}`);
+    } catch (e: any) {
+      console.log(e);
+      setAlert({ title: "Napaka", message: "Napaka pri prenosu", type: "error" });
     }
   }
 
@@ -84,16 +103,20 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
   return (
     <div>
       <div className="inline-flex items-center overflow-hidden bg-white rounded-md border-2 border-main-200 text-sm hover:cursor-pointer">
-        <span onClick={downloadFile} className="inline-flex items-center px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
+        <span onClick={props.userType === UserType.ASSESSMENT_PROVIDER ? downloadZip : downloadFile} className="inline-flex items-center px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
           <FaFileDownload className="mr-2" />
           {props.documentType === "dpp" && <p>Download DPP</p>}
           {props.documentType === "dgd" && <p>Download DGD</p>}
         </span>
         <RoleBasedComponent
           projectManagerComponent={
-            <div onClick={() => setIsActive(!isActive)} className="p-2 bg-white text-main-200">
-              <div>{isActive ? <FaChevronUp /> : <FaChevronDown />}</div>
-            </div>
+            <>
+              {!props.updateDisabled && (
+                <div onClick={() => setIsActive(!isActive)} className="p-2 bg-white text-main-200">
+                  <div>{isActive ? <FaChevronUp /> : <FaChevronDown />}</div>
+                </div>
+              )}
+            </>
           }
         />
       </div>
@@ -114,27 +137,24 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
                 <DocumentInput onDocumentChange={handleDocumentChange} />
                 {fileForUpdate && (
                   <div className="p-3 flex justify-end">
-                    <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Update"} icon={<FaEdit />} onClick={updateDocument} />
+                    <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Posodobi"} icon={<FaEdit />} onClick={updateDocument} />
                   </div>
                 )}
               </span>
             ) : (
               <>
                 <div className="p-2">
-                  <strong className="block p-2 text-xs font-medium uppercase text-gray-400">General</strong>
-
                   <button onClick={downloadFile} className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700" role="menuitem">
-                    Download
+                    Prenesi
                   </button>
-
                   <button
-                    onClick={() => {
-                      setIsUpdate(true);
-                    }}
-                    className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                    role="menuitem"
+                      onClick={() => {
+                        setIsUpdate(true);
+                      }}
+                      className="w-full text-left block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                      role="menuitem"
                   >
-                    Update
+                    Posodbi
                   </button>
                 </div>
               </>
@@ -222,6 +242,8 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
   return (
     <>
       {props.fileName !== null ? (
+        <>
+        {(props.assessmentProviderRelevantDocumentContract || props.userType != UserType.ASSESSMENT_PROVIDER) && (
         <DocumentDownload
           documentId={props.documentId}
           documentType={props.documentType}
@@ -229,7 +251,13 @@ const DocumentDropdown = (props: DocumentDropdownProps) => {
           onDocumentChange={props.onDocumentChange}
           path={props.path}
           projectAddress={props.projectAddress}
-        />
+          userType={props.userType}
+          userId={props.userId}
+          projectName={props.projectName}
+          assessmentProviderRelevantDocumentContract={props.assessmentProviderRelevantDocumentContract}
+          updateDisabled={props.updateDisabled}
+        />)}
+      </>
       ) : (
         <>
           <RoleBasedComponent

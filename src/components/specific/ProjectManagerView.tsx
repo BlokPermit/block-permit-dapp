@@ -150,10 +150,10 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
     });
 
     if (response.ok) {
-      setAlert({ title: "Uspeh", message: "Projekt zaključen", type: "success" });
+      setAlert({ title: "Uspeh", message: "Faza pridobivanja projektnih pogojev zaključena", type: "success" });
       router.push(router.asPath);
     } else {
-      setAlert({ title: "Napaka", message: "Napaka pri zaključevanju projekta", type: "error" });
+      setAlert({ title: "Napaka", message: "Napaka pri zaključevanju faze pridobivanja projektnih pogojev", type: "error" });
     }
   };
 

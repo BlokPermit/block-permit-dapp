@@ -10,4 +10,9 @@ export interface DocumentContractModel {
     attachments: string[] | null;
     assessmentMainDocument: string | null;
     assessmentAttachments: string[] | null;
+    mainDocumentType: MainDocumentType;
+    assessmentDateProvided: number | null;
+    dateCreated: number;
 }
+
+export enum MainDocumentType {DPP, DGD}

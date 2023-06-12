@@ -1,6 +1,7 @@
 import React from "react";
 import { Project } from "@prisma/client";
 import { FaHeading, FaTag, FaTree } from "react-icons/fa";
+import {FaCheck} from "react-icons/all";
 
 interface IconCardProps {
   title: string;
@@ -8,6 +9,7 @@ interface IconCardProps {
   className?: string;
   icon: any;
   trailing?: any;
+  valueClassName?: string;
 }
 
 const IconCard = (props: IconCardProps) => {
@@ -19,7 +21,8 @@ const IconCard = (props: IconCardProps) => {
         <div>
           <p className="text-sm text-gray-500">{props.title}</p>
 
-          <p className="text-lg font-medium text-gray-900">{props.value}</p>
+          <p className={props.valueClassName ?? "text-lg font-medium text-gray-900"}>{props.value}</p>
+
         </div>
       </div>
       <div>{props.trailing}</div>

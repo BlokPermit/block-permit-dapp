@@ -15,5 +15,6 @@ export interface ProjectModel {
   sentDGDs: DocumentContractModel[];
   numOfSentDGDs: number,
   numOfAssessedDGDs: number;
+  isDPPPhaseFinalized: boolean;
 }
 
