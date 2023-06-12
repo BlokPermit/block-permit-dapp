@@ -1,4 +1,4 @@
-import { FaArrowUp, FaCalendarPlus, FaHourglass, FaPaperclip, FaQuestion, FaUpload, FaUser } from "react-icons/fa";
+import { FaArrowUp, FaCalendarPlus, FaHourglass, FaInfo, FaPaperclip, FaQuestion, FaUpload, FaUser } from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
@@ -14,6 +14,7 @@ import useAlert from "@/hooks/AlertHook";
 import { useRouter } from "next/router";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
 import { headers } from "next/dist/client/components/headers";
+import ProjectManagerInfoPopup from "./ProjectManagerInfoPopup";
 
 interface AssessmentProviderViewProps {
   project: ProjectModel;
@@ -28,6 +29,7 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
   const { setConformationPopup } = useConformationPopup();
 
   const [isAttachmentsPopupOpen, setIsAttachmentsPopupOpen] = useState<boolean>(false);
+  const [isProjectManagerInfoPopupOpen, setIsProjectManagerInfoPopupOpen] = useState<boolean>(false);
   const [unsentAttachments, setUnsentAttachments] = useState<string[]>([]);
   const [assessment, setAssessment] = useState<File>();
 
@@ -113,7 +115,7 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
 
   return (
     <div className="mb-10">
-      <div className="grid grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-5 gap-5 mb-10">
         {isAttachmentsPopupOpen && (
           <AttachmentsPopup
             existingAttachments={unsentAttachments ?? []}
@@ -122,7 +124,24 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
             documentContractAddress={documentContract ? documentContract.documentContractAddress ?? "" : ""}
           />
         )}
-        <IconCard icon={<FaUser />} title="Projektni vodja" value={project.projectManager.name} />
+        {isProjectManagerInfoPopupOpen && <ProjectManagerInfoPopup projectManager={project.projectManager} onClose={() => setIsProjectManagerInfoPopupOpen(false)} />}
+        <IconCard
+          className="col-span-2"
+          icon={<FaUser />}
+          title="Projektni vodja"
+          value={project.projectManager.name}
+          trailing={
+            <ButtonGroup
+              secondaryButtons={[
+                {
+                  text: "Več informacij",
+                  icon: <FaInfo />,
+                  onClick: () => setIsProjectManagerInfoPopupOpen(true),
+                },
+              ]}
+            />
+          }
+        />
         <IconCard
           className="col-span-3"
           icon={<FaHourglass />}

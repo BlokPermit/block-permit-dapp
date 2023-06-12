@@ -1,9 +1,9 @@
-import { findProjectById } from "@/lib/ProjectService";
-import { ProjectState } from "@prisma/client";
+import { findProjectById, getProjectsOfUserFromDatabase } from "@/lib/ProjectService";
+import { ProjectState, UserType } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
 import { BreadCrumbs } from "@/components/generic/navigation/Breadcrumbs";
-import { FaEdit, FaFileContract, FaHeading, FaLandmark, FaPlus, FaTag } from "react-icons/all";
+import { FaEdit, FaFileContract, FaHeading, FaLandmark, FaPlus, FaSyncAlt, FaTag } from "react-icons/all";
 import IconButton from "@/components/generic/buttons/IconButton";
 import DocumentDropdown from "@/components/generic/dropdown/DocumentDropdown";
 import IconCard from "@/components/generic/data-view/IconCard";
@@ -22,6 +22,7 @@ import AdministrativeAuthorityPopup from "@/components/specific/AdministrativeAu
 import ProjectManagerView from "@/components/specific/ProjectManagerView";
 import AssessmentProviderView from "@/components/specific/AssessmentProviderView";
 import { getSession } from "next-auth/react";
+import RequestMainDocumentUpdatePopup from "@/components/specific/RequestMainDocumentUpdatePopup";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -50,10 +51,19 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
   const router = useRouter();
   const { setAlert } = useAlert();
   const [isAdministrativeAuthorityPopupOpen, setIsAdministrativeAuthorityPopupOpen] = useState<boolean>(false);
+  const [isRequestMainDocumentUpdatePopupOpen, setIsRequestMainDocumentUpdatePopupOpen] = useState<boolean>(false);
   const [selectedState, setSelectedState] = useState<ProjectState>(project.baseProject.projectState);
+  const [assessmentProviderRelevantDocumentContract, setAssessmentProviderRelevantDocumentContract] = useState<DocumentContractModel | undefined>();
 
   useEffect(() => {
     setRecentProject(project.baseProject.id);
+    if (loggedInUser.userType === UserType.ASSESSMENT_PROVIDER) {
+      if (project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS) {
+        setAssessmentProviderRelevantDocumentContract(project.sentDPPs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id));
+      } else {
+        setAssessmentProviderRelevantDocumentContract(project.sentDGDs.find((documentContract: DocumentContractModel) => documentContract.assessmentProvider.id === loggedInUser.id));
+      }
+    }
   }, []);
 
   const downloadZip = async (paths: string[], zipName: string): Promise<boolean> => {
@@ -95,7 +105,9 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
 
   return (
     <div className="px-40 mb-10">
-        <div className="mt-6"><BreadCrumbs  projectName={project.baseProject.name}/></div>
+      <div className="mt-6">
+        <BreadCrumbs projectName={project.baseProject.name} />
+      </div>
       <ProgressBar className="my-6" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
       <div className="flex justify-between mb-10">
         <span className="inline-flex items-center gap-3">
@@ -109,6 +121,35 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
           />
         </span>
         <div className="flex items-center gap-5">
+          <RoleBasedComponent
+            assessmentProviderComponent={
+              <>
+                {isRequestMainDocumentUpdatePopupOpen && (
+                  <RequestMainDocumentUpdatePopup
+                    onClose={() => setIsRequestMainDocumentUpdatePopupOpen(false)}
+                    documentContractAddress={assessmentProviderRelevantDocumentContract!.documentContractAddress!}
+                    documentType={project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}
+                    assessmentProviderInfo={{
+                      assessmentProviderName: loggedInUser.name,
+                      assessmentProviderAddress: loggedInUser.walletAddress,
+                    }}
+                    projectInfo={{
+                      projectManagerEmail: project.projectManager.email,
+                      projectName: project.baseProject.name,
+                    }}
+                  />
+                )}
+                {assessmentProviderRelevantDocumentContract && !assessmentProviderRelevantDocumentContract.isClosed && !assessmentProviderRelevantDocumentContract.mainDocumentUpdateRequested && (
+                  <IconButton
+                    className="border-gray-50 rounded-none text-main-200 hover:border-b-main-200"
+                    text={"Zahtevaj posodobitev"}
+                    icon={<FaSyncAlt />}
+                    onClick={() => setIsRequestMainDocumentUpdatePopupOpen(true)}
+                  />
+                )}
+              </>
+            }
+          />
           <RoleBasedComponent
             projectManagerComponent={
               <>

@@ -16,7 +16,7 @@ interface PrimaryButtonProps {
 
 interface ButtonGroupProps {
   secondaryButtons: SecondaryButtonProps[];
-  primaryButton: PrimaryButtonProps;
+  primaryButton?: PrimaryButtonProps;
 }
 const ButtonGroup = (props: ButtonGroupProps) => {
   return (
@@ -32,15 +32,17 @@ const ButtonGroup = (props: ButtonGroupProps) => {
         </span>
       ))}
 
-      <span
-        className={`${
-          !props.primaryButton.disabled && "text-main-200 bg-white hover:cursor-pointer hover:bg-main-200 hover:text-white"
-        } inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm shadow-sm focus:relative text-gray-700 bg-gray-300`}
-        onClick={props.primaryButton.onClick}
-      >
-        {props.primaryButton.icon}
-        {props.primaryButton.text}
-      </span>
+      {props.primaryButton && (
+        <span
+          className={`${
+            !props.primaryButton.disabled && "text-main-200 bg-white hover:cursor-pointer hover:bg-main-200 hover:text-white"
+          } inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm shadow-sm focus:relative text-gray-700 bg-gray-300`}
+          onClick={props.primaryButton.onClick}
+        >
+          {props.primaryButton.icon}
+          {props.primaryButton.text}
+        </span>
+      )}
     </div>
   );
 };

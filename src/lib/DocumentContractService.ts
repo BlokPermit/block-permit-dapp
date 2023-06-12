@@ -39,3 +39,12 @@ export const provideAssessment = async (documentContractAddress: string, signerA
     throw new Error(getErrorReason(error));
   }
 };
+
+export const requestMainDocumentUpdate = async (documentContractAddress: string, signerAddress: string) => {
+  try {
+    const documentContract = new Contract(documentContractAddress, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await documentContract.requestMainDocumentUpdate();
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+};
