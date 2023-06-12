@@ -1,5 +1,5 @@
 import React, { FC, ReactNode } from "react";
-import { AiOutlineFundProjectionScreen, AiOutlineUserAdd, HiOutlineDocumentSearch, HiUserAdd, RiDashboardLine } from "react-icons/all";
+import { AiOutlineFundProjectionScreen, AiOutlineUserAdd, RiDashboardLine } from "react-icons/all";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -17,22 +17,18 @@ const Navigation: FC = () => {
     {
       label: "Nadzorna plošča",
       href: "/dashboard",
-      icon: <RiDashboardLine size={26} />,
+      icon: <RiDashboardLine size={24} />,
     },
     {
       label: "Projekti",
       href: "/projects",
-      icon: <AiOutlineFundProjectionScreen size={26} />,
+      icon: <AiOutlineFundProjectionScreen size={24} />,
     },
-    {
-      label: "Dokumenti",
-      href: "/documents",
-      icon: <HiOutlineDocumentSearch size={26} />,
-    },
+
     {
       label: "Dodaj uporabnike",
       href: "/addUser",
-      icon: <AiOutlineUserAdd size={26} />,
+      icon: <AiOutlineUserAdd size={24} />,
       adminOnly: true,
     },
   ];
@@ -45,15 +41,17 @@ const Navigation: FC = () => {
   });
 
   return (
-    <nav aria-label="Main Nav" className="mt-6 flex flex-col space-y-5">
+    <nav aria-label="Main Nav" className=" flex ">
+      <span
+          className=" w-32 flex justify-center items-center rounded-lg bg-grey-100 text-xs text-gray-600">   <img src="/images/logo1.png" alt="Metamask Logo" className="w-500 h-200 "/></span>
       {adminRoutes.map((item, index) => (
         <Link
           key={index}
           href={item.href}
-          className={`flex items-center gap-2 hover:text-main-200  px-4 py-2 text-gray-70 ${pathname.split("/").slice(0, 2).join("/") == item.href ? "border-r-4 border-main-200 rounded-sm" : ""}`}
+          className={`flex items-center gap-2 hover:text-main-200 px-5 text-gray-70 ${pathname.split("/").slice(0, 2).join("/") == item.href ? "border-b-2 border-main-200 rounded-sm" : ""}`}
         >
           <div className={`pr-2  ${pathname.split("/").slice(0, 2).join("/") == item.href ? "text-main-200" : ""}`}>{item.icon}</div>
-          <span className={`text-lg  ${pathname.split("/").slice(0, 2).join("/") == item.href ? "text-main-200 font-bold" : ""}`}> {item.label} </span>
+          <span className={`text-md ${pathname.split("/").slice(0, 2).join("/") == item.href ? "text-main-200 font-semibold" : ""}`}> {item.label} </span>
         </Link>
       ))}
     </nav>

@@ -1,4 +1,4 @@
-import { findProjectById, getProjectsOfUserFromDatabase } from "@/lib/ProjectService";
+import { findProjectById } from "@/lib/ProjectService";
 import { ProjectState } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { InferGetServerSidePropsType } from "next";
@@ -95,8 +95,8 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
 
   return (
     <div className="px-40 mb-10">
-      <BreadCrumbs  projectName={project.baseProject.name}/>
-      <ProgressBar className="my-16" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
+        <div className="mt-6"><BreadCrumbs  projectName={project.baseProject.name}/></div>
+      <ProgressBar className="my-6" actualState={project.baseProject.projectState} selectedState={selectedState} handleStateChange={(state: ProjectState) => setSelectedState(state)} />
       <div className="flex justify-between mb-10">
         <span className="inline-flex items-center gap-3">
           <h1 className="text-3xl font-semibold text-neutral-900">{project.baseProject.name}</h1>
