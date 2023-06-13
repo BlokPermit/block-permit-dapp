@@ -212,9 +212,9 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
       <div className="grid grid-cols-8 gap-12 border-b border-gray-900/10 mb-10">
         <div className="col-span-3 pb-12">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Podatki o gradnji</h2>
-          <IconCard icon={<FaHeading />} title="Naziv zgradbe" value={project.baseProject.constructionTitle} />
-          <IconCard icon={<FaTag />} title="Tip konstrukcije" value={project.baseProject.constructionType} />
-          <IconCard icon={<FaFileContract />} title="Vpliv na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
+          <IconCard icon={<FaHeading />} title="Naziv gradnje" value={project.baseProject.constructionTitle} />
+          <IconCard icon={<FaTag />} title="vrsta gradnje" value={project.baseProject.constructionType} />
+          <IconCard icon={<FaFileContract />} title="Objekt z vplivi na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Da" : "Ne"} />
             {(isProjectManagerInfoPopupOpen && loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&
             <ProjectManagerInfoPopup projectManager={project.projectManager} onClose={() => setIsProjectManagerInfoPopupOpen(false)} />}
             {(loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&

@@ -82,7 +82,7 @@ export default function User({ user }: InferGetServerSidePropsType<typeof getSer
                         </div>
 
                         <div className="flex">
-                            <div className="text-neutral-400 mr-2">Metamask račun:</div>
+                            <div className="text-neutral-400 mr-2">Javni ključ:</div>
                             {user.walletAddress}</div>
 
                         <div className="flex">

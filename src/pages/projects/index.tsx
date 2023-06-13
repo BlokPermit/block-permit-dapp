@@ -97,7 +97,7 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.name}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionTitle}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionType}</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Yes" : "No"}</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{project.constructionImpactsEnvironment ? "Da" : "Ne"}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{getProjectStateName(project.projectState)}</td>
                     </tr>
                   )}

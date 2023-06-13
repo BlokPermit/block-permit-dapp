@@ -129,7 +129,7 @@ const CreateProject = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Error saving project.");
+        throw new Error("Napaka pri kreiranju projekta.");
       }
 
       let createdProject = await response.json();
@@ -148,32 +148,32 @@ const CreateProject = () => {
         <form onSubmit={handleSubmit}>
           <div className="space-y-12">
             <div className="border-b border-gray-900/10 pb-12">
-              <h2 className="text-xl font-semibold leading-7 text-gray-900">Create project</h2>
-              <p className="mt-1 text-sm leading-6 text-gray-600">This information will be displayed publicly so be careful what you share.</p>
+              <h2 className="text-xl font-semibold leading-7 text-gray-900">Ustvari projekt</h2>
+              <p className="mt-1 text-sm leading-6 text-gray-600">Ti podatki bodo javno dostopni, zato bodite previdni ob vnosu.</p>
 
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div className="sm:col-span-4">
-                  <CreateProjectInputField label={"Project Name"} onChange={handleProjectNameChange} />
+                  <CreateProjectInputField label={"Šifra projekta"} onChange={handleProjectNameChange} />
                 </div>
 
                 <div className="col-span-full">
-                  <TextareaInputField instructions={"Describe your project"} onChange={handleDescriptionChange} title={"Description"} />
+                  <TextareaInputField instructions={"Opis gradnje"} onChange={handleDescriptionChange} title={"Opis"} />
                 </div>
                 <div className="col-span-full flex justify-between space-x-4">
                   <div className="w-1/3 pr-20">
-                    <ConstructionTitleInput label={"Construction title"} onChange={handleConstructionTitleChange} />
+                    <ConstructionTitleInput label={"Naziv gradnje"} onChange={handleConstructionTitleChange} />
                   </div>
                   <div className="w-1/3">
-                    <Dropdown label={"Construction Type"} onChange={handleDropdownChange} options={dropdownOptions} />
+                    <Dropdown label={"Vrsta gradnje"} onChange={handleDropdownChange} options={dropdownOptions} />
                   </div>
                   <div className="w-1/3">
                     <DoubleRadioButtons
-                      label={"Environment Impact"}
+                      label={"Objekt s vplivi na okolje"}
                       options={[
-                        { value: true, label: "Yes" },
+                        { value: true, label: "Da" },
                         {
                           value: false,
-                          label: "No",
+                          label: "Ne",
                         },
                       ]}
                       onRadioChange={handleRadioChange}
@@ -186,34 +186,34 @@ const CreateProject = () => {
             <div className=" pb-2">
               <div className="flex justify-between   pb-0">
                 <div>
-                  <h2 className="text-xl font-semibold leading-7 text-gray-900">Investors</h2>
-                  <p className="mt-1 text-sm leading-6 text-gray-600">Add required investors to your project.</p>
+                  <h2 className="text-xl font-semibold leading-7 text-gray-900">Investitorji</h2>
+                  <p className="mt-1 text-sm leading-6 text-gray-600">Dodajte investitorje na projekt.</p>
                 </div>
                 <div className="flex ">
-                  {!isFormComplete ? <div className="mr-5 text-neutral-400">*Fill all fields to add investor</div> : null}
+                  {!isFormComplete ? <div className="mr-5 text-neutral-400">*Zapolnite vsa polja, da dodate investitorja</div> : null}
                   <div className="">
-                    <OutlineButton text={"Add Investor"} onClick={handleAddInvestor} disabled={!isFormComplete} />
+                    <OutlineButton text={"Dodaj investitorja"} onClick={handleAddInvestor} disabled={!isFormComplete} />
                   </div>
                 </div>
               </div>
               <div className="border-b border-gray-900/10 py-10 ">
                 <div className="flex w-full ">
                   <div className="w-1/2 pr-5 space-y-2 ">
-                    <InputField id={"name"} name={"name"} label={"Full name"} placeholder={"Enter display name..."} type={"text"} onChange={handleInputChange} value={userForm.name} />
-                    <InputField id={"email"} name={"email"} label={"Email"} placeholder={"Enter email address..."} type={"text"} onChange={handleInputChange} value={userForm.email} />
-                    <InputField id={"phoneNumber"} name={"phoneNumber"} label={"Phone"} placeholder={"Enter phone number..."} type={"text"} onChange={handleInputChange} value={userForm.phoneNumber} />
+                    <InputField id={"name"} name={"name"} label={"Naziv"} placeholder={"Vnesite naziv..."} type={"text"} onChange={handleInputChange} value={userForm.name} />
+                    <InputField id={"email"} name={"email"} label={"E-pošta"} placeholder={"Vnesite e-poštni naslov..."} type={"text"} onChange={handleInputChange} value={userForm.email} />
+                    <InputField id={"phoneNumber"} name={"phoneNumber"} label={"Telefonska številka"} placeholder={"Vnesite telefonsko številko..."} type={"text"} onChange={handleInputChange} value={userForm.phoneNumber} />
                   </div>
                   <div className="w-1/2 pl-5 space-y-2">
                     <InputField
                       id={"streetAddress"}
                       name={"streetAddress"}
-                      label={"Street address"}
-                      placeholder={"Enter street address..."}
+                      label={"Naslov"}
+                      placeholder={"Vnesite naslov..."}
                       onChange={handleInputChange}
                       type={"text"}
                       value={userForm.streetAddress}
                     />
-                    <InputField id={"taxId"} name={"taxId"} label={"Tax Number"} placeholder={"Enter tax number..."} type={"text"} onChange={handleInputChange} value={userForm.taxId} />
+                    <InputField id={"taxId"} name={"taxId"} label={"Davčna številka"} placeholder={"Vnesite davčno številko..."} type={"text"} onChange={handleInputChange} value={userForm.taxId} />
                   </div>
                 </div>
               </div>
@@ -221,27 +221,27 @@ const CreateProject = () => {
                 <div key={i} className={`border-b ${i == 0 ? "border-t" : null} border-gray-900/10 py-5`}>
                   <div className="grid grid-cols-6 w-full items-center justify-between">
                     <div className="col-span-1">
-                      <div className="text-neutral-400">Name</div>
+                      <div className="text-neutral-400">Naziv</div>
                       <div style={{ wordWrap: "break-word" }}>{user.name}</div>
                     </div>
                     <div className="col-span-1">
-                      <div className="text-neutral-400">Street Address</div>
+                      <div className="text-neutral-400">Naslov</div>
                       <div style={{ wordWrap: "break-word" }}>{user.streetAddress}</div>
                     </div>
                     <div className="col-span-1">
-                      <div className="text-neutral-400">Tax Number</div>
+                      <div className="text-neutral-400">Davčna številka</div>
                       <div style={{ wordWrap: "break-word" }}>{user.taxId}</div>
                     </div>
                     <div className="col-span-1">
-                      <div className="text-neutral-400">Email</div>
+                      <div className="text-neutral-400">E-pošta</div>
                       <div style={{ wordWrap: "break-word" }}>{user.email}</div>
                     </div>
                     <div className="col-span-1">
-                      <div className="text-neutral-400">Phone Number</div>
+                      <div className="text-neutral-400">Telefonska številka</div>
                       <div style={{ wordWrap: "break-word" }}>{user.phoneNumber}</div>
                     </div>
                     <div className="col-span-1 text-right pr-5">
-                      <Button text={"Remove"} onClick={() => handleRemoveInvestor(i)} />
+                      <Button text={"Odstrani"} onClick={() => handleRemoveInvestor(i)} />
                     </div>
                   </div>
                 </div>
@@ -250,7 +250,7 @@ const CreateProject = () => {
           </div>
 
           <div className="mt-6 mb-40 flex items-center justify-end gap-x-6 pb-5">
-            <AnimatedIconButton text={"CREATE"} icon={<AiOutlinePlus />} type={"submit"}></AnimatedIconButton>
+            <AnimatedIconButton text={"USTVARI"} icon={<AiOutlinePlus />} type={"submit"}></AnimatedIconButton>
           </div>
         </form>
       </div>

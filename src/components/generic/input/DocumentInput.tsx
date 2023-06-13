@@ -36,12 +36,12 @@ const DocumentInput = ({ label, title, description, onDocumentChange }: Document
                   htmlFor="file-upload"
                   className="relative cursor-pointer rounded-md  font-semibold text-main-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-main-200 focus-within:ring-offset-2 hover:text-main-500"
                 >
-                  {fileName == undefined ? <span>Upload a file</span> : <span className="text-white mr-2">{fileName}</span>}
+                  {fileName == undefined ? <span>Naloži datoteko</span> : <span className="text-white mr-2">{fileName}</span>}
                   <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleDocumentChange} />
                 </label>
                 {fileName != undefined ? <span id="file-upload-text" className={`ml-2 text-white`}></span> : null}
               </div>
-              <p className={`text-xs leading-5 ${fileName != undefined ? "text-white" : ""}`}>PDF, DOCX, PNG up to 10MB</p>
+              <p className={`text-xs leading-5 ${fileName != undefined ? "text-white" : ""}`}>Do 50MB</p>
             </div>
           </div>
         </div>

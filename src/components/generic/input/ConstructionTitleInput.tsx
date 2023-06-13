@@ -27,7 +27,7 @@ const CreateProjectInputField = ({label, onChange, initialValue = ""}: Construct
                         value={constructionTitle}
                         type="text"
                         className="block flex-1 shadow-sm rounded-md border-0.5 border-gray-300 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400  focus-within:ring-main-500 sm:text-sm sm:leading-6"
-                        placeholder="Enter construction title..."
+                        placeholder="Vnesite naziv gradnje..."
                         onChange={handleChange}
                     />
                 </div>

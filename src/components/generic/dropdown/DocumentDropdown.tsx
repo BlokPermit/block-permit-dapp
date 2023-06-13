@@ -105,8 +105,8 @@ const DocumentDownload = (props: DocumentDropdownProps) => {
       <div className="inline-flex items-center overflow-hidden bg-white rounded-md border-2 border-main-200 text-sm hover:cursor-pointer">
         <span onClick={props.userType === UserType.ASSESSMENT_PROVIDER ? downloadZip : downloadFile} className="inline-flex items-center px-4 py-2 text-main-200 hover:bg-main-200 hover:text-white">
           <FaFileDownload className="mr-2" />
-          {props.documentType === "dpp" && <p>Download DPP</p>}
-          {props.documentType === "dgd" && <p>Download DGD</p>}
+          {props.documentType === "dpp" && <p>Prenesi DPP</p>}
+          {props.documentType === "dgd" && <p>Prenesi DGD</p>}
         </span>
         <RoleBasedComponent
           projectManagerComponent={

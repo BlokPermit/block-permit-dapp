@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import Link from 'next/link';
 
 const Route2LabelMap = {
-    "projects": "Projects",
-    "addProject": "Create Project",
-    "editProject": "Edit Project",
-    "user": "User",
-    "editUser": "Edit User"
+    "projects": "Projekti",
+    "addProject": "Ustvari projekt",
+    "editProject": "Uredi projekt",
+    "user": "Uporabnik",
+    "editUser": "Uredi račun"
 };
 
 interface Crumb {
