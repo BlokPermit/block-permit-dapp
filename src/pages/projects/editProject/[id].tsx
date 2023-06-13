@@ -13,9 +13,10 @@ import OutlineButton from "@/components/generic/buttons/OutlineButton";
 import InputField from "@/components/generic/input/InputField";
 import Button from "@/components/generic/buttons/Button";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
-import { AiOutlinePlus } from "react-icons/all";
+import { AiOutlinePlus, FaEdit } from "react-icons/all";
 import { dropdownOptions, InvestorInput, Option } from "@/pages/projects/addProject";
 import { Project } from "@prisma/client";
+import useConformationPopup from "@/hooks/ConformationPopupHook";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -29,6 +30,7 @@ export const getServerSideProps: any = async (context: any) => {
 };
 
 const EditProject = ({ project }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { setConformationPopup } = useConformationPopup();
   const emptyInvestor = {
     name: "",
     streetAddress: "",
@@ -84,7 +86,18 @@ const EditProject = ({ project }: InferGetServerSidePropsType<typeof getServerSi
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    setConformationPopup({
+      title: "Posodobi projekt",
+      message: `Ali ste prepričani, da želiti shraniti spremenjene podatke in posodobiti projekt?`,
+      icon: <FaEdit />,
+      popupType: "warning",
+      buttonPrimaryText: "Posodobi",
+      onClickPrimary: updateProject,
+      show: true,
+    });
+  };
 
+  const updateProject = async () => {
     try {
       const updatedProjectData = {
         ...project,

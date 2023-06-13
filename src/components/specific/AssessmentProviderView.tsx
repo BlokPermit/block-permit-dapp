@@ -1,14 +1,4 @@
-import {
-  FaArrowUp,
-  FaCalendarPlus,
-  FaFileDownload,
-  FaHourglass,
-  FaPaperclip,
-  FaQuestion,
-  FaUpload,
-  FaUser,
-  FaInfo  
-} from "react-icons/fa";
+import { FaArrowUp, FaCalendarPlus, FaFileDownload, FaHourglass, FaPaperclip, FaQuestion, FaUpload, FaUser, FaInfo } from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { ProjectModel } from "@/models/ProjectModel";
 import { DocumentContractModel } from "@/models/DocumentContractModel";
@@ -23,13 +13,11 @@ import { getFileNamesFromDirectory, saveDocument } from "@/lib/DocumentService";
 import useAlert from "@/hooks/AlertHook";
 import { useRouter } from "next/router";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
-import { headers } from "next/dist/client/components/headers";
-import {getConnectedAddress} from "../../utils/MetamaskUtils";
-import {hashFileToBytes32} from "../../utils/FileUtils";
-import {getFileNamesWithHashesFromDirectory} from "../../lib/DocumentService";
-import {FaSpinner} from "react-icons/all";
-import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
+import { getConnectedAddress } from "../../utils/MetamaskUtils";
+import { hashFileToBytes32 } from "../../utils/FileUtils";
+import { getFileNamesWithHashesFromDirectory } from "../../lib/DocumentService";
+import { FaSpinner } from "react-icons/all";
+import "react-calendar/dist/Calendar.css";
 import AssessmentDueDateExtensionPopup from "./AssessmentDueDateExtensionPopup";
 import ProjectManagerInfoPopup from "./ProjectManagerInfoPopup";
 
@@ -112,19 +100,18 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
         const assessmentMainDocument = {
           id: assessmentUrl,
           owner: connectedAddress,
-          documentHash: await hashFileToBytes32(assessment)
-        }
+          documentHash: await hashFileToBytes32(assessment),
+        };
 
         const assessmentAttachments = await getFileNamesWithHashesFromDirectory(`public/${assessmentPath}/attachments`);
         for (let attachment of assessmentAttachments) {
           attachment.owner = connectedAddress;
         }
 
-
         const assessmentStruct = {
           assessmentMainDocument: assessmentMainDocument,
-          assessmentAttachments: assessmentAttachments
-        }
+          assessmentAttachments: assessmentAttachments,
+        };
         const response = await fetch(`/api/documentContracts/provideAssessment`, {
           method: "POST",
           headers: {
@@ -151,7 +138,6 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
 
   useEffect(() => {
     getUnsentAttachments();
-
   }, []);
 
   const downloadAssessment = async () => {
@@ -194,7 +180,7 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
         {isAssessmentDueDateExtensionPopupOpen && (
           <AssessmentDueDateExtensionPopup
             onClose={() => setIsAssessmentDueDateExtensionPopupOpen(false)}
-            projectInfo={{name: project.baseProject.title, projectManagerEmail: project.projectManager.email}}
+            projectInfo={{ name: project.baseProject.name, projectManagerEmail: project.projectManager.email }}
             documentContract={documentContract}
           />
         )}
@@ -203,64 +189,71 @@ const AssessmentProviderView = ({ project, selectedState, loggedInAssessmentProv
           icon={<FaHourglass />}
           title={selectedState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "Rok za oddajo pogojev" : "Rok za oddajo mnenja"}
           value={documentContract ? formatDate(dateFromTimestamp(documentContract.assessmentDueDate)) ?? "N/A" : "N/A"}
-          valueClassName={documentContract
+          valueClassName={
+            documentContract
               ? documentContract.assessmentDateProvided
-                  ? documentContract.assessmentDateProvided < documentContract.assessmentDueDate ? "text-green-500" : "text-red-500"
-                  : dateFromTimestamp(documentContract.assessmentDueDate) > new Date() ? "text-main-200" : "text-red-500"
+                ? documentContract.assessmentDateProvided < documentContract.assessmentDueDate
+                  ? "text-green-500"
+                  : "text-red-500"
+                : dateFromTimestamp(documentContract.assessmentDueDate) > new Date()
+                ? "text-main-200"
+                : "text-red-500"
               : undefined
           }
           trailing={
-            documentContract
-            ? !documentContract.isClosed
-              ? (<ButtonGroup
-                secondaryButtons={documentContract.requestedAssessmentDueDate
-                ? [{
-                    text: formatDate(dateFromTimestamp(documentContract.requestedAssessmentDueDate)),
-                    icon: <FaQuestion />,
-                    disabled: true,
-                  }]
-                : []}
-                primaryButton={!documentContract.requestedAssessmentDueDate
-                ? {
-                  text: "Zaprosi za podaljšanje roka ocenitve",
-                  icon: <FaCalendarPlus />,
-                  onClick: () => setIsAssessmentDueDateExtensionPopupOpen(true),
-                } : {
-                  text: "Zaprosi za podaljšanje roka ocenitve",
-                  icon: <FaCalendarPlus />,
-                  onClick: () => {},
-                  disabled: true
-                }}
-              />
+            documentContract ? (
+              !documentContract.isClosed ? (
+                <ButtonGroup
+                  secondaryButtons={
+                    documentContract.requestedAssessmentDueDate
+                      ? [
+                          {
+                            text: formatDate(dateFromTimestamp(documentContract.requestedAssessmentDueDate)),
+                            icon: <FaQuestion />,
+                            disabled: true,
+                          },
+                        ]
+                      : []
+                  }
+                  primaryButton={
+                    !documentContract.requestedAssessmentDueDate
+                      ? {
+                          text: "Zaprosi za podaljšanje roka ocenitve",
+                          icon: <FaCalendarPlus />,
+                          onClick: () => setIsAssessmentDueDateExtensionPopupOpen(true),
+                        }
+                      : {
+                          text: "Zaprosi za podaljšanje roka ocenitve",
+                          icon: <FaCalendarPlus />,
+                          onClick: () => {},
+                          disabled: true,
+                        }
+                  }
+                />
+              ) : (
+                <ButtonGroup
+                  secondaryButtons={[]}
+                  primaryButton={{
+                    text: selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "Prenesi projektne pogoje" : "Prenesi projektno mnenje",
+                    icon: !isDownloading ? <FaFileDownload /> : <FaSpinner className="animate-spin" />,
+                    onClick: downloadAssessment,
+                  }}
+                />
               )
-              : (<ButtonGroup
-                secondaryButtons={[]}
-                primaryButton={{
-                  text: selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "Prenesi projektne pogoje" : "Prenesi projektno mnenje",
-                  icon: !isDownloading ? <FaFileDownload /> : <FaSpinner className="animate-spin" />,
-                  onClick: downloadAssessment,
-                }}
-              />)
-                : null
+            ) : null
           }
         />
       </div>
       {documentContract && !documentContract.isClosed ? (
         <div>
           <h2 className="text-2xl font-semibold my-5">{project.baseProject.projectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "Naloži projektne pogoje" : "Naloži projektno mnenje"}</h2>
-          <DocumentInput onDocumentChange={onDocumentChange}/>
+          <DocumentInput onDocumentChange={onDocumentChange} />
           <div className="flex justify-end gap-4">
-            <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Priloge"
-                        icon={<FaPaperclip/>} onClick={() => setIsAttachmentsPopupOpen(true)}/>
-            {assessment ?
-                (<IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200" text="Pošlji"
-                             icon={<FaUpload/>} onClick={handleSendAssessment}/>)
-                : null
-            }
+            <IconButton className="mt-3 bg-white text-main-200 hover:bg-main-200 hover:text-white" text="Priloge" icon={<FaPaperclip />} onClick={() => setIsAttachmentsPopupOpen(true)} />
+            {assessment ? <IconButton className="mt-3 bg-main-200 text-white hover:bg-white hover:text-main-200" text="Pošlji" icon={<FaUpload />} onClick={handleSendAssessment} /> : null}
           </div>
         </div>
-      ) : null
-      }
+      ) : null}
     </div>
   );
 };
