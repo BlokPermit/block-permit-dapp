@@ -26,348 +26,362 @@ async function getContract(contractAddress: string, signer: string): Promise<Con
 }*/
 
 export const createProject = async (data: Project, walletAddress: string) => {
-  try {
-    const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
-    // Deploys a new Project smart contract on a blockchain
-    const contractFactory: ContractFactory = new ContractFactory(contractArtifact.abi, contractArtifact.bytecode, await provider.getSigner(walletAddress));
+    try {
+        const contractArtifact: any = getContractArtifact(ArtifactType.PROJECT_ARTIFACT);
+        // Deploys a new Project smart contract on a blockchain
+        const contractFactory: ContractFactory = new ContractFactory(contractArtifact.abi, contractArtifact.bytecode, await provider.getSigner(walletAddress));
 
-    const contract: Contract = await contractFactory.deploy();
-    await contract.deployed();
-    console.log(`Project contract with address ${contract.address} deployed`);
+        const contract: Contract = await contractFactory.deploy();
+        await contract.deployed();
+        console.log(`Project contract with address ${contract.address} deployed`);
 
-    // Inserts Project and links it within User
-    data.smartContractAddress = contract.address;
-    data.createdAt = parseInt(await contract.dateCreated());
-    let project: Project = await prisma.project.create({
-      data: data,
-    });
+        // Inserts Project and links it within User
+        data.smartContractAddress = contract.address;
+        data.createdAt = parseInt(await contract.dateCreated());
+        let project: Project = await prisma.project.create({
+            data: data,
+        });
 
-    await prisma.user.update({
-      where: { walletAddress: walletAddress },
-      data: {
-        projectAddresses: {
-          push: contract.address,
-        },
-      },
-    });
+        await prisma.user.update({
+            where: {walletAddress: walletAddress},
+            data: {
+                projectAddresses: {
+                    push: contract.address,
+                },
+            },
+        });
 
-    return project;
-  } catch (error: Error | any) {
-    console.log(error.message);
-    throw new Error("Something went wrong in ProjectService.ts");
-  }
+        return project;
+    } catch (error: Error | any) {
+        console.log(error.message);
+        throw new Error("Something went wrong in ProjectService.ts");
+    }
 };
 
 export const findBaseProjectById = async (id: string): Promise<Project> => {
-  try {
-    const baseProject = await prisma.project.findFirst({
-      where: {
-        id: id,
-      },
-    });
+    try {
+        const baseProject = await prisma.project.findFirst({
+            where: {
+                id: id,
+            },
+        });
 
-    if (baseProject) return baseProject!;
+        if (baseProject) return baseProject!;
 
-    throw new Error("Project not found");
-  } catch (error: any) {
-    throw error;
-  }
+        throw new Error("Project not found");
+    } catch (error: any) {
+        throw error;
+    }
 };
 
 export const findProjectById = async (id: string) => {
-  try {
-    // Queries DB
-    const baseProject: Project | null = await prisma.project.findFirst({
-      where: {
-        id: id,
-      },
-      include: {
-        investors: true,
-      },
-    });
+    try {
+        // Queries DB
+        const baseProject: Project | null = await prisma.project.findFirst({
+            where: {
+                id: id,
+            },
+            include: {
+                investors: true,
+            },
+        });
 
-    if (!baseProject) throw new Error("Project not found");
+        if (!baseProject) throw new Error("Project not found");
 
-    // Queries blockchain
-    const projectContract = new Contract(baseProject.smartContractAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, provider);
+        // Queries blockchain
+        const projectContract = new Contract(baseProject.smartContractAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, provider);
 
-    const projectManager: User | null = await findUserByAddress(await projectContract.projectManager());
+        const projectManager: User | null = await findUserByAddress(await projectContract.projectManager());
 
-    let assessmentProviders: User[] = [];
-    for (const address of await projectContract.getAssessmentProvidersAddresses()) {
-      let user: User | null = await findUserByAddress(address);
-      if (user) assessmentProviders.push(user);
+        let assessmentProviders: User[] = [];
+        for (const address of await projectContract.getAssessmentProvidersAddresses()) {
+            let user: User | null = await findUserByAddress(address);
+            if (user) assessmentProviders.push(user);
+        }
+
+        const numOfAssessmentProviders: number = parseInt(await projectContract.numOfAssessmentProviders());
+
+        let administrativeAuthority: User | null = null;
+        const administrativeAuthorityAddress: string = await projectContract.administrativeAuthority();
+        if (administrativeAuthorityAddress != AddressZero) {
+            administrativeAuthority = await findUserByAddress(administrativeAuthorityAddress);
+            console.log(administrativeAuthority);
+        }
+
+        const DPP = await projectContract.DPP();
+        const DPPUrl: string | null = DPP.id != "" ? DPP.id : null;
+        const sentDPPs: DocumentContractModel[] = await getDocumentContractModels(await projectContract.getSentDPPsAddresses());
+        const numOfSentDPPs: number = parseInt(await projectContract.getSentDPPsLength());
+        const numOfAssessedDPPs: number = parseInt(await projectContract.numOfAssessedDPPs());
+
+        const DGD = await projectContract.DGD();
+        const DGDUrl: string | null = DGD.id != "" ? DGD.id : null;
+        const sentDGDs: DocumentContractModel[] | null = await getDocumentContractModels(await projectContract.getSentDGDsAddresses());
+        const numOfSentDGDs: number = parseInt(await projectContract.getSentDGDsLength());
+        const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
+
+        const isDPPPhaseFinalized = await projectContract.isDPPPhaseFinalized();
+
+        return {
+            baseProject: baseProject,
+            projectManager: projectManager!,
+            assessmentProviders: assessmentProviders,
+            numOfAssessmentProviders: numOfAssessmentProviders,
+            administrativeAuthority: administrativeAuthority,
+            DPPUrl: DPPUrl,
+            sentDPPs: sentDPPs,
+            numOfSentDPPs: numOfSentDPPs,
+            numOfAssessedDPPs: numOfAssessedDPPs,
+            DGDUrl: DGDUrl,
+            sentDGDs: sentDGDs,
+            numOfSentDGDs: numOfSentDGDs,
+            numOfAssessedDGDs: numOfAssessedDGDs,
+            isDPPPhaseFinalized: isDPPPhaseFinalized
+        };
+    } catch (error: any) {
+        throw new Error(error.message);
     }
-
-    const numOfAssessmentProviders: number = parseInt(await projectContract.numOfAssessmentProviders());
-
-    let administrativeAuthority: User | null = null;
-    const administrativeAuthorityAddress: string = await projectContract.administrativeAuthority();
-    if (administrativeAuthorityAddress != AddressZero) {
-      administrativeAuthority = await findUserByAddress(administrativeAuthorityAddress);
-      console.log(administrativeAuthority);
-    }
-
-    const DPP = await projectContract.DPP();
-    const DPPUrl: string | null = DPP.id != "" ? DPP.id : null;
-    const sentDPPs: DocumentContractModel[] = await getDocumentContractModels(await projectContract.getSentDPPsAddresses());
-    const numOfSentDPPs: number = parseInt(await projectContract.getSentDPPsLength());
-    const numOfAssessedDPPs: number = parseInt(await projectContract.numOfAssessedDPPs());
-
-    const DGD = await projectContract.DGD();
-    const DGDUrl: string | null = DGD.id != "" ? DGD.id : null;
-    const sentDGDs: DocumentContractModel[] | null = await getDocumentContractModels(await projectContract.getSentDGDsAddresses());
-    const numOfSentDGDs: number = parseInt(await projectContract.getSentDGDsLength());
-    const numOfAssessedDGDs: number = parseInt(await projectContract.numOfAssessedDGDs());
-
-    const isDPPPhaseFinalized = await projectContract.isDPPPhaseFinalized();
-
-    return {
-      baseProject: baseProject,
-      projectManager: projectManager!,
-      assessmentProviders: assessmentProviders,
-      numOfAssessmentProviders: numOfAssessmentProviders,
-      administrativeAuthority: administrativeAuthority,
-      DPPUrl: DPPUrl,
-      sentDPPs: sentDPPs,
-      numOfSentDPPs: numOfSentDPPs,
-      numOfAssessedDPPs: numOfAssessedDPPs,
-      DGDUrl: DGDUrl,
-      sentDGDs: sentDGDs,
-      numOfSentDGDs: numOfSentDGDs,
-      numOfAssessedDGDs: numOfAssessedDGDs,
-      isDPPPhaseFinalized: isDPPPhaseFinalized
-    };
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
 };
 
 export const getProjectsOfUserFromDatabase = async (userId: string): Promise<Project[]> => {
-  try {
-    const user = await findUserById(userId);
-    return prisma.project.findMany({
-      where: {
-        smartContractAddress: {
-          in: user?.projectAddresses,
-        },
-      },
-    });
-    /*return await prisma.project.findMany({
-            where: {}
-        });*/
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+    try {
+        const user = await findUserById(userId);
+        return prisma.project.findMany({
+            where: {
+                smartContractAddress: {
+                    in: user?.projectAddresses,
+                },
+            },
+        });
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
-export const getRecentProjects = async (projectIds: string[]) => {
-  try {
-    return await prisma.project.findMany({
-      where: {
-        id: {
-          in: projectIds,
-        },
-      },
-    });
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+export const getRecentProjects = async (projectIds: string[], userId: string) => {
+    try {
+        const user = await findUserById(userId);
+        return await prisma.project.findMany({
+            where: {
+                AND: [{
+                    id: {
+                        in: projectIds,
+                    }
+                }, {
+                    smartContractAddress: {
+                        in: user?.projectAddresses,
+                    }
+                }
+                ]
+
+            },
+        });
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
 export const updateProject = async (project: Project) => {
-  try {
-    const { id, ...updatedProject } = project;
-    return await prisma.project.update({
-      where: {
-        id: id,
-      },
-      data: updatedProject,
-    });
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+    try {
+        const {id, ...updatedProject} = project;
+        return await prisma.project.update({
+            where: {
+                id: id,
+            },
+            data: updatedProject,
+        });
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
-export const getRecentProjectsByState = async (state: ProjectState) => {
-  try {
-    let projects: Project[] = await prisma.project.findMany({
-      where: {
-        projectState: state,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 5,
-    });
-    if (projects.length == 0) return [];
-    return projects;
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+export const getRecentProjectsByState = async (state: ProjectState, userId: string) => {
+    try {
+        const user = await findUserById(userId);
+        let projects: Project[] = await prisma.project.findMany({
+            where: {
+                AND: [{
+                    projectState: state
+                }, {
+                    smartContractAddress: {
+                        in: user?.projectAddresses,
+                    }
+                }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            take: 5,
+        });
+        if (projects.length == 0) return [];
+        return projects;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
 export const addAssessmentProviders = async (projectAddress: string, signerAddress: string, assessmentProvidersAddresses: string[]) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await projectContract.addAssessmentProviders(assessmentProvidersAddresses);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
-
-  try {
-    for (let assessmentProviderAddress of assessmentProvidersAddresses) {
-      await prisma.user.update({
-        where: { walletAddress: assessmentProviderAddress },
-        data: {
-          projectAddresses: {
-            push: projectAddress,
-          },
-        },
-      });
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+        await projectContract.addAssessmentProviders(assessmentProvidersAddresses);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
     }
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+
+    try {
+        for (let assessmentProviderAddress of assessmentProvidersAddresses) {
+            await prisma.user.update({
+                where: {walletAddress: assessmentProviderAddress},
+                data: {
+                    projectAddresses: {
+                        push: projectAddress,
+                    },
+                },
+            });
+        }
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
 export const removeAssessmentProviders = async (projectAddress: string, signerAddress: string, assessmentProvidersAddresses: string[]) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await projectContract.removeAssessmentProviders(assessmentProvidersAddresses);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+        await projectContract.removeAssessmentProviders(assessmentProvidersAddresses);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
 
-    const dpp = {
-      id: dppUrl,
-      owner: signerAddress,
-      documentHash: dppHash,
-    };
+        const dpp = {
+            id: dppUrl,
+            owner: signerAddress,
+            documentHash: dppHash,
+        };
 
-    await projectContract.setDPP(dpp);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+        await projectContract.setDPP(dpp);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const sendDPP = async (projectAddress: string, signerAddress: string, documentContractStructs: object[]) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
 
-    await projectContract.sendDPP(documentContractStructs);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+        await projectContract.sendDPP(documentContractStructs);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const setDGD = async (projectAddress: string, signerAddress: string, dgdUrl: string, dgdHash: string) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
 
-    const dgd = {
-      id: dgdUrl,
-      owner: signerAddress,
-      documentHash: dgdHash,
-    };
+        const dgd = {
+            id: dgdUrl,
+            owner: signerAddress,
+            documentHash: dgdHash,
+        };
 
-    await projectContract.setDGD(dgd);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+        await projectContract.setDGD(dgd);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const sendDGD = async (projectAddress: string, signerAddress: string, documentContractStructs: object[]) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
 
-    await projectContract.sendDGD(documentContractStructs);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+        await projectContract.sendDGD(documentContractStructs);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const changeAdministrativeAuthority = async (projectAddress: string, signerAddress: string, administrativeAuthorityAddress: string) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await projectContract.changeAdministrativeAuthority(administrativeAuthorityAddress);
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+        await projectContract.changeAdministrativeAuthority(administrativeAuthorityAddress);
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 export const finalizeDPPPhase = async (projectAddress: string, signerAddress: string) => {
-  try {
-    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-    await projectContract.finalizeDPPPhase();
+    try {
+        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+        await projectContract.finalizeDPPPhase();
 
-    await prisma.project.update({
-      where: {
-        smartContractAddress: projectAddress,
-      },
-      data: {
-        projectState: ProjectState.AQUIRING_PROJECT_OPINIONS,
-      },
-    });
-  } catch (error: any) {
-    throw new Error(getErrorReason(error));
-  }
+        await prisma.project.update({
+            where: {
+                smartContractAddress: projectAddress,
+            },
+            data: {
+                projectState: ProjectState.AQUIRING_PROJECT_OPINIONS,
+            },
+        });
+    } catch (error: any) {
+        throw new Error(getErrorReason(error));
+    }
 };
 
 const getProjectAddressesOfUser = async (walletAddress: string) => {
-  try {
-    return await prisma.user.findUnique({
-      where: {
-        walletAddress: walletAddress,
-      },
-    });
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+    try {
+        return await prisma.user.findUnique({
+            where: {
+                walletAddress: walletAddress,
+            },
+        });
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
 };
 
 const getDocumentContractModels = async (addresses: string[]) => {
-  let sentDocumentContracts: DocumentContractModel[] = [];
-  for (const address of addresses) {
-    const documentContract = new Contract(address, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, provider);
+    let sentDocumentContracts: DocumentContractModel[] = [];
+    for (const address of addresses) {
+        const documentContract = new Contract(address, getContractArtifact(ArtifactType.DOCUMENT_CONTRACT_ARTIFACT).abi, provider);
 
-    const assessmentProvider: User | null = await findUserByAddress(await documentContract.assessmentProvider());
+        const assessmentProvider: User | null = await findUserByAddress(await documentContract.assessmentProvider());
 
-    if (!assessmentProvider) throw new Error("Assessment provider not found");
+        if (!assessmentProvider) throw new Error("Assessment provider not found");
 
-    let requestedAssessmentDueDate: number | null = parseInt(await documentContract.requestedAssessmentDueDate());
-    if (requestedAssessmentDueDate == 0) requestedAssessmentDueDate = null;
+        let requestedAssessmentDueDate: number | null = parseInt(await documentContract.requestedAssessmentDueDate());
+        if (requestedAssessmentDueDate == 0) requestedAssessmentDueDate = null;
 
-    let mainDocumentType: MainDocumentType = parseInt(await documentContract.mainDocumentType()) == 0
-        ? MainDocumentType.DPP : MainDocumentType.DGD;
+        let mainDocumentType: MainDocumentType = parseInt(await documentContract.mainDocumentType()) == 0
+            ? MainDocumentType.DPP : MainDocumentType.DGD;
 
-    let assessmentDateProvided: number | null = parseInt((await documentContract.assessment()).dateProvided);
-    if (assessmentDateProvided == 0) assessmentDateProvided = null;
+        let assessmentDateProvided: number | null = parseInt((await documentContract.assessment()).dateProvided);
+        if (assessmentDateProvided == 0) assessmentDateProvided = null;
 
-    sentDocumentContracts.push({
-      documentContractAddress: address,
-      assessmentProvider: assessmentProvider,
-      isClosed: await documentContract.isClosed(),
-      assessmentDueDate: parseInt(await documentContract.assessmentDueDate()),
-      mainDocumentUpdateRequested: await documentContract.mainDocumentUpdateRequested(),
-      requestedAssessmentDueDate: requestedAssessmentDueDate,
-      attachments: getAttachmentsUrls(await documentContract.getAttachments()),
-      assessmentAttachments: getAttachmentsUrls(await documentContract.getAssessmentAttachments()),
-      assessmentMainDocument: (await documentContract.assessment()).assessmentMainDocument.id,
-      mainDocumentType: mainDocumentType,
-      assessmentDateProvided: assessmentDateProvided,
-      dateCreated: parseInt(await documentContract.dateCreated())
-    });
-  }
+        sentDocumentContracts.push({
+            documentContractAddress: address,
+            assessmentProvider: assessmentProvider,
+            isClosed: await documentContract.isClosed(),
+            assessmentDueDate: parseInt(await documentContract.assessmentDueDate()),
+            mainDocumentUpdateRequested: await documentContract.mainDocumentUpdateRequested(),
+            requestedAssessmentDueDate: requestedAssessmentDueDate,
+            attachments: getAttachmentsUrls(await documentContract.getAttachments()),
+            assessmentAttachments: getAttachmentsUrls(await documentContract.getAssessmentAttachments()),
+            assessmentMainDocument: (await documentContract.assessment()).assessmentMainDocument.id,
+            mainDocumentType: mainDocumentType,
+            assessmentDateProvided: assessmentDateProvided,
+            dateCreated: parseInt(await documentContract.dateCreated())
+        });
+    }
 
-  return sentDocumentContracts;
+    return sentDocumentContracts;
 };
 
 const getAttachmentsUrls = (attachments: { id: string }[]) => {
-  return attachments.map((attachment) => attachment.id);
+    return attachments.map((attachment) => attachment.id);
 };

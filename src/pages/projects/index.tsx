@@ -63,32 +63,10 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
         <div className="mt-8">
           <ProgressBar actualState={ProjectState.AQUIRING_BUILDING_PERMIT} selectedState={projectState} handleStateChange={(state: ProjectState) => setProjectState(state)} />
           <div className="my-3 grid grid-cols-6 gap-4">
-            <span className="col-span-4">
+            <span className="col-span-6">
               <InputField id={searchText} label={""} placeholder={"Išči projekte..."} type={"text"} onChange={(e) => setSearchText(e.target.value)} />
             </span>
-            <span className="col-span-2">
-              <Radio
-                label={"Vpliva na okolje"}
-                options={[
-                  {
-                    title: "Vpliva na okolje",
-                    description: "Da",
-                    value: true,
-                  },
-                  {
-                    title: "Vpliva na okolje",
-                    description: "Ne",
-                    value: false,
-                  },
-                  {
-                    title: "Vpliva na okolje",
-                    description: "Vsi",
-                    value: "all",
-                  },
-                ]}
-                onChange={(e) => setEnvironmentImpact(e.target.value !== "all" ? e.target.value === "true" : undefined)}
-              />
-            </span>
+
           </div>
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm text-left">

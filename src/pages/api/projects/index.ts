@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(201).json(project);
             break;
         case "GET":
-            const projects: Project[] | Error = await getRecentProjects(req.body.projectIds);
+            const projects: Project[] | Error = await getRecentProjects(req.body.projectIds, req.body.userId);
             res.status(201).json(projects);
             break;
         case "PUT":

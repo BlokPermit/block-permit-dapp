@@ -1,26 +1,40 @@
 import React, {useEffect, useState} from "react";
 import ProtectedRoute from "@/components/generic/navigation/ProtectedRoute";
 import {Project} from "@prisma/client";
-import {getRecentProjectsByState} from "@/lib/ProjectService";
+import {findProjectById, getRecentProjectsByState} from "@/lib/ProjectService";
 import {InferGetServerSidePropsType} from "next/types";
 import RecentProjectCard from "@/components/specific/RecentProjectCard";
 import {ProjectState} from ".prisma/client";
 import ProjectAddPlaceholder from "@/components/specific/ProjectAddPlaceholder";
 import {getRecentProjects} from "@/utils/LocalStorageUtil";
+import {getSession} from "next-auth/react";
 
-export const getServerSideProps: any = async () => {
+export const getServerSideProps: any = async (context: any) => {
     try {
-        const acquiringConditionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_CONDITIONS);
-        const acquiringOpinionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_OPINIONS);
-        const acquiringBuildingPermitsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_BUILDING_PERMIT) ;
+        const session = await getSession(context);
 
-        return {
-            props: {
-                acquiringConditionsProjects,
-                acquiringBuildingPermitsProjects,
-                acquiringOpinionsProjects
-            },
-        };
+        if (!session) {
+            return {
+                redirect: {
+                    destination: "/auth",
+                    permanent: false,
+                },
+            };
+        } else {
+            const loggedInUser = session.user;
+            const acquiringConditionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_CONDITIONS, session.user?.id?.toString() || "");
+            const acquiringOpinionsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_PROJECT_OPINIONS, session.user?.id?.toString() || "");
+            const acquiringBuildingPermitsProjects = await getRecentProjectsByState(ProjectState.AQUIRING_BUILDING_PERMIT, session.user?.id?.toString() || "");
+
+            return {
+                props: {
+                    acquiringConditionsProjects,
+                    acquiringBuildingPermitsProjects,
+                    acquiringOpinionsProjects,
+                    loggedInUser
+                },
+            };
+        }
     } catch (error: any) {
         console.error(error.message);
     }
@@ -29,7 +43,8 @@ export const getServerSideProps: any = async () => {
 const Dashboard = ({
                        acquiringConditionsProjects = [],
                        acquiringBuildingPermitsProjects = [],
-                       acquiringOpinionsProjects = []
+                       acquiringOpinionsProjects = [],
+                        loggedInUser
                    }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     const [recentProjects, setRecentProjects] = useState([]);
 
@@ -38,8 +53,7 @@ const Dashboard = ({
     }, []);
 
     const fetchProjects = async () => {
-        const recentProjects = await getRecentProjects();
-        console.log("recent", recentProjects);
+        const recentProjects = await getRecentProjects(loggedInUser.id.toString());
         setRecentProjects(recentProjects);
     };
 

@@ -18,11 +18,7 @@ export default function Sidebar() {
                 <Link href="/user"
                       className={`flex items-center gap-3.5  p-4 hover:bg-gray-50 ${pathname == "/user" ? "bg-gray-100" : "bg-white"}`}>
                     <div>
-
                             <strong className="block text-md">{data?.user.name}</strong>
-
-
-
                     </div>
                     <Jazzicon seed={10015} diameter={38}/>
                 </Link>

@@ -1,6 +1,6 @@
 import {Project} from "@prisma/client";
 
-export const getRecentProjects = async () => {
+export const getRecentProjects = async (userId: string) => {
     const projectIds = localStorage.getItem('recentProjects');
     if (projectIds) {
         const parsedProjectIds = JSON.parse(projectIds);
@@ -10,7 +10,8 @@ export const getRecentProjects = async () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                projectIds: parsedProjectIds
+                projectIds: parsedProjectIds,
+                userId: userId
             })
         });
         if(!response.ok) {
