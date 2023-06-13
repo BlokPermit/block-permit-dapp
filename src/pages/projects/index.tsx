@@ -1,16 +1,15 @@
 import React from "react";
 import ProtectedRoute from "@/components/generic/navigation/ProtectedRoute";
-import { AiOutlineAppstoreAdd } from "react-icons/all";
+import {AiOutlineAppstoreAdd} from "react-icons/all";
 import AnimatedIconButton from "@/components/generic/buttons/AnimatedIconButton";
-import { getProjectsOfUserFromDatabase} from "@/lib/ProjectService";
-import { InferGetServerSidePropsType } from "next/types";
-import {Project, ProjectState, User} from "@prisma/client";
-import { useRouter } from "next/router";
+import {getProjectsOfUserFromDatabase} from "@/lib/ProjectService";
+import {InferGetServerSidePropsType} from "next/types";
+import {Project, ProjectState} from "@prisma/client";
+import {useRouter} from "next/router";
 import InputField from "@/components/generic/input/InputField";
-import Radio from "@/components/generic/input/Radio";
-import ProgressBar from "@/components/specific/ProgressBar";
 import {getProjectStateName} from "@/utils/EnumUtils";
 import {getSession} from "next-auth/react";
+import FilterProgressBar, {FilterProjectState} from "@/components/specific/FilterProgressBar";
 
 export const getServerSideProps: any = async (context: any) => {
   try {
@@ -37,19 +36,31 @@ export const getServerSideProps: any = async (context: any) => {
 const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const [searchText, setSearchText] = React.useState<string>("");
-  const [environmentImpact, setEnvironmentImpact] = React.useState<boolean>();
-  const [projectState, setProjectState] = React.useState<ProjectState>(ProjectState.AQUIRING_PROJECT_CONDITIONS);
+  const [projectState, setProjectState] = React.useState<FilterProjectState>(FilterProjectState.ALL);
 
   const filter = (project: Project): boolean => {
+    console.log(parseProjectState(projectState));
     return (
       (project.constructionTitle.toLowerCase().includes(searchText.toLowerCase()) ||
         project.constructionType.toLowerCase().includes(searchText.toLowerCase()) ||
         project.name.toLowerCase().includes(searchText.toLowerCase()) ||
         searchText === "") &&
-      (environmentImpact === undefined || project.constructionImpactsEnvironment === environmentImpact) &&
-      projectState === project.projectState
+        (parseProjectState(projectState) === project.projectState || parseProjectState(projectState) === "ALL")
     );
   };
+
+  function parseProjectState(state: FilterProjectState): ProjectState | string {
+    switch (state) {
+      case FilterProjectState.AQUIRING_PROJECT_CONDITIONS:
+        return ProjectState.AQUIRING_PROJECT_CONDITIONS
+      case FilterProjectState.AQUIRING_PROJECT_OPINIONS:
+        return ProjectState.AQUIRING_PROJECT_OPINIONS
+      case FilterProjectState.AQUIRING_BUILDING_PERMIT:
+        return ProjectState.AQUIRING_BUILDING_PERMIT
+      default:
+        return "ALL"
+    }
+  }
 
   return (
     <ProtectedRoute>
@@ -60,8 +71,8 @@ const Projects = ({ projects }: InferGetServerSidePropsType<typeof getServerSide
           </div>
           <AnimatedIconButton text={"Dodaj Projekt"} icon={<AiOutlineAppstoreAdd size={20} />} isLink={true} href={"/projects/addProject"}></AnimatedIconButton>
         </div>
-        <div className="mt-8">
-          <ProgressBar actualState={ProjectState.AQUIRING_BUILDING_PERMIT} selectedState={projectState} handleStateChange={(state: ProjectState) => setProjectState(state)} />
+        <div className="mt-6">
+          <FilterProgressBar actualState={FilterProjectState.ALL} selectedState={projectState} handleStateChange={(state: FilterProjectState) => setProjectState(state)} />
           <div className="my-3 grid grid-cols-6 gap-4">
             <span className="col-span-6">
               <InputField id={searchText} label={""} placeholder={"Išči projekte..."} type={"text"} onChange={(e) => setSearchText(e.target.value)} />
