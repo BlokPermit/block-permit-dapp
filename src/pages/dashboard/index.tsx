@@ -54,6 +54,7 @@ const Dashboard = ({
 
     const fetchProjects = async () => {
         const recentProjects = await getRecentProjects(loggedInUser.id.toString());
+        console.log(recentProjects)
         setRecentProjects(recentProjects);
     };
 

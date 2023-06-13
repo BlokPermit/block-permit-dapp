@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     switch (method) {
         case "POST":
-            const projects = await getRecentProjects(req.body.projectIds);
+            const projects = await getRecentProjects(req.body.projectIds, req.body.userId);
             res.status(201).json(projects);
             break;
         default:
