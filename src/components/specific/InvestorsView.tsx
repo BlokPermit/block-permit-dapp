@@ -57,20 +57,26 @@ const InvestorsView = (props: InvestorsViewProps) => {
     <>
       {isInvestorInfoPopupOpen && <InvestorInfoPopup investor={selectedInvestor!} onClose={() => setIsInvestorInfoPopupOpen(false)} />}
       <div>
-        {props.investors.length === 0 && (
-          <div className="text-left text-gray-500">
-            Na projekt niste dodali nobenega investitorja. To lahko storite{" "}
-            <span
-              className="text-main-200 underline hover:text-gray-500 hover:cursor-pointer"
-              onClick={() => {
-                router.push(`/projects/editProject/${props.projectId}`);
-              }}
-            >
-              tukaj
-            </span>
-            .
-          </div>
-        )}
+        <RoleBasedComponent
+          projectManagerComponent={
+            <>
+              {props.investors.length === 0 && (
+                <div className="text-left text-gray-500">
+                  Na projekt niste dodali nobenega investitorja. To lahko storite{" "}
+                  <span
+                    className="text-main-200 underline hover:text-gray-500 hover:cursor-pointer"
+                    onClick={() => {
+                      router.push(`/projects/editProject/${props.projectId}`);
+                    }}
+                  >
+                    tukaj
+                  </span>
+                  .
+                </div>
+              )}
+            </>
+          }
+        />
         {props.investors.map((investor: Investor) => (
           <div key={investor.taxId}>
             <InvestorListItem investor={investor} moreInfoClick={(investor: Investor) => handleMoreInfoClick(investor)} sendUpdateClick={(investor: Investor) => handleSendUpdateClick(investor)} />

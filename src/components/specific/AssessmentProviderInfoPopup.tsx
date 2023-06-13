@@ -1,6 +1,6 @@
 import { DocumentContractModel } from "@/models/DocumentContractModel";
-import React from "react";
-import { FaCalendarMinus, FaCalendarPlus, FaDownload, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaCalendarMinus, FaCalendarPlus, FaDownload, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes, FaTrash } from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { dateFromTimestamp, formatDate } from "@/utils/DateUtils";
 import IconButton from "../generic/buttons/IconButton";
@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import { User } from "@prisma/client";
 import { getEvaluateDueDateExtensionText, getRemoveAssessmentProvidersText, getSentMainDocumentText, mailUser } from "../../utils/MailingUtils";
+import useConformationPopup from "@/hooks/ConformationPopupHook";
 
 interface AssessmentProviderInfoPopupProps {
   documentContract?: DocumentContractModel;
@@ -22,8 +23,21 @@ interface AssessmentProviderInfoPopupProps {
 const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) => {
   const router = useRouter();
   const { setAlert } = useAlert();
+  const { setConformationPopup } = useConformationPopup();
 
   const handleRemoveAssessmentProvider = async () => {
+    setConformationPopup({
+      title: "Odstrani mnenjedajalce",
+      message: `Ali ste prepričani, da želite odstraniti mnenjedajalca ${props.assessmentProvider.name}`,
+      icon: <FaTrash />,
+      popupType: "error",
+      buttonPrimaryText: "Pošlji",
+      onClickPrimary: removeAssessmentProvider,
+      show: true,
+    });
+  };
+
+  const removeAssessmentProvider = async () => {
     const response = await fetch(`/api/projects/removeAssessmentProviders`, {
       method: "POST",
       headers: {
@@ -54,35 +68,45 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
   };
 
   const handleRequestedDueDateExtensionEvaluation = async (confirmed: boolean) => {
-    try {
-      const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          documentContractAddress: props.documentContract!.documentContractAddress,
-          signerAddress: await getConnectedAddress(window),
-          confirmed: confirmed,
-        }),
-      });
+    setConformationPopup({
+      title: `${confirmed ? "Sprejmi" : "Zavrni"} zahtevo za podaljšanje roka`,
+      message: `Ali ste prepričani, da želite ${confirmed ? "sprejeti" : "zavrniti"} zahtevo za podaljšanje roka za ocenitev`,
+      icon: confirmed ? <FaCalendarPlus /> : <FaTimes />,
+      popupType: confirmed ? "success" : "error",
+      buttonPrimaryText: confirmed ? "Sprejmi" : "Zavrni",
+      onClickPrimary: async () => {
+        try {
+          const response = await fetch(`/api/documentContracts/evaluateAssessmentDueDateExtension`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              documentContractAddress: props.documentContract!.documentContractAddress,
+              signerAddress: await getConnectedAddress(window),
+              confirmed: confirmed,
+            }),
+          });
 
-      if (response.ok) {
-        const responseMail = await mailUser({
-          to: [props.assessmentProvider.email],
-          subject: `${props.projectName} - zahteva za podaljšanje roka ${confirmed ? "sprejeta" : "zavrnjena"}`,
-          text: getEvaluateDueDateExtensionText(props.projectName, confirmed),
-          link: router.asPath,
-        });
-        if (!responseMail.ok) throw new Error(await responseMail.json());
-        setAlert({ title: "", message: `Rok za ocenitev ${confirmed ? "sprejet" : "zavrnjen"}`, type: "success" });
-        router.push(router.asPath);
-      } else {
-        throw new Error(await response.json());
-      }
-    } catch (e: any) {
-      setAlert({ title: "Napaka", message: e.message.message, type: "error" });
-    }
+          if (response.ok) {
+            const responseMail = await mailUser({
+              to: [props.assessmentProvider.email],
+              subject: `${props.projectName} - zahteva za podaljšanje roka ${confirmed ? "sprejeta" : "zavrnjena"}`,
+              text: getEvaluateDueDateExtensionText(props.projectName, confirmed),
+              link: router.asPath,
+            });
+            if (!responseMail.ok) throw new Error(await responseMail.json());
+            setAlert({ title: "Uspeh", message: `Zahteva za podaljšanje roka za ocenitev ${confirmed ? "sprejeta" : "zavrnjena"}`, type: "success" });
+            router.push(router.asPath);
+          } else {
+            throw new Error(await response.json());
+          }
+        } catch (e: any) {
+          setAlert({ title: "Napaka", message: e.message.message, type: "error" });
+        }
+      },
+      show: true,
+    });
   };
 
   return (

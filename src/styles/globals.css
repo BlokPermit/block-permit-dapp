@@ -1,74 +1,92 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @font-face {
-    font-family: 'Titillium Web';
-    src: url('../../public/fonts/TitilliumWeb-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: "Titillium Web";
+  src: url("../../public/fonts/TitilliumWeb-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
 :root {
-    background: #faf9f9;
-
+  background: #faf9f9;
 }
 
 input:focus,
 select:focus,
 textarea:focus,
 button:focus {
-    outline: none;
+  outline: none;
 }
 
 body {
-    font-family: 'Titillium Web', sans-serif;
+  font-family: "Titillium Web", sans-serif;
 }
 
 body::-webkit-scrollbar {
-    display: none;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  display: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @keyframes animate {
-    0% {
-        background-position: 0 0;
-    }
-    100% {
-        background-position: 500% 0;
-    }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 500% 0;
+  }
 }
 
 .gradient-progress-bar {
-    background: linear-gradient(to right, #4F46E5, #945DD6);
-    background-size: 200% 100%;
-    animation: progress-bar-animation 2s linear infinite;
+  background: linear-gradient(to right, #4f46e5, #945dd6);
+  background-size: 200% 100%;
+  animation: progress-bar-animation 2s linear infinite;
 }
 
 .loader {
-    position: fixed;
-    top: 0;
-    z-index: 50;
-    width: 100%;
-    height: 8px;
+  position: fixed;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  height: 8px;
 }
 
 .loader::before {
-    content: '';
-    inset: 0;
-    background: linear-gradient(90deg, white, #f67362, #f99d91, white);
-    animation: animate 20s linear infinite;
-    background-size: 500%;
+  content: "";
+  inset: 0;
+  background: linear-gradient(90deg, white, #f67362, #f99d91, white);
+  animation: animate 20s linear infinite;
+  background-size: 500%;
 }
 
-
 .loader::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, white, #f67362, #f99d91, white);
-    animation: animate 4s linear infinite;
-    background-size: 500%;
-    filter: blur(1px)
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, white, #f67362, #f99d91, white);
+  animation: animate 4s linear infinite;
+  background-size: 500%;
+  filter: blur(1px);
+}
+
+.my-calendar .react-calendar__tile--active {
+  background-color: #f78172;
+}
+
+.my-calendar .react-calendar__tile--active:enabled {
+  background-color: #f78172;
+}
+
+.my-calendar .react-calendar__tile--active:enabled:hover {
+  background-color: #f78172;
+}
+
+.my-calendar .react-calendar {
+  border-radius: 0.5rem;
+  border: none;
+  overflow: hidden;
+  padding: 2rem;
+  width: 100%;
 }

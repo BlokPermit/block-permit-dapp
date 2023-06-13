@@ -36,7 +36,7 @@ const IconBadge = (props: IconBadgeProps) => {
   }, [props.badgeType]);
 
   return (
-    <span className={`inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-sm ${bgColor} ${textColor}`}>
+    <span className={`inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-1 text-sm ${bgColor} ${textColor}`}>
       <span className="ms-1 me-1.5">{props.icon}</span>
       <span className="me-1">{props.text}</span>
     </span>

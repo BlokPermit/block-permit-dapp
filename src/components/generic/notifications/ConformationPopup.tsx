@@ -47,7 +47,12 @@ const ConformationPopup = () => {
                 {props.buttonPrimaryText}
               </button>
 
-              <button className="mt-2 inline-block w-full rounded-lg bg-gray-50 px-5 py-3 text-center text-sm font-semibold text-gray-500 sm:mt-0 sm:w-auto" onClick={() => setShow(false)}>
+              <button
+                className="mt-2 inline-block w-full rounded-lg bg-gray-50 px-5 py-3 text-center text-sm font-semibold text-gray-500 sm:mt-0 sm:w-auto"
+                onClick={() => {
+                  closeAndClearPopup();
+                }}
+              >
                 Prekliči
               </button>
             </div>
