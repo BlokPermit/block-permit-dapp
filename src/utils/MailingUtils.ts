@@ -64,11 +64,12 @@ export const getProvideAssessmentText = (projectName: string, projectState: Proj
 }
 
 //PM -> AA
-export const getDeadlineExceededText = (projectName: string, projectState: ProjectState) => {
-    const mainDocumentName = projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD";
-    return `${mainDocumentName} na projektu ${projectName} je bil posodobljen.`;
-}
-
 export const getBuildingPermitContractSentText = (projectName: string) => {
     return `Dobili ste zahtevo za izdajo gradbenega dovoljenja na projektu ${projectName}.`
+}
+
+//AA -> AP
+export const getDueDateExceededText = (projectName: string, projectState: ProjectState) => {
+    const assessmentName = projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
+    return `Opozarjamo Vas, da ste zamudli rok za pošiljanje ${assessmentName} na projektu ${projectName}. V kolikor ${assessmentName} ne boste poslali v roku petih dni, vas lahko doletijo pravne posledice`;
 }

@@ -123,7 +123,7 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
       if (response.ok) {
         setAlert({ title: "", message: `${documentType} poslan`, type: "success" });
         if (assessmentProvidersInfo.length !== 0) {
-          const subjectText = project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
+          const subjectText = selectedState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektnih pogojev" : "projektnega mnenja";
           const responseMail = await mailUser({
             to: assessmentProvidersInfo.map((ap) => ap!.email),
             subject: `${project.baseProject.name} - pridobljena zahteva za pridobitev ${subjectText}`,

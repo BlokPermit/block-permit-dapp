@@ -12,7 +12,9 @@ import { getConnectedAddress } from "../../utils/MetamaskUtils";
 import { hashFileToBytes32 } from "../../utils/FileUtils";
 import useAlert from "../../hooks/AlertHook";
 import AssessmentProviderInfoPopup from "@/components/specific/AssessmentProviderInfoPopup";
-import { FaFileDownload } from "react-icons/fa";
+import {FaExclamation, FaFileDownload} from "react-icons/fa";
+import {dateFromTimestamp} from "../../utils/DateUtils";
+import {getDueDateExceededText, getEvaluateDueDateExtensionText, mailUser} from "../../utils/MailingUtils";
 
 interface AssessmentProviderListItemProps {
   assessmentProvider: User;
@@ -27,6 +29,7 @@ interface AssessmentProviderListItemProps {
   projectName: string;
   isDPPPhaseFinalized: boolean;
   downloadAssessment: (paths: string[], zipName: string) => Promise<boolean>;
+  isAdministrativeAuthority?: boolean;
 }
 
 const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
@@ -38,9 +41,13 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const { setAlert } = useAlert();
 
+  useEffect(() => {
+    getUnsentAttachments();
+  }, []);
+
   const getUnsentAttachments = async () => {
     const files = await getFileNamesFromDirectory(
-      `public/projects/${props.projectId}/${props.actualProjectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
+      `public/projects/${props.projectId}/${props.selectedProjectState === ProjectState.AQUIRING_PROJECT_CONDITIONS ? "DPP" : "DGD"}/${props.assessmentProvider.id}/attachments`
     );
     setUnsentAttachments(files);
   };
@@ -88,17 +95,23 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
     }
   };
 
-  useEffect(() => {
-    getUnsentAttachments();
-  }, []);
-
   const downloadAssessment = async () => {
     setIsDownloading(true);
     let paths: string[] = props.documentContract!.assessmentAttachments ?? [];
-    const zipName = `${props.projectName}_${props.actualProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektni-pogoji" : "projektno-mnenje"}_${props.assessmentProvider.name}`;
+    const zipName = `${props.projectName}_${props.selectedProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektni-pogoji" : "projektno-mnenje"}_${props.assessmentProvider.name}`;
     paths.push(props.documentContract!.assessmentMainDocument!);
     setIsDownloading(await props.downloadAssessment(paths, zipName));
   };
+
+  const sendDueDateExceededMail = async () => {
+    const response = await mailUser({
+      to: [props.assessmentProvider.email],
+      subject: `${props.projectName} - opozorilo prekoračitve roka pošiljanja ${props.actualProjectState ? "projektnih pogojev" : "projektnega mnenja"}`,
+      text: getDueDateExceededText(props.projectName, props.actualProjectState),
+      link: router.asPath,
+    });
+    if (!response.ok)  setAlert({ title: "Napaka", message: (await response.json()).message, type: "error" });
+  }
 
   return (
     <>
@@ -108,7 +121,10 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           onAdd={handleAddAttachment}
           onClose={() => setIsAttachmentsPopupOpen(false)}
           documentContractAddress={props.documentContract ? props.documentContract.documentContractAddress! : ""}
-          addDisabeld={props.documentContract ? props.documentContract.isClosed : false}
+          addDisabeld={(!props.isAdministrativeAuthority)
+              ? props.documentContract ? props.documentContract.isClosed : false
+              : true
+          }
         />
       )}
       {isAssessmentProviderInfoPopupOpen && (
@@ -119,15 +135,18 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
           onClose={() => setIsAssessmentProviderInfoPopupOpen(false)}
           projectName={props.projectName}
           isDPPPhaseFinalized={props.isDPPPhaseFinalized}
+          isAdministrativeAuthority={props.isAdministrativeAuthority}
         />
       )}
       <div key={props.assessmentProvider.id} className={`${isSelected ? "p-4 mb-4 rounded-lg bg-gray-100 border border-gray-200" : "p-4 mb-4 rounded-lg bg-white border border-gray-200"}`}>
         <div className="flex justify-between">
           <div className="flex justify-between gap-5 items-center">
             <div className="text-lg">
-              {!props.documentContract && <IconBadge icon={<FaArrowUp />} text="Waiting to Send" badgeType="info" />}
-              {props.documentContract && !props.documentContract.isClosed && <IconBadge icon={<FaClock />} text="Waiting for Assessment" badgeType="warning" />}
-              {props.documentContract && props.documentContract.isClosed && <IconBadge icon={<FaCheck />} text="Ready for Review" badgeType="success" />}
+              {!props.documentContract && <IconBadge icon={<FaArrowUp />} text="Čaka na pošiljanje" badgeType="info" />}
+              {props.documentContract && !props.documentContract.isClosed && <IconBadge icon={<FaClock />}
+                text={`Čakanje na ${props.selectedProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektne pogoje" : "projektno mnenje"}`}
+                badgeType="warning" />}
+              {props.documentContract && props.documentContract.isClosed && <IconBadge icon={<FaCheck />} text="Pripravljeno za pregled" badgeType="success" />}
             </div>
             <span className="text-black">
               <div className="text-lg font-bold">{props.assessmentProvider.name}</div>
@@ -137,37 +156,75 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             <span className="inline-flex items-center gap-3">
               {props.documentContract && (props.documentContract.mainDocumentUpdateRequested || props.documentContract.requestedAssessmentDueDate) && <FaBell color="red" />}
               <ButtonGroup
-                secondaryButtons={[
-                  {
-                    text: "More info",
-                    icon: <FaInfo />,
-                    onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
-                  },
-                  {
-                    text: "Attachments",
-                    icon: <FaPaperclip />,
-                    onClick: () => setIsAttachmentsPopupOpen(true),
-                  },
-                ]}
-                primaryButton={
-                  !props.documentContract
-                    ? {
-                        text: isSelected ? "Deselect" : "Select",
-                        icon: isSelected ? <FaTimes /> : <FaCheck />,
-                        onClick: () => {
-                          setIsSelected(!isSelected);
-                          props.countSelected(!isSelected, props.assessmentProvider.id);
+                secondaryButtons={(!props.isAdministrativeAuthority)
+                  ? [
+                      {
+                        text: "Več informacij",
+                        icon: <FaInfo />,
+                        onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+                      },
+                      {
+                        text: "Priloge",
+                        icon: <FaPaperclip />,
+                        onClick: () => setIsAttachmentsPopupOpen(true),
+                      },
+                    ]
+                  : (!props.documentContract)
+                    ? [
+                        {
+                          text: "Več informacij",
+                          icon: <FaInfo />,
+                          onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
+                        }
+                      ]
+                    : [
+                        {
+                          text: "Več informacij",
+                          icon: <FaInfo />,
+                          onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
                         },
-                      }
-                    : {
-                        text:
-                          props.documentContract && props.documentContract.isClosed
-                            ? `Prenesi ${props.actualProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektne pogoje" : "projektno mnenje"}`
-                            : "Sent",
-                        icon: props.documentContract && props.documentContract.isClosed ? !isDownloading ? <FaFileDownload /> : <FaSpinner className="animate-spin" /> : <FaArrowUp />,
-                        onClick: props.documentContract && props.documentContract.isClosed ? downloadAssessment : () => {},
-                        disabled: props.documentContract && props.documentContract.isClosed ? false : true,
-                      }
+                        {
+                          text: "Priloge",
+                          icon: <FaPaperclip />,
+                          onClick: () => setIsAttachmentsPopupOpen(true),
+                        },
+                      ]
+                }
+                primaryButton={
+                  !props.isAdministrativeAuthority
+                    ? (!props.documentContract
+                      ? {
+                          text: isSelected ? "Prekliči" : "Izberi",
+                          icon: isSelected ? <FaTimes /> : <FaCheck />,
+                          onClick: () => {
+                            setIsSelected(!isSelected);
+                            props.countSelected(!isSelected, props.assessmentProvider.id);
+                          },
+                        }
+                      : {
+                          text: props.documentContract!.isClosed
+                              ? `Prenesi ${props.selectedProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektne pogoje" : "projektno mnenje"}`
+                              : "Sent",
+                          icon: props.documentContract!.isClosed ? !isDownloading ? <FaFileDownload /> : <FaSpinner className="animate-spin" /> : <FaArrowUp />,
+                          onClick: props.documentContract!.isClosed ? downloadAssessment : () => {},
+                          disabled: props.documentContract!.isClosed ? false : true,
+                        })
+                    : (!props.documentContract
+                      ? null
+                      : {
+                        text: props.documentContract!.isClosed
+                                ? `Prenesi ${props.selectedProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektne pogoje" : "projektno mnenje"}`
+                                : (dateFromTimestamp(props.documentContract!.assessmentDueDate) < new Date()) ? "Obvesti o zamudi" : "Poslano",
+                        icon: props.documentContract!.isClosed
+                            ? !isDownloading ? <FaFileDownload /> : <FaSpinner className="animate-spin" />
+                            : (dateFromTimestamp(props.documentContract!.assessmentDueDate) < new Date()) ? <FaExclamation className="text-red-500"/> : <FaArrowUp />,
+                        onClick: props.documentContract!.isClosed
+                            ? downloadAssessment
+                            : (dateFromTimestamp(props.documentContract!.assessmentDueDate) < new Date()) ? sendDueDateExceededMail : () => {},
+                        disabled:  props.documentContract!.isClosed
+                            ? false
+                            : !(dateFromTimestamp(props.documentContract!.assessmentDueDate) < new Date()),
+                      })
                 }
               />
             </span>
@@ -175,7 +232,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
             <ButtonGroup
               secondaryButtons={[]}
               primaryButton={{
-                text: "More info",
+                text: "Več informacij",
                 icon: <FaInfo />,
                 onClick: () => setIsAssessmentProviderInfoPopupOpen(true),
               }}

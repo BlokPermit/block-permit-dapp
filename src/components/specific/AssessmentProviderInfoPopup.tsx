@@ -1,6 +1,6 @@
 import { DocumentContractModel } from "@/models/DocumentContractModel";
-import React, { useState } from "react";
-import { FaCalendarMinus, FaCalendarPlus, FaDownload, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes, FaTrash } from "react-icons/fa";
+import React from "react";
+import { FaCheck, FaCalendarMinus, FaCalendarPlus, FaDownload, FaEnvelope, FaExclamation, FaHeading, FaMapMarker, FaPhone, FaTimes, FaTrash } from "react-icons/fa";
 import IconCard from "../generic/data-view/IconCard";
 import { dateFromTimestamp, formatDate } from "@/utils/DateUtils";
 import IconButton from "../generic/buttons/IconButton";
@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { getConnectedAddress } from "@/utils/MetamaskUtils";
 import { User } from "@prisma/client";
 import { getEvaluateDueDateExtensionText, getRemoveAssessmentProvidersText, getSentMainDocumentText, mailUser } from "../../utils/MailingUtils";
+import {MainDocumentType} from "../../models/DocumentContractModel";
 import useConformationPopup from "@/hooks/ConformationPopupHook";
 
 interface AssessmentProviderInfoPopupProps {
@@ -18,6 +19,7 @@ interface AssessmentProviderInfoPopupProps {
   projectName: string;
   onClose: () => void;
   isDPPPhaseFinalized: boolean;
+  isAdministrativeAuthority?: boolean;
 }
 
 const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) => {
@@ -125,19 +127,24 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
               <div>
                 {props.documentContract.requestedAssessmentDueDate && (
                   <div className="inline-flex items-center gap-3">
-                    <p className="me-1 text-lg text-gray-500 font-semibold">{formatDate(dateFromTimestamp(props.documentContract.requestedAssessmentDueDate))}</p>
-                    <IconButton
-                      className="text-white bg-green-700 hover:text-green-700 hover:bg-white"
-                      text={"Potrdi podaljšanje roka"}
-                      icon={<FaCalendarPlus />}
-                      onClick={() => handleRequestedDueDateExtensionEvaluation(true)}
-                    />
-                    <IconButton
-                      className="text-white bg-red-600 hover:text-red-600 hover:bg-white"
-                      text={"Zavrni podaljšanje roka"}
-                      icon={<FaCalendarMinus />}
-                      onClick={() => handleRequestedDueDateExtensionEvaluation(false)}
-                    />
+                    {(!props.isAdministrativeAuthority) ? (<>
+                        <p className="me-1 text-lg text-gray-500 font-semibold">{formatDate(dateFromTimestamp(props.documentContract.requestedAssessmentDueDate))}</p>
+                        <IconButton
+                          className="text-white bg-green-700 hover:text-green-700 hover:bg-white"
+                          text={"Potrdi podaljšanje roka"}
+                          icon={<FaCalendarPlus/>}
+                          onClick={() => handleRequestedDueDateExtensionEvaluation(true)}
+                        />
+                        <IconButton
+                        className="text-white bg-red-600 hover:text-red-600 hover:bg-white"
+                        text={"Zavrni podaljšanje roka"}
+                        icon={<FaCalendarMinus />}
+                        onClick={() => handleRequestedDueDateExtensionEvaluation(false)}
+                        />
+                      </>)
+                      : (<h1 className="flex items-center text-gray-500">Prošnja za podaljšanje roka do
+                          <span className="ms-2 text-xl font-semibold text-gray-500">{formatDate(dateFromTimestamp(props.documentContract.requestedAssessmentDueDate!))}</span>
+                        </h1>)}
                   </div>
                 )}
               </div>
@@ -156,12 +163,22 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
           <IconCard title={"Naslov"} value={props.assessmentProvider.streetAddress} icon={<FaMapMarker />} />
           {props.assessmentProvider.phone && <IconCard title={"Telefon"} value={props.assessmentProvider.phone} icon={<FaPhone />} />}
           <IconCard title={"E-pošta"} value={props.assessmentProvider.email} icon={<FaEnvelope />} />
-        </div>
-        <div className="flex justify-end">
-          {(!props.documentContract || (props.documentContract && !props.documentContract.isClosed)) && !props.isDPPPhaseFinalized && (
-            <IconButton className="bg-red-500 text-white hover:bg-white hover:text-red-600" text={"Odstrani"} icon={<FaTimes />} onClick={() => handleRemoveAssessmentProvider()} />
+          {(props.documentContract && props.documentContract.isClosed) &&
+            (<IconCard
+                title={`Datum ${props.documentContract!.mainDocumentType == MainDocumentType.DPP ? "poslanih projektnih pogojev" : "poslanega projektnega mnenja"} 
+                (rok do ${formatDate(dateFromTimestamp(props.documentContract!.assessmentDueDate))})`}
+              value={formatDate(dateFromTimestamp(props.documentContract!.assessmentDateProvided))}
+              icon={(dateFromTimestamp(props.documentContract!.assessmentDateProvided) < dateFromTimestamp(props.documentContract!.assessmentDueDate)) ?
+              <FaCheck className="text-green-500"/> : <FaTimes className="text-red-500"/>}
+                />
           )}
         </div>
+        {(!props.isAdministrativeAuthority) && (<div className="flex justify-end">
+          {(!props.documentContract || (props.documentContract && !props.documentContract.isClosed)) && !props.isDPPPhaseFinalized && (
+              <IconButton className="bg-red-500 text-white hover:bg-white hover:text-red-600" text={"Odstrani"}
+                          icon={<FaTimes/>} onClick={() => handleRemoveAssessmentProvider()}/>
+          )}
+        </div>)}
       </div>
     </div>
   );

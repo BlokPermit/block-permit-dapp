@@ -24,6 +24,10 @@ import AssessmentProviderView from "@/components/specific/AssessmentProviderView
 import { getSession } from "next-auth/react";
 import RequestMainDocumentUpdatePopup from "@/components/specific/RequestMainDocumentUpdatePopup";
 import DocumentDropdown from "../../components/generic/dropdown/DocumentDropdown";
+import AdministrativeAuthorityView from "../../components/specific/AdministrativeAuthorityView";
+import ProjectManagerInfoPopup from "../../components/specific/ProjectManagerInfoPopup";
+import {FaInfo, FaUser} from "react-icons/fa";
+import ButtonGroup from "../../components/generic/buttons/ButtonGroup";
 
 export const getServerSideProps: any = async (context: any) => {
   const id = context.params ? context.params.id : "";
@@ -55,6 +59,7 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
   const [isRequestMainDocumentUpdatePopupOpen, setIsRequestMainDocumentUpdatePopupOpen] = useState<boolean>(false);
   const [selectedState, setSelectedState] = useState<ProjectState>(project.baseProject.projectState);
   const [assessmentProviderRelevantDocumentContract, setAssessmentProviderRelevantDocumentContract] = useState<DocumentContractModel | undefined>();
+  const [isProjectManagerInfoPopupOpen, setIsProjectManagerInfoPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setRecentProject(project.baseProject.id);
@@ -112,8 +117,8 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
       <ProgressBar
         hideLastPhase={true}
         className="my-6"
-        actualState={project.baseProject.projectState}
-        selectedState={selectedState}
+        actualState={project.baseProject.projectState == ProjectState.AQUIRING_BUILDING_PERMIT ? ProjectState.AQUIRING_PROJECT_OPINIONS : project.baseProject.projectState}
+        selectedState={selectedState == ProjectState.AQUIRING_BUILDING_PERMIT ? ProjectState.AQUIRING_PROJECT_OPINIONS : selectedState}
         handleStateChange={(state: ProjectState) => setSelectedState(state)}
       />
       <div className="flex justify-between mb-10">
@@ -210,6 +215,26 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
           <IconCard icon={<FaHeading />} title="Naziv zgradbe" value={project.baseProject.constructionTitle} />
           <IconCard icon={<FaTag />} title="Tip konstrukcije" value={project.baseProject.constructionType} />
           <IconCard icon={<FaFileContract />} title="Vpliv na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Yes" : "No"} />
+            {(isProjectManagerInfoPopupOpen && loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&
+            <ProjectManagerInfoPopup projectManager={project.projectManager} onClose={() => setIsProjectManagerInfoPopupOpen(false)} />}
+            {(loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&
+            (<IconCard
+                className="col-span-2"
+                icon={<FaUser/>}
+                title="Projektni vodja"
+                value={project.projectManager.name}
+                trailing={
+                    <ButtonGroup
+                        secondaryButtons={[
+                            {
+                                text: "Več informacij",
+                                icon: <FaInfo/>,
+                                onClick: () => setIsProjectManagerInfoPopupOpen(true),
+                            },
+                        ]}
+                    />
+                }
+            />)}
         </div>
         <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investitorji</h2>
@@ -246,6 +271,11 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
           </div>
         }
       />
+        <RoleBasedComponent
+        administrativeAuthorityComponent={
+            <AdministrativeAuthorityView project={project} selectedState={selectedState} downloadZip={downloadZip} isAdministrativeAuthority={true}/>
+        }
+    />
     </div>
   );
 };

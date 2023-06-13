@@ -246,12 +246,20 @@ export const addAssessmentProviders = async (projectAddress: string, signerAddre
 };
 
 export const removeAssessmentProviders = async (projectAddress: string, signerAddress: string, assessmentProvidersAddresses: string[]) => {
-    try {
-        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-        await projectContract.removeAssessmentProviders(assessmentProvidersAddresses);
-    } catch (error: any) {
-        throw new Error(getErrorReason(error));
+  try {
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    await projectContract.removeAssessmentProviders(assessmentProvidersAddresses);
+  } catch (error: any) {
+    throw new Error(getErrorReason(error));
+  }
+
+  try {
+    for (let assessmentProviderAddress of assessmentProvidersAddresses) {
+      await removeProjectFromUser(assessmentProviderAddress, projectAddress);
     }
+  } catch (e: any) {
+    throw e;
+  }
 };
 
 export const setDPP = async (projectAddress: string, signerAddress: string, dppUrl: string, dppHash: string) => {
@@ -307,12 +315,29 @@ export const sendDGD = async (projectAddress: string, signerAddress: string, doc
 };
 
 export const changeAdministrativeAuthority = async (projectAddress: string, signerAddress: string, administrativeAuthorityAddress: string) => {
-    try {
-        const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
-        await projectContract.changeAdministrativeAuthority(administrativeAuthorityAddress);
-    } catch (error: any) {
-        throw new Error(getErrorReason(error));
-    }
+  try {
+    const projectContract = new Contract(projectAddress, getContractArtifact(ArtifactType.PROJECT_ARTIFACT).abi, await provider.getSigner(signerAddress));
+    const previousAdministrativeAuthority = await projectContract.administrativeAuthority();
+    console.log(previousAdministrativeAuthority);
+    if (previousAdministrativeAuthority != AddressZero) await removeProjectFromUser(previousAdministrativeAuthority.toLowerCase(), projectAddress);
+    await projectContract.changeAdministrativeAuthority(administrativeAuthorityAddress);
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(getErrorReason(error));
+  }
+
+  try {
+    await prisma.user.update({
+      where: { walletAddress: administrativeAuthorityAddress },
+      data: {
+        projectAddresses: {
+          push: projectAddress,
+        },
+      },
+    });
+  } catch (e: any) {
+    throw e;
+  }
 };
 
 export const finalizeDPPPhase = async (projectAddress: string, signerAddress: string) => {
@@ -385,3 +410,29 @@ const getDocumentContractModels = async (addresses: string[]) => {
 const getAttachmentsUrls = (attachments: { id: string }[]) => {
     return attachments.map((attachment) => attachment.id);
 };
+
+export const removeProjectFromUser = async (walletAddress: string, projectAddress: string) => {
+  try {
+    const {projectAddresses}: string[] = await prisma.user.findUnique({
+      where: {
+        walletAddress: walletAddress
+      },
+      select: {
+        projectAddresses: true
+      }
+    });
+
+    await prisma.user.update({
+      where: {
+        walletAddress: walletAddress
+      },
+      data: {
+        projectAddresses: {
+          set: projectAddresses.filter((address) => address != projectAddress),
+        }
+      }
+    });
+  } catch (e: any) {
+    throw e;
+  }
+}
