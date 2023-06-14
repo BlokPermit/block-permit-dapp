@@ -33,7 +33,7 @@ function SignIn() {
             connector: new MetaMaskConnector(),
         });
 
-       /* const response = await fetch("/api/auth/blockchainAuthorization", {
+        const response = await fetch("/api/auth/blockchainAuthorization", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -46,7 +46,7 @@ function SignIn() {
         if (!response.ok) {
             setAlert({title: '', message: 'You are not registered on this platform.', type: 'error'});
             return;
-        }*/
+        }
         // @ts-ignore
         const {message} = await requestChallengeAsync({
             address: account,
@@ -73,7 +73,7 @@ function SignIn() {
                 <img src="/images/logo1.png" alt="Metamask Logo" className="w-500 h-300 mb-4"/>
                 <h1 className="text-4xl font-semibold mb-4 pt-10 text-black">Prijavite se z Metamaskom</h1>
                 <p className="text-gray-500 mb-8">Prosimo, povežite denarnico.</p>
-                <button className="py-3 px-6 bg-orange-400 hover:bg-orange-500 text-white rounded-3xl font-medium"
+                <button className="py-3 px-6 bg-main-200 hover:bg-main-50 text-white rounded-3xl font-medium"
                         onClick={handleAuth}>
                     Poveži denarnico
                 </button>
