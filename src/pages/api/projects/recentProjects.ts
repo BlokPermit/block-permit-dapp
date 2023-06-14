@@ -1,4 +1,3 @@
-import {Project} from "@prisma/client";
 import {getRecentProjects} from "@/lib/ProjectService";
 import {NextApiRequest, NextApiResponse} from "next";
 
