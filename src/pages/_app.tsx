@@ -59,7 +59,8 @@ function MyApp({Component, pageProps}: AppProps) {
                         <NextNProgress color="#E88778"/>
                         <Layout>
                             <Head>
-                                <title>D-Verification</title>
+                                <title>blockPermit</title>
+                                <link rel="icon" href="/logo.png"/>
                             </Head>
                             <Component {...pageProps} />
                             <Alert/>

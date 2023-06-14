@@ -34,19 +34,19 @@ declare global {
 const options: Option[] = [
     {
         value: UserType.PROJECT_MANAGER,
-        label: "Project Manager",
+        label: "Projektni vodja",
     },
     {
         value: UserType.ADMINISTRATIVE_AUTHORITY,
-        label: "Administrative Authority",
+        label: "Upravna enota",
     },
     {
         value: UserType.ASSESSMENT_PROVIDER,
-        label: "Opinion Provider",
+        label: "Mnenjedajalec",
     },
     {
         value: UserType.ADMIN,
-        label: "Admin",
+        label: "Administrator",
     },
 ];
 

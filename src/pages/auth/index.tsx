@@ -70,12 +70,12 @@ function SignIn() {
         <>
             {isLoading ? <LoadingAnimation/> : null}
             <div className="flex flex-col items-center justify-center h-full ">
-                <img src="/images/metamask-logo.png" alt="Metamask Logo" className="w-500 h-300 mb-4"/>
-                <h1 className="text-4xl font-semibold mb-4 pt-10 text-black">Login with Metamask</h1>
-                <p className="text-gray-500 mb-8">Please connect a wallet.</p>
+                <img src="/images/logo1.png" alt="Metamask Logo" className="w-500 h-300 mb-4"/>
+                <h1 className="text-4xl font-semibold mb-4 pt-10 text-black">Prijavite se z Metamaskom</h1>
+                <p className="text-gray-500 mb-8">Prosimo, povežite denarnico.</p>
                 <button className="py-3 px-6 bg-orange-400 hover:bg-orange-500 text-white rounded-3xl font-medium"
                         onClick={handleAuth}>
-                    Connect Wallet
+                    Poveži denarnico
                 </button>
             </div>
         </>
