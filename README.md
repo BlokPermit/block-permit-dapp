@@ -44,6 +44,22 @@ cd block-permit-blockchain
 npm run localganache
 ```
 
+### Environment variables
+In order to run this project, you will need to create and add the following environment variables to your .env.local file:
+```dotenv
+APP_DOMAIN=block.permit
+NEXTAUTH_URL=http://localhost:3000
+PROVIDER_URL=HTTP://127.0.0.1:8545
+OWNER_CONTRACT_ADDRESS=0x1e26219666121025C07CF50d6cd8963C6F93190d
+MORALIS_API_KEY=""
+NEXTAUTH_SECRET=""
+DATABASE_URL=""
+NEXT_PUBLIC_SUPABASE_PROJECT_URL=""
+NEXT_PUBLIC_SUPABASE_PROJECT_ANON_KEY=""
+```
+
+Replace the values with your actual keys and URLs where needed.
+
 ## Using BlockPermit
 
 To use BlockPermit, follow these steps:
