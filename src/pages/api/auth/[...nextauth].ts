@@ -7,6 +7,7 @@ export default NextAuth({
     callbacks: {
         async jwt({token, user}) {
             if (user) {
+                // @ts-ignore
                 token.user = await findUserByAddress(user.address as string);
                 console.log(token.user);
             }

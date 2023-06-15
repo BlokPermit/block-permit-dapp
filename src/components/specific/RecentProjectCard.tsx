@@ -3,6 +3,7 @@ import {Project} from "@prisma/client";
 import Link from "next/link";
 import {formatDate} from "@/utils/DateUtils";
 import ProjectStateBadge from "@/components/specific/ProjectStateBadge";
+import {dateFromTimestamp} from "../../utils/DateUtils";
 
 interface RecentProjectProps {
     project: Project;
@@ -29,7 +30,7 @@ const RecentProjectCard = ({project}: RecentProjectProps) => {
                 <div></div>
                 <div className="flex">
                     <div className="text-neutral-400 mr-2">Ustvarjen:</div>
-                    {formatDate(project.createdAt)}</div>
+                    {formatDate(dateFromTimestamp(project.createdAt))}</div>
             </div>
 
         </Link>

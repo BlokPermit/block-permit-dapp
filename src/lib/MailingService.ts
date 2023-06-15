@@ -2,11 +2,10 @@ import {Mailgun} from "mailgun-js";
 import mailgun from 'mailgun-js';
 import {User} from "@prisma/client";
 
-export const sendMailToUser = async (to: string[], subject: string, text: string, link?: string) : Promise<string> => {
+export const sendMailToUser = async (to: string[], subject: string, text: string, link?: string) : Promise<void> => {
     link = link ?? `http://localhost:3000${link}`;
-    console.log(getUserHtmlTemplate(link, text));
     try {
-        await sendMail(to, subject, text, getUserHtmlTemplate(link, text))
+        await sendMail(to, subject, text, getUserHtmlTemplate(text, link))
     } catch (e: any) {
         throw e;
     }
@@ -20,7 +19,7 @@ export const sendMailToInvestor = async (to: string[], subject: string, info: {
     numOfAssessedDPPs: number;
     numOfSentDGDs: number;
     numOfAssessedDGDs: number;
-}) : Promise<string> => {
+}) : Promise<void> => {
     console.log(info);
     try {
         await sendMail(to, subject, "Poslano vam je bilo poročilo o projektu", getInvestorHtmlTemplate(info));
@@ -49,7 +48,7 @@ const sendMail = async (to: string[], subject: string, text: string, html: strin
     }
 }
 
-const getUserHtmlTemplate = (link?: string, text: string) => {
+const getUserHtmlTemplate = (text: string, link?: string) => {
     return link
     ? `<!DOCTYPE html>
     <html>
@@ -60,7 +59,7 @@ const getUserHtmlTemplate = (link?: string, text: string) => {
         <body>
           <h3>${text}</h3>
           <p>Podrobnosti:</p>
-          <a href="${link}">${link}</a>
+          <a href="http://localhost:3000/${link}">${"http://localhost:3000/"+link}</a>
           <p>To je avtomatsko generirano sporočilo aplikacije Docu-Verification dApp</p>
         </body>
     </html>

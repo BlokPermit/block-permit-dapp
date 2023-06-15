@@ -210,7 +210,7 @@ const AssessmentProviderListItem = (props: AssessmentProviderListItemProps) => {
                           disabled: props.documentContract!.isClosed ? false : true,
                         })
                     : (!props.documentContract
-                      ? null
+                      ? undefined
                       : {
                         text: props.documentContract!.isClosed
                                 ? `Prenesi ${props.selectedProjectState == ProjectState.AQUIRING_PROJECT_CONDITIONS ? "projektne pogoje" : "projektno mnenje"}`

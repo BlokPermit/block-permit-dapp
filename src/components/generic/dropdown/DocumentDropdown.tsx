@@ -27,7 +27,7 @@ interface DocumentDropdownProps {
   userId?: string;
   projectName?: string;
   assessmentProviderRelevantDocumentContract?: DocumentContractModel;
-  updateDisabled: boolean;
+  updateDisabled?: boolean;
 }
 
 const DocumentDownload = (props: DocumentDropdownProps) => {
@@ -198,8 +198,8 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
         });
 
         if (response.ok) {
+          setAlert({ title: "", message: "Dokument naložen", type: "success" });
           setIsActive(false);
-          setAlert({ title: "Success", message: "DPP is set", type: "success" });
           props.onDocumentChange();
         } else {
           throw new Error((await response.json()).message);
@@ -219,8 +219,8 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
       >
         <span className="flex justify-between items-center px-2 py-2 text-sm text-inherit">
           <FaFileUpload className="mr-2" />
-          {props.documentType === "dpp" && <p>Upload DPP</p>}
-          {props.documentType === "dgd" && <p>Upload DGD</p>}
+          {props.documentType === "dpp" && <p>Naloži DPP</p>}
+          {props.documentType === "dgd" && <p>Naloži DGD</p>}
         </span>
 
         <span className="h-full p-2 text-inherit">{isActive ? <FaChevronUp size={15} /> : <FaChevronDown size={15} />}</span>
@@ -230,7 +230,7 @@ const DocumentUpload = (props: DocumentDropdownProps) => {
         <DocumentInput onDocumentChange={handleDocumentChange} />
         {file && (
           <div className="p-3 flex justify-end">
-            <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Upload"} icon={<FaArrowUp />} onClick={uploadDocument} />
+            <IconButton className="bg-main-200 text-white hover:bg-white hover:text-main-200" text={"Naloži"} icon={<FaArrowUp />} onClick={uploadDocument} />
           </div>
         )}
       </div>

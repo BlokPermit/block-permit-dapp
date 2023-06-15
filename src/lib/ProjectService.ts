@@ -413,6 +413,7 @@ const getAttachmentsUrls = (attachments: { id: string }[]) => {
 
 export const removeProjectFromUser = async (walletAddress: string, projectAddress: string) => {
   try {
+    // @ts-ignore
     const {projectAddresses}: string[] = await prisma.user.findUnique({
       where: {
         walletAddress: walletAddress
@@ -422,16 +423,19 @@ export const removeProjectFromUser = async (walletAddress: string, projectAddres
       }
     });
 
-    await prisma.user.update({
-      where: {
-        walletAddress: walletAddress
-      },
-      data: {
-        projectAddresses: {
-          set: projectAddresses.filter((address) => address != projectAddress),
-        }
-      }
-    });
+    if (projectAddresses != null) {
+        await prisma.user.update({
+            where: {
+                walletAddress: walletAddress
+            },
+            data: {
+                projectAddresses: {
+                    // @ts-ignore
+                    set: projectAddresses.filter((address) => address != projectAddress),
+                }
+            }
+        });
+    }
   } catch (e: any) {
     throw e;
   }

@@ -25,6 +25,7 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
   const { setConformationPopup } = useConformationPopup();
 
   const [isAddAssessmentProvidersPopupOpen, setIsAddAssessmentProvidersPopupOpen] = useState<boolean>(false);
+  const [isBuildingPermitRequestSent, setIsBuildingPermitRequestSent] = useState<boolean>(false);
 
   //Count Selected Opinion Providers
   const [numOfSelected, setNumOfSelected] = useState<number>(0);
@@ -177,6 +178,7 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
       link: router.asPath,
     });
     if (!response.ok) throw new Error((await response.json()).message);
+    setIsBuildingPermitRequestSent(true);
     setAlert({ title: "Uspeh", message: "Zahtevek za izdajo gradbenega dovoljenja poslan", type: "success" });
   };
 
@@ -233,12 +235,13 @@ const ProjectManagerView = ({ project, selectedState, downloadZip }: ProjectMana
               onClick={handleSend}
             />
           )}
+          {/*test comment*/}
         {project.baseProject.projectState == ProjectState.AQUIRING_PROJECT_CONDITIONS &&
           project.numOfSentDPPs != 0 &&
           project.sentDPPs.filter((documentContract: DocumentContractModel) => documentContract.isClosed === true).length === project.assessmentProviders.length && (
             <IconButton className="bg-green-600 text-white hover:bg-white hover:text-green-600" text={"Zaključi prvo fazo"} icon={<FaCheckCircle />} onClick={finalizeDPPPhase} />
           )}
-        {project.baseProject.projectState == ProjectState.AQUIRING_BUILDING_PERMIT && project.administrativeAuthority && (
+        {project.baseProject.projectState == ProjectState.AQUIRING_BUILDING_PERMIT && project.administrativeAuthority && !isBuildingPermitRequestSent && (
           <IconButton className="bg-green-500 text-white hover:text-green-500 hover:bg-white" text={"Zahtevaj gradbeno dovoljenje"} icon={<FaBuilding />} onClick={handleConstructionPermitRequest} />
         )}
       </div>

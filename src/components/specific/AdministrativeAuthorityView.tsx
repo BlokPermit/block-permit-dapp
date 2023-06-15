@@ -26,18 +26,6 @@ const AdministrativeAuthorityView = ({ project, selectedState, downloadZip }: Ad
     const { setAlert } = useAlert();
     const { setConformationPopup } = useConformationPopup();
 
-    const handleConstructionPermitRequest = () => {
-        setConformationPopup({
-            title: "Zahtevek za izdajo gradbenega dovoljenja",
-            message: "Ali ste prepričani, da želite upravnemu organu poslati zahtevek za izdajo gradbenega dovoljenja?",
-            icon: <FaArrowUp />,
-            popupType: "warning",
-            buttonPrimaryText: "Pošlji",
-            onClickPrimary: requestConstructionPermit,
-            show: true,
-        });
-    };
-
     return (
         <div className="overflow-x-auto">
       <span className="inline-flex items-center gap-5 mb-5">

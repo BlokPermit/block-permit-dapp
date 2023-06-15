@@ -273,7 +273,7 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
       />
         <RoleBasedComponent
         administrativeAuthorityComponent={
-            <AdministrativeAuthorityView project={project} selectedState={selectedState} downloadZip={downloadZip} isAdministrativeAuthority={true}/>
+            <AdministrativeAuthorityView project={project} selectedState={selectedState} downloadZip={downloadZip}/>
         }
     />
     </div>

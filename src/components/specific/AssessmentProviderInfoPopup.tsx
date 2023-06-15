@@ -33,7 +33,7 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
       message: `Ali ste prepričani, da želite odstraniti mnenjedajalca ${props.assessmentProvider.name}`,
       icon: <FaTrash />,
       popupType: "error",
-      buttonPrimaryText: "Pošlji",
+      buttonPrimaryText: "Odstrani",
       onClickPrimary: removeAssessmentProvider,
       show: true,
     });
@@ -167,8 +167,8 @@ const AssessmentProviderInfoPopup = (props: AssessmentProviderInfoPopupProps) =>
             (<IconCard
                 title={`Datum ${props.documentContract!.mainDocumentType == MainDocumentType.DPP ? "poslanih projektnih pogojev" : "poslanega projektnega mnenja"} 
                 (rok do ${formatDate(dateFromTimestamp(props.documentContract!.assessmentDueDate))})`}
-              value={formatDate(dateFromTimestamp(props.documentContract!.assessmentDateProvided))}
-              icon={(dateFromTimestamp(props.documentContract!.assessmentDateProvided) < dateFromTimestamp(props.documentContract!.assessmentDueDate)) ?
+              value={formatDate(dateFromTimestamp(props.documentContract!.assessmentDateProvided!))}
+              icon={(dateFromTimestamp(props.documentContract!.assessmentDateProvided!) < dateFromTimestamp(props.documentContract!.assessmentDueDate)) ?
               <FaCheck className="text-green-500"/> : <FaTimes className="text-red-500"/>}
                 />
           )}
