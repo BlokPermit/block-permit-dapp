@@ -31,15 +31,15 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
           <FaTimes className="hover:text-gray-500 hover:cursor-pointer" size={20} onClick={props.onClose} />
         </div>
         <div className="p-5 my-5">
-          <h2 className="text-xl mb-3 font-semibold">Priponke</h2>
-          {props.existingAttachments.length === 0 && <div className="text-gray-500">Ni priponk</div>}
+          <h2 className="text-xl mb-3 font-semibold">Priloge</h2>
+          {props.existingAttachments.length === 0 && <div className="text-gray-500">Ni prilog</div>}
           <div>
             {props.existingAttachments.map((attachment, index) => (
               <div key={index} className="w-full">
                 <AttachmentCard
                   onRemove={(attachmentPath: string) => {
                     props.existingAttachments.splice(props.existingAttachments.indexOf(attachmentPath), 1);
-                    setAlert({ title: "Priponka izbrisana", message: "Priponka je bila uspešno izbrisana", type: "success" });
+                    setAlert({ title: "Priponka odstranjena", message: "Priloga je bila uspešno odstranjena", type: "success" });
                   }}
                   attachment={{
                     attachmentTitle: attachment.split("/").pop() || "",
@@ -60,7 +60,7 @@ const AttachmentsPopup = (props: AttachmentsPopupProps) => {
               <div className="mt-2 flex justify-end">
                 <IconButton
                   className="bg-main-200 text-white hover:bg-white hover:text-main-200 hover:cursor-pointer"
-                  text="Add Attachment"
+                  text="Dodaj prilogo"
                   icon={<FaPlus />}
                   onClick={() => {
                     props.onAdd(file);

@@ -111,7 +111,7 @@ const InvestorListItem = (props: InvestorListItemProps) => {
                   },
                 ]}
                 primaryButton={{
-                  text: "Pošlji spremembo",
+                  text: "Pošlji poročilo",
                   icon: <FaPaperPlane />,
                   onClick: () => {
                     props.sendUpdateClick(props.investor);

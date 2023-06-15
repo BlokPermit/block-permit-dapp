@@ -81,9 +81,9 @@ const AddAssessmentProvidersPopup = (props: AddAssessmentProvidersPopupProps) =>
       <span className="fixed top-0 left-0 w-full h-full" onClick={props.onClose}></span>
       <span className="bg-white max-w-6xl w-1/2 rounded-lg shadow-xl bottom-52 relative">
         <div className="grid grid-cols-7 gap-2 m-3">
-          <input className="col-span-5 border-none rounded-lg p-3 bg-gray-200" type="text" placeholder="Search Assessment Providers" onChange={(e) => setSearchQuery(e.target.value)} />
-          <IconButton className="bg-gray-200" text="Search" icon={<FaSearch />} onClick={handleSearch} />
-          <IconButton className={`text-white ${selectedUsers.length === 0 ? "bg-gray-200" : "bg-main-200"}`} text="Submit" icon={<FaPlus />} disabled={selectedUsers.length == 0} onClick={handleAdd} />
+          <input className="col-span-5 border-none rounded-lg p-3 bg-gray-200" type="text" placeholder="Išči mnenjedajalce" onChange={(e) => setSearchQuery(e.target.value)} />
+          <IconButton className="bg-gray-200" text="Išči" icon={<FaSearch />} onClick={handleSearch} />
+          <IconButton className={`text-white ${selectedUsers.length === 0 ? "bg-gray-200" : "bg-main-200"}`} text="Dodaj" icon={<FaPlus />} disabled={selectedUsers.length == 0} onClick={handleAdd} />
         </div>
         {selectedUsers.length > 0 && (
           <div className="m-3 border-b border-gray-200">
