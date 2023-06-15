@@ -1,17 +1,62 @@
-This is a [Next.js](https://nextjs.org/) frontend for blockPermit dApp.
+# BlockPermit
 
-## Getting Started
+BlockPermit is a Next.js application designed for project management that utilizes blockchain technology for secure and transparent operations. The application integrates with MetaMask for authentication, providing a user-friendly, secure, and reliable interface for managing projects.
 
-First, run the development server:
+## Features
+
+- Blockchain Integration: All operations are securely logged in the blockchain providing immutable and verifiable records.
+- MetaMask Authentication: Easy and secure authentication via MetaMask.
+- Project Management: Manage projects and coordinate with administrative authorities and opinion provider to speed up your project development.
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- You have installed the latest version of [Node.js and npm](https://nodejs.org/en/download/).
+- You have a basic understanding of JavaScript and React.js.
+- You have MetaMask installed and set up in your browser. If you don't, refer to the [MetaMask Setup Guide](https://metamask.io/download.html).
+- You have [Ganache](https://www.trufflesuite.com/ganache) installed for local blockchain development.
+
+## Installing BlockPermit
+
+To install BlockPermit, follow these steps:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+# Clone the repository
+git clone https://github.com/BlokPermit/BlockPermit.git
+
+# Navigate to the project directory
+cd block-permit-dapp
+
+# Install the dependencies
+npm install
+```
+To develop with a local blockchain, you also need to clone and setup the local Ganache environment:
+
+```bash
+# Clone the blockchain repository
+git clone https://github.com/BlokPermit/block-permit-blockchain.git
+
+# Navigate to the blockchain directory
+cd block-permit-blockchain
+
+# Run local Ganache
+npm run localganache
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Using BlockPermit
+
+To use BlockPermit, follow these steps:
+
+1. Start the development server:
+```bash
+npm run dev
+```
+2. Open http://localhost:3000 with your browser. The page will automatically reload if you make changes to the code.
+3. You will be asked to connect with your MetaMask wallet for authentication.
+4. You're ready to start managing your projects on the blockchain!
 
 
+***
+
+Made with :heart: by BlockPermit
