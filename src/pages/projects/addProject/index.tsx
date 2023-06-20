@@ -64,7 +64,7 @@ const CreateProject = () => {
   const router = useRouter();
   const [projectName, setProjectName] = useState<string>("");
   const [constructionTitle, setConstructionTitle] = useState<string>("");
-  const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({ label: "Mixed", value: "1" });
+  const [selectedConstructionType, setSelectedConstructionType] = useState<Option>({ label: "Novogradnja - Novozgrajen objekt", value: "1" });
   const [description, setDescription] = useState<string>("");
   const [selectedEnvironmentImpact, setSelectedEnvironmentImpact] = useState<Option>({ label: "No", value: false });
   const [userForm, setInvestorForm] = useState<InvestorInput>({ ...emptyInvestor });
@@ -201,7 +201,15 @@ const CreateProject = () => {
                   <div className="w-1/2 pr-5 space-y-2 ">
                     <InputField id={"name"} name={"name"} label={"Naziv"} placeholder={"Vnesite naziv..."} type={"text"} onChange={handleInputChange} value={userForm.name} />
                     <InputField id={"email"} name={"email"} label={"E-pošta"} placeholder={"Vnesite e-poštni naslov..."} type={"text"} onChange={handleInputChange} value={userForm.email} />
-                    <InputField id={"phoneNumber"} name={"phoneNumber"} label={"Telefonska številka"} placeholder={"Vnesite telefonsko številko..."} type={"text"} onChange={handleInputChange} value={userForm.phoneNumber} />
+                    <InputField
+                      id={"phoneNumber"}
+                      name={"phoneNumber"}
+                      label={"Telefonska številka"}
+                      placeholder={"Vnesite telefonsko številko..."}
+                      type={"text"}
+                      onChange={handleInputChange}
+                      value={userForm.phoneNumber}
+                    />
                   </div>
                   <div className="w-1/2 pl-5 space-y-2">
                     <InputField

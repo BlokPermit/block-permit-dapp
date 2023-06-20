@@ -26,7 +26,7 @@ import RequestMainDocumentUpdatePopup from "@/components/specific/RequestMainDoc
 import DocumentDropdown from "../../components/generic/dropdown/DocumentDropdown";
 import AdministrativeAuthorityView from "../../components/specific/AdministrativeAuthorityView";
 import ProjectManagerInfoPopup from "../../components/specific/ProjectManagerInfoPopup";
-import {FaInfo, FaUser} from "react-icons/fa";
+import { FaInfo, FaUser } from "react-icons/fa";
 import ButtonGroup from "../../components/generic/buttons/ButtonGroup";
 
 export const getServerSideProps: any = async (context: any) => {
@@ -215,26 +215,28 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
           <IconCard icon={<FaHeading />} title="Naziv gradnje" value={project.baseProject.constructionTitle} />
           <IconCard icon={<FaTag />} title="vrsta gradnje" value={project.baseProject.constructionType} />
           <IconCard icon={<FaFileContract />} title="Objekt z vplivi na okolje?" value={project.baseProject.constructionImpactsEnvironment ? "Da" : "Ne"} />
-            {(isProjectManagerInfoPopupOpen && loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&
-            <ProjectManagerInfoPopup projectManager={project.projectManager} onClose={() => setIsProjectManagerInfoPopupOpen(false)} />}
-            {(loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY) &&
-            (<IconCard
-                className="col-span-2"
-                icon={<FaUser/>}
-                title="Projektni vodja"
-                value={project.projectManager.name}
-                trailing={
-                    <ButtonGroup
-                        secondaryButtons={[
-                            {
-                                text: "Več informacij",
-                                icon: <FaInfo/>,
-                                onClick: () => setIsProjectManagerInfoPopupOpen(true),
-                            },
-                        ]}
-                    />
-                }
-            />)}
+          {isProjectManagerInfoPopupOpen && loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY && (
+            <ProjectManagerInfoPopup projectManager={project.projectManager} onClose={() => setIsProjectManagerInfoPopupOpen(false)} />
+          )}
+          {loggedInUser.userType == UserType.ADMINISTRATIVE_AUTHORITY && (
+            <IconCard
+              className="col-span-2"
+              icon={<FaUser />}
+              title="Projektni vodja"
+              value={project.projectManager.name}
+              trailing={
+                <ButtonGroup
+                  secondaryButtons={[
+                    {
+                      text: "Več informacij",
+                      icon: <FaInfo />,
+                      onClick: () => setIsProjectManagerInfoPopupOpen(true),
+                    },
+                  ]}
+                />
+              }
+            />
+          )}
         </div>
         <div className="col-span-5">
           <h2 className="text-2xl font-semibold text-neutral-900 mb-5">Investitorji</h2>
@@ -271,11 +273,7 @@ const ProjectPage = ({ project, loggedInUser }: InferGetServerSidePropsType<type
           </div>
         }
       />
-        <RoleBasedComponent
-        administrativeAuthorityComponent={
-            <AdministrativeAuthorityView project={project} selectedState={selectedState} downloadZip={downloadZip}/>
-        }
-    />
+      <RoleBasedComponent administrativeAuthorityComponent={<AdministrativeAuthorityView project={project} selectedState={selectedState} downloadZip={downloadZip} />} />
     </div>
   );
 };
